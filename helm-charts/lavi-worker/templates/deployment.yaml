@@ -20,6 +20,9 @@ spec:
             - "--host=0.0.0.0"
             - "lavi_worker.main:app"
           command: ["uvicorn"]
+          env:
+            - name: EXPECTED_PREFIX
+              value: {{ .Values.ingress.prefix | quote }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: uvicorn
