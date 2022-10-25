@@ -14,6 +14,8 @@ values:
   image:
     repository: ${modules.lavi-worker-ctr.outputs.deployment-image-name}
     tag: ${modules.lavi-worker-ctr.version}
+  ingress:
+    host: ${var.hostname}
 devMode:
   command: ["uvicorn"]
   args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.main:app"]

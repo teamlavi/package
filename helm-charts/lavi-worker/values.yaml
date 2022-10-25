@@ -3,4 +3,10 @@ image:
   repository:
   tag:
 
-replicas:
+ingress:
+  enabled: true
+  host:
+  prefix: /lavi
+  tlsSecretName: ingress-cert
+
+replicas: 1

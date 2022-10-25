@@ -5,13 +5,15 @@ environments:
   - name: dev
     defaultNamespace: dev-${local.env.LAVI_DEV_USER}
     variables:
-      externalHostname: https://${local.env.LAVI_DEV_USER}.dev.lavi-lava.com
+      hostname: ${local.env.LAVI_DEV_USER}.lavi-lava.com
   - name: ci
     defaultNamespace: ci-${local.env.CI_ID}
+    variables:
+      hostname: ci-${local.env.CI_ID}.lavi-lava.com
   - name: prod
     defaultNamespace: prod
     variables:
-      externalHostname: https://lavi-lava.com
+      hostname: lavi-lava.com
     production: true
 
 providers:
@@ -25,10 +27,6 @@ providers:
     kaniko:
       namespace: null
     setupIngressController: nginx
-    tlsCertificates:
-      - name: main
-        secretRef:
-          name: ingress-cert
-          namespace: default
+    defaultHostname: ${var.hostname}
 
 defaultEnvironment: dev
