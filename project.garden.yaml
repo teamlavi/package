@@ -2,16 +2,33 @@ kind: Project
 name: package
 
 environments:
+  - name: dev
+    defaultNamespace: dev-${local.env.LAVI_DEV_USER}
+    variables:
+      externalHostname: https://${local.env.LAVI_DEV_USER}.dev.lavi-lava.com
+  - name: ci
+    defaultNamespace: ci-${local.env.CI_ID}
   - name: prod
     defaultNamespace: prod
+    variables:
+      externalHostname: https://lavi-lava.com
+    production: true
 
 providers:
   - name: kubernetes
     context: vke-f1c7cfde-e72f-4b47-b331-e44d06bd74e2
     environments:
+      - dev
+      - ci
       - prod
     buildMode: kaniko
     kaniko:
       namespace: null
+    setupIngressController: nginx
+    tlsCertificates:
+      - name: main
+        secretRef:
+          name: ingress-cert
+          namespace: default
 
-defaultEnvironment: prod
+defaultEnvironment: dev
