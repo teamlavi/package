@@ -7,3 +7,6 @@ tests:
   - name: lint
     command: ["bash"]
     args: ["tests/lint.sh"]
+  - name: unit
+    command: ["pytest"]
+    args: ["-v", "tests/unit"]
