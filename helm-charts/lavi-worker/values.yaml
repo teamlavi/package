@@ -1,0 +1,6 @@
+image:
+  pullPolicy: Always
+  repository:
+  tag:
+
+replicas:

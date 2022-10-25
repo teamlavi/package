@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "lavi-worker.labels" . | nindent 4 }}
+  name: {{ include "lavi-worker.fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "lavi-worker.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "lavi-worker.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - args:
+            - "--port=80"
+            - "--host=0.0.0.0"
+            - "lavi_worker.main:app"
+          command: ["uvicorn"]
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: uvicorn
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
