@@ -7,7 +7,11 @@ The backend API supporting LAVI's functionality.
 
 ### In remote cluster (preferred)
 
-TODO
+From [repository root](../):
+```bash
+garden deploy lavi-worker
+kubectl port-forward --namespace=<your namespace> service/lavi-worker 8080:80
+```
 
 ### Local docker container
 
@@ -28,7 +32,11 @@ uvicorn --port=8080 lavi_worker.main:app
 
 ### In remote cluster (preferred)
 
-TODO
+From [repository root](../):
+```bash
+garden deploy --dev-mode lavi-worker
+kubectl port-forward --namespace=<your namespace> service/lavi-worker 8080:80
+```
 
 ### Directly
 
@@ -37,22 +45,28 @@ pip3 install --upgrade -r requirements.txt
 uvicorn --port=8080 lavi_worker.main:app
 ```
 
-# Testing
+# Linting / Unit Testing
 
 ### In remote cluster (preferred)
 
-TODO
+From [repository root](../):
+```bash
+garden test lavi-worker-ctr
+```
 
 ### Local docker container
 
 ```bash
 docker build --target=main --tag=lavi-worker .
-docker run -p 8080:8080 lavi-worker bash tests/lint.sh
+docker run lavi-worker bash tests/lint.sh
+docker run lavi-worker pytest -v tests/unit
 ```
 
 ### Directly
 
 ```bash
 pip3 install --upgrade -r requirements.txt
+export PYTHONPATH=$PYTHONPATH:.
 bash tests/lint.sh
+pytest -v tests/unit
 ```
