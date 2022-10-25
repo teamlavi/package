@@ -23,3 +23,9 @@ devMode:
       exclude:
         - "**/__pycache__/**/*"
       mode: one-way-replica
+tests:
+  - name: integration
+    env:
+      BASE_URL: "http://lavi-worker"
+    command: ["pytest"]
+    args: ["-v", "tests/integration"]
