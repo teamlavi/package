@@ -1,0 +1,12 @@
+image:
+  pullPolicy: Always
+  repository:
+  tag:
+
+ingress:
+  enabled: true
+  host:
+  prefix: /lavi
+  tlsSecretName: ingress-cert
+
+replicas: 1

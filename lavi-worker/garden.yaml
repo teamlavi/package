@@ -1,0 +1,12 @@
+kind: Module
+name: lavi-worker-ctr
+type: container
+build:
+  targetImage: main
+tests:
+  - name: lint
+    command: ["bash"]
+    args: ["tests/lint.sh"]
+  - name: unit
+    command: ["pytest"]
+    args: ["-v", "tests/unit"]
