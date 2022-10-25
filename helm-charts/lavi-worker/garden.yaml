@@ -1,0 +1,25 @@
+kind: Module
+name: lavi-worker
+type: helm
+serviceResource:
+  kind: Deployment
+  name: '{{ include "lavi-worker.fullname" . }}'
+  containerModule: lavi-worker-ctr
+build:
+  dependencies:
+    - lavi-worker-ctr
+valueFiles:
+  - values.yaml
+values:
+  image:
+    repository: ${modules.lavi-worker-ctr.outputs.deployment-image-name}
+    tag: ${modules.lavi-worker-ctr.version}
+devMode:
+  command: ["uvicorn"]
+  args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.main:app"]
+  sync:
+    - source: lavi_worker
+      target: /src/lavi_worker
+      exclude:
+        - "**/__pycache__/**/*"
+      mode: one-way-replica
