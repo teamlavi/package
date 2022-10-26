@@ -2,16 +2,24 @@ import requests
 import json
 
 
+repository = "PIP"
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
 token = ""
 
+last_cursor = "Y3Vyc29yOnYyOpK5MjAyMi0xMC0wNlQxNjoxMDo0OC0wNDowMM2HsQ=="
 url = 'https://api.github.com/graphql'
 
 query = """ {
-securityVulnerabilities(first:100) {
-    nodes {
+securityVulnerabilities(first:10, ecosystem: """ + repository + """, before: \"""" + last_cursor + """\") {
+	pageInfo {
+		startCursor
+		endCursor
+	}
+	edges {
+    cursor
+    node {
       advisory {
         cwes(first:100){
           nodes {
@@ -31,6 +39,7 @@ securityVulnerabilities(first:100) {
       vulnerableVersionRange
     }
   }
+}
 }
 """
 
