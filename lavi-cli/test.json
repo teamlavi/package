@@ -1,0 +1,87 @@
+{
+ "repository": "pip",
+ "nodes": {
+  "7JdPiUztN0+b1F6x3HX3oUF0hzi3Q12QiepLF6JJ0WA=": {
+   "id": "7JdPiUztN0+b1F6x3HX3oUF0hzi3Q12QiepLF6JJ0WA=",
+   "string": "matplotlib",
+   "version": "3.6.1",
+   "dependencies": [
+    "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=",
+    "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=",
+    "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=",
+    "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=",
+    "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=",
+    "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=",
+    "NB1lozxgz5ZQB7mK4Puw7iOP5bmxB/YSnN/lIDLh4Xk=",
+    "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=",
+    "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8="
+   ]
+  },
+  "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=": {
+   "id": "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=",
+   "string": "pyparsing",
+   "version": "3.0.9",
+   "dependencies": []
+  },
+  "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=": {
+   "id": "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=",
+   "string": "numpy",
+   "version": "1.23.3",
+   "dependencies": []
+  },
+  "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4=": {
+   "id": "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4=",
+   "string": "six",
+   "version": "1.16.0",
+   "dependencies": []
+  },
+  "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8=": {
+   "id": "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8=",
+   "string": "python-dateutil",
+   "version": "2.8.2",
+   "dependencies": [
+    "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4="
+   ]
+  },
+  "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=": {
+   "id": "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=",
+   "string": "cycler",
+   "version": "0.11.0",
+   "dependencies": []
+  },
+  "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=": {
+   "id": "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=",
+   "string": "packaging",
+   "version": "21.3",
+   "dependencies": [
+    "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg="
+   ]
+  },
+  "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=": {
+   "id": "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=",
+   "string": "kiwisolver",
+   "version": "1.4.4",
+   "dependencies": []
+  },
+  "rvliaNb4ExVbl0D1LgU5JLOZbXqr6vrUkYrvr6y8IiM=": {
+   "id": "rvliaNb4ExVbl0D1LgU5JLOZbXqr6vrUkYrvr6y8IiM=",
+   "string": "Pillow",
+   "version": "9.2.0",
+   "dependencies": []
+  },
+  "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=": {
+   "id": "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=",
+   "string": "fonttools",
+   "version": "4.38.0",
+   "dependencies": []
+  },
+  "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=": {
+   "id": "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=",
+   "string": "contourpy",
+   "version": "1.0.5",
+   "dependencies": [
+    "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc="
+   ]
+  }
+ }
+}

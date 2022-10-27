@@ -7,6 +7,8 @@ package cmd
 import (
 	"fmt"
 
+	"dep-tree-gen/generator"
+
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +24,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("pip called")
+		path, _ := cmd.Flags().GetString("path")
+		pythonPath, _ := cmd.Flags().GetString("python")
+		generator.GeneratePipTree(path, pythonPath)
 	},
 }
 
@@ -36,5 +41,6 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// pipCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	pipCmd.Flags().StringP("python", "p", "python", "Path or alias to call python from")
+	pipCmd.Flags().String("path", "requirements.txt", "Path to requirements.txt")
 }
