@@ -3,7 +3,7 @@
  "nodes": {
   "0gP3DFUmouE9pwfPNzd81NgG+X2ty4V27/Qf/g6Cdsw=": {
    "id": "0gP3DFUmouE9pwfPNzd81NgG+X2ty4V27/Qf/g6Cdsw=",
-   "string": "gopkg.in/yaml.v3",
+   "package": "gopkg.in/yaml.v3",
    "version": "v3.0.1",
    "dependencies": [
     "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk="
@@ -11,37 +11,37 @@
   },
   "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=": {
    "id": "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=",
-   "string": "dep-tree-gen",
+   "package": "dep-tree-gen",
    "version": "v0.0.0",
    "dependencies": []
   },
   "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ=": {
    "id": "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ=",
-   "string": "github.com/spf13/pflag",
+   "package": "github.com/spf13/pflag",
    "version": "v1.0.5",
    "dependencies": []
   },
   "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M=": {
    "id": "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M=",
-   "string": "github.com/russross/blackfriday/v2",
+   "package": "github.com/russross/blackfriday/v2",
    "version": "v2.1.0",
    "dependencies": []
   },
   "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=": {
    "id": "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=",
-   "string": "github.com/inconshreveable/mousetrap",
+   "package": "github.com/inconshreveable/mousetrap",
    "version": "v1.0.1",
    "dependencies": []
   },
   "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk=": {
    "id": "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk=",
-   "string": "gopkg.in/check.v1",
+   "package": "gopkg.in/check.v1",
    "version": "v0.0.0-20161208181325-20d25e280405",
    "dependencies": []
   },
   "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=": {
    "id": "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=",
-   "string": "github.com/spf13/cobra",
+   "package": "github.com/spf13/cobra",
    "version": "v1.6.1",
    "dependencies": [
     "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=",
@@ -52,11 +52,19 @@
   },
   "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=": {
    "id": "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=",
-   "string": "github.com/cpuguy83/go-md2man/v2",
+   "package": "github.com/cpuguy83/go-md2man/v2",
    "version": "v2.0.2",
    "dependencies": [
     "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M="
    ]
   }
+ },
+ "root": {
+  "dependencies": [
+   "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=",
+   "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=",
+   "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=",
+   "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ="
+  ]
  }
 }
