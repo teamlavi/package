@@ -5,7 +5,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"dep-tree-gen/generator"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("go called")
+		path, _ := cmd.Flags().GetString("path")
+		generator.GenerateGoTree(path)
 	},
 }
 
@@ -37,4 +38,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// goCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	goCmd.Flags().String("path", ".", "Path to project")
+
 }
