@@ -1,0 +1,9 @@
+{
+    "name": "test",
+    "version": "0.1.0",
+    "dependencies": {
+        "express": "^4.18.2",
+        "moment": "^2.29.4",
+        "test": "file:"
+    }
+}
