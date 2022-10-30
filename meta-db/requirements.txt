@@ -1,0 +1,12 @@
+# Execution requirements
+grpcio==1.50.0
+grpcio-tools==1.50.0
+
+# Dev requirements
+watchdog==2.1.9
+
+# Test / lint requirements
+black==22.10.0
+flake8==5.0.4
+mypy==0.982
+pytest==7.1.3
