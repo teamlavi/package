@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "meta-db.labels" . | nindent 4 }}
+  name: {{ include "meta-db.fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "meta-db.selectorLabels" . | nindent 6}}
+  template:
+    metadata:
+      labels:
+        {{- include "meta-db.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - args:
+            - "-m"
+            - "meta_db.server"
+          command: ["python3"]
+          env:
+            - name: EXPECTED_PREFIX
+              value: {{ .Values.ingress.prefix | quote }}
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: grpc-server
+          ports:
+            - containerPort: 50051
+              name: grpc
+              protocol: TCP

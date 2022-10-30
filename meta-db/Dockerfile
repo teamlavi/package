@@ -17,7 +17,7 @@ COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=$PYTHONPATH:/src
 
-COPY lavi_worker /src/lavi_worker
+COPY meta_db /src/meta_db
 COPY tests /src/tests
 COPY --from=protobuf-base /protobuf /src/protobuf
 

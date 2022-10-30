@@ -1,5 +1,5 @@
 kind: Module
-name: lavi-worker-ctr
+name: meta-db-ctr
 type: container
 build:
   targetImage: main

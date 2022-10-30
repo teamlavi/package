@@ -1,13 +1,12 @@
 # Execution requirements
-fastapi==0.85.1
 grpcio==1.50.0
 grpcio-tools==1.50.0
-python-multipart==0.0.5
-uvicorn[standard]==0.19.0
+
+# Dev requirements
+watchdog==2.1.9
 
 # Test / lint requirements
 black==22.10.0
 flake8==5.0.4
-httpx==0.23.0
 mypy==0.982
 pytest==7.1.3

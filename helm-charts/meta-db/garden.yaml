@@ -1,0 +1,36 @@
+kind: Module
+name: meta-db
+type: helm
+serviceResource:
+  kind: Deployment
+  name: '{{ include "meta-db.fullname" . }}'
+  containerModule: meta-db-ctr
+  containerName: grpc-server
+build:
+  dependencies:
+    - meta-db-ctr
+valueFiles:
+  - values.yaml
+values:
+  image:
+    repository: ${modules.meta-db-ctr.outputs.deployment-image-name}
+    tag: ${modules.meta-db-ctr.version}
+  ingress:
+    host: ${var.hostname}
+devMode:
+  command: ["watchmedo"]
+  args:
+    - "auto-restart"
+    - "--recursive"
+    - "--pattern=*.py"
+    - "--directory=meta_db"
+    - "python3"
+    - "--"
+    - "-m"
+    - "meta_db.server"
+  sync:
+    - source: meta_db
+      target: /src/meta_db
+      exclude:
+        - "**/__pycache__"
+      mode: one-way-replica
