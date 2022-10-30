@@ -4,7 +4,7 @@ import sys
 
 import grpc
 
-protos, services = grpc.protos_and_services("protobuf/helloworld.proto")
+protos, services = grpc.protos_and_services("protobuf/meta_db.proto")
 
 
 def exit_handler(_signo, _stack_frame):

@@ -1,7 +1,7 @@
 import grpc
 import grpc.experimental
 
-protos, services = grpc.protos_and_services("protobuf/helloworld.proto")
+protos, services = grpc.protos_and_services("protobuf/meta_db.proto")
 
 
 def get_greeting(name: str) -> str:
