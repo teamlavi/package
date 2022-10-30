@@ -13,7 +13,6 @@ def exit_handler(_signo, _stack_frame):
 
 
 class Greeter(services.GreeterServicer):
-
     def SayHello(self, request, context):
         return protos.HelloReply(message=f"Hello, {request.name}!")
 
@@ -21,7 +20,7 @@ class Greeter(services.GreeterServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     services.add_GreeterServicer_to_server(Greeter(), server)
-    server.add_insecure_port('[::]:50051')
+    server.add_insecure_port("[::]:50051")
     server.start()
     server.wait_for_termination()
 
