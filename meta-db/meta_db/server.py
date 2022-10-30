@@ -4,7 +4,7 @@ import sys
 
 import grpc
 
-protos, services = grpc.protos_and_services("meta_db/helloworld.proto")
+protos, services = grpc.protos_and_services("protobuf/helloworld.proto")
 
 
 def exit_handler(_signo, _stack_frame):
@@ -15,7 +15,7 @@ def exit_handler(_signo, _stack_frame):
 class Greeter(services.GreeterServicer):
 
     def SayHello(self, request, context):
-        return protos.HelloReply(message=f"Hellof, {request.name}!")
+        return protos.HelloReply(message=f"Hello, {request.name}!")
 
 
 def serve():

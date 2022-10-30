@@ -1,0 +1,4 @@
+kind: Module
+name: protobuf-base
+description: Base image to provide protobufs
+type: container

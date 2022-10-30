@@ -32,5 +32,5 @@ devMode:
     - source: meta_db
       target: /src/meta_db
       exclude:
-        - "**/__pycache__/**/*"
+        - "**/__pycache__"
       mode: one-way-replica

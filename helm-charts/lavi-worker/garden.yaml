@@ -23,7 +23,7 @@ devMode:
     - source: lavi_worker
       target: /src/lavi_worker
       exclude:
-        - "**/__pycache__/**/*"
+        - "**/__pycache__"
       mode: one-way-replica
 tests:
   - name: integration
