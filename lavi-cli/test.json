@@ -1,70 +1,93 @@
 {
- "repository": "go",
+ "repository": "pip",
  "nodes": {
-  "0gP3DFUmouE9pwfPNzd81NgG+X2ty4V27/Qf/g6Cdsw=": {
-   "id": "0gP3DFUmouE9pwfPNzd81NgG+X2ty4V27/Qf/g6Cdsw=",
-   "package": "gopkg.in/yaml.v3",
-   "version": "v3.0.1",
+  "7JdPiUztN0+b1F6x3HX3oUF0hzi3Q12QiepLF6JJ0WA=": {
+   "id": "7JdPiUztN0+b1F6x3HX3oUF0hzi3Q12QiepLF6JJ0WA=",
+   "package": "matplotlib",
+   "version": "3.6.1",
    "dependencies": [
-    "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk="
+    "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=",
+    "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=",
+    "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=",
+    "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=",
+    "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=",
+    "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=",
+    "NB1lozxgz5ZQB7mK4Puw7iOP5bmxB/YSnN/lIDLh4Xk=",
+    "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=",
+    "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8="
    ]
   },
-  "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=": {
-   "id": "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=",
-   "package": "dep-tree-gen",
-   "version": "v0.0.0",
+  "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=": {
+   "id": "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg=",
+   "package": "pyparsing",
+   "version": "3.0.9",
    "dependencies": []
   },
-  "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ=": {
-   "id": "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ=",
-   "package": "github.com/spf13/pflag",
-   "version": "v1.0.5",
+  "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=": {
+   "id": "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc=",
+   "package": "numpy",
+   "version": "1.23.3",
    "dependencies": []
   },
-  "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M=": {
-   "id": "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M=",
-   "package": "github.com/russross/blackfriday/v2",
-   "version": "v2.1.0",
+  "NB1lozxgz5ZQB7mK4Puw7iOP5bmxB/YSnN/lIDLh4Xk=": {
+   "id": "NB1lozxgz5ZQB7mK4Puw7iOP5bmxB/YSnN/lIDLh4Xk=",
+   "package": "Pillow",
+   "version": "9.2.0",
    "dependencies": []
   },
-  "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=": {
-   "id": "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=",
-   "package": "github.com/inconshreveable/mousetrap",
-   "version": "v1.0.1",
+  "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4=": {
+   "id": "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4=",
+   "package": "six",
+   "version": "1.16.0",
    "dependencies": []
   },
-  "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk=": {
-   "id": "n0/lkOXk1/zWZj1C87AKkXb3pGN3zG6g6RL86JhaJTk=",
-   "package": "gopkg.in/check.v1",
-   "version": "v0.0.0-20161208181325-20d25e280405",
-   "dependencies": []
-  },
-  "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=": {
-   "id": "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=",
-   "package": "github.com/spf13/cobra",
-   "version": "v1.6.1",
+  "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8=": {
+   "id": "WvFUnEm3eJfIRAr++3Ru/23nTaOjJz7CvGaqgIJ2Vd8=",
+   "package": "python-dateutil",
+   "version": "2.8.2",
    "dependencies": [
-    "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=",
-    "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=",
-    "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ=",
-    "0gP3DFUmouE9pwfPNzd81NgG+X2ty4V27/Qf/g6Cdsw="
+    "W9nfQv41w78VX+9qdPOgpK3ID8gn3DLkGnDtp+AecJ4="
    ]
   },
-  "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=": {
-   "id": "vKbk/uEgQ8u4UAsZGp9WCbygWYdvT6NUmTQiLJUU25o=",
-   "package": "github.com/cpuguy83/go-md2man/v2",
-   "version": "v2.0.2",
+  "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=": {
+   "id": "d1cUCS8HLI5B/w1VFehuCOecFC71fXTPrrQGUxqBuRI=",
+   "package": "cycler",
+   "version": "0.11.0",
+   "dependencies": []
+  },
+  "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=": {
+   "id": "mV8PR6Njg1RkZEntlH5S8d+lstyrhfzVSpacH+YI9Ts=",
+   "package": "packaging",
+   "version": "21.3",
    "dependencies": [
-    "dBvfla+SdlMAOmbNKG9T2lIX/ezXh6N6DdAzyVot9+M="
+    "F3ZM+O0ltAdFLVMGPOcyqO4X9q/7q3E16EscWHBdrDg="
+   ]
+  },
+  "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=": {
+   "id": "oDczRlgBDI3QJ1vmUaiegwrzhBqKwGUp0XL0qBRzVcs=",
+   "package": "kiwisolver",
+   "version": "1.4.4",
+   "dependencies": []
+  },
+  "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=": {
+   "id": "tIsP8PirG/LSgOi3X6PhPI8kYn+c7G2vDrZYJ7+v89M=",
+   "package": "fonttools",
+   "version": "4.38.0",
+   "dependencies": []
+  },
+  "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=": {
+   "id": "zOhGLZ4frfUU4+VViEsiChK10Xko+bOdocxZvWph7IE=",
+   "package": "contourpy",
+   "version": "1.0.5",
+   "dependencies": [
+    "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc="
    ]
   }
  },
  "root": {
   "dependencies": [
-   "3Zmi/CYfCiYCP9nFXy6+bNE+sA1RzsTKQP3R7O/dDkI=",
-   "ixHhiRG835ROePoOl2YbTl/Z06K6R38FkXEdo8ATavI=",
-   "q4H8YpdV11j6aFc5mOLPB72FKp3u3uNC7pW4AjJ7iIs=",
-   "EsV0uSOdzKmQD8kJ5aUHzWtzP65VrwnjqgZA3PqlqNQ="
+   "7JdPiUztN0+b1F6x3HX3oUF0hzi3Q12QiepLF6JJ0WA=",
+   "KaMjn1M/IIV6t+VYhgffmey9OuYLbfRJ1T+sdnKXojc="
   ]
  }
 }
