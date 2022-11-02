@@ -29,3 +29,4 @@ deploy-prod:
       when: manual
   script:
     garden --env=prod --yes deploy
+
