@@ -1,0 +1,25 @@
+variables:
+  CI_ID: $CI_PIPELINE_IID
+
+stages:
+  - build
+  - test
+  - deploy-prod
+
+build:
+  stage: build
+  script:
+    - garden --env=ci build
+
+test:
+  stage: test
+  script:
+    - garden --env=ci test
+
+deploy-prod:
+  stage: deploy-prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+  script:
+    garden --env=prod --yes deploy
