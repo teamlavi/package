@@ -11,6 +11,7 @@ build:
   script:
     - echo $PATH
     - ls -la /root/.garden/bin
+    - pwd
     - garden --env=ci build
 
 test:
@@ -18,6 +19,7 @@ test:
   script:
     - echo $PATH
     - ls -la /root/.garden/bin
+    - pwd
     - garden --env=ci test
 
 deploy-prod:
