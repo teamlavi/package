@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    {{- include "lavi-worker.dbLabels" . | nindent 4 }}
+  name: {{ include "lavi-worker.dbFullname" . }}
+spec:
+  replicas: {{ .Values.postgres.replicas }}
+  selector:
+    matchLabels:
+      {{- include "lavi-worker.dbSelectorLabels" . | nindent 6 }}
+  serviceName: {{ printf "%s-db" (include "lavi-worker.fullname" .) | quote }}
+  template:
+    metadata:
+      labels:
+        {{- include "lavi-worker.dbSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.dbname }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgresAdminPassword
+                  name: {{ include "lavi-worker.dbFullname" . }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: postgresAdminUser
+                  name: {{ include "lavi-worker.dbFullname" . }}
+          image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag | quote}}
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          name: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: data
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          {{- include "lavi-worker.dbLabels" . | nindent 10 }}
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgres.pvc.size }}
+        {{- if .Values.postgres.pvc.storageClass }}
+        storageClassName: {{ .Values.postgres.pvc.storageClass }}
+        {{- end }}

@@ -18,12 +18,12 @@ values:
     host: ${var.hostname}
 devMode:
   command: ["uvicorn"]
-  args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.main:app"]
+  args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.routers.main:app"]
   sync:
     - source: lavi_worker
       target: /src/lavi_worker
       exclude:
-        - "**/__pycache__/**/*"
+        - "**/__pycache__"
       mode: one-way-replica
 tests:
   - name: integration
@@ -31,3 +31,5 @@ tests:
       BASE_URL: "http://lavi-worker"
     command: ["pytest"]
     args: ["-v", "tests/integration"]
+    dependencies:
+      - lavi-worker

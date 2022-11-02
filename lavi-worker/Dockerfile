@@ -1,6 +1,9 @@
 # Builder image
 FROM python:3.10-slim as builder
 
+RUN apt-get update -y
+RUN apt-get install -y libpq-dev gcc
+
 RUN python3 -m pip install --upgrade pip
 COPY requirements.txt /requirements.txt
 RUN pip3 install --upgrade --user -r /requirements.txt

@@ -1,3 +1,5 @@
 **/.DS_Store
 **/*.pyc
 .garden
+**/.mypy_cache
+**/.pytest_cache

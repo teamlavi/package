@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "lavi-worker.dbLabels" . | nindent 4 }}
+  name: {{ include "lavi-worker.dbFullname" . }}
+spec:
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    {{- include "lavi-worker.dbSelectorLabels" . | nindent 4 }}
+  type: ClusterIP
