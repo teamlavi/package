@@ -31,3 +31,5 @@ tests:
       BASE_URL: "http://lavi-worker"
     command: ["pytest"]
     args: ["-v", "tests/integration"]
+    dependencies:
+      - lavi-worker
