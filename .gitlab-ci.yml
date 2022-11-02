@@ -1,33 +1,16 @@
 variables:
-  CI_ID: $CI_PIPELINE_IID
+  CI_ID: $CI_JOB_ID
 
 stages:
-  - build
   - test
-  - cleanup
   - deploy-prod
-
-build:
-  stage: build
-  script:
-    - echo $PATH
-    - ls -la /root/.garden/bin
-    - pwd
-    - garden --env=ci build
 
 test:
   stage: test
   script:
-    - echo $PATH
-    - ls -la /root/.garden/bin
-    - pwd
-    - garden --env=ci test
-
-cleanup-ci-ns:
-  stage: cleanup
-  rules:
-    - when: always
-  script:
+    - garden --logger-type=basic --env=ci build
+    - garden --logger-type=basic --env=ci test
+  after_script:
     - kubectl delete namespace "package-ci-${CI_ID}"
 
 deploy-prod:
@@ -36,4 +19,4 @@ deploy-prod:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: manual
   script:
-    garden --env=prod --yes deploy
+    garden --logger-type=basic --env=prod --yes deploy
