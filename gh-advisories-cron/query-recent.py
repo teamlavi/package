@@ -1,45 +1,47 @@
 import requests
 import json
 
-
 repository = "PIP"
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
 token = ""
 
-last_cursor = "Y3Vyc29yOnYyOpK5MjAyMi0xMC0wNlQxNjoxMDo0OC0wNDowMM2HsQ=="
+last_cursor = "Y3Vyc29yOnYyOpK5MjAyMi0xMC0zMVQxODo0Mjo1OC0wNDowMM2LOA=="
 url = 'https://api.github.com/graphql'
 
-query = """ {
-securityVulnerabilities(first:10, ecosystem: """ + repository + """, before: \"""" + last_cursor + """\") {
-	pageInfo {
-		startCursor
-		endCursor
-	}
-	edges {
-    cursor
-    node {
-      advisory {
-        cwes(first:100){
-          nodes {
-            cweId
+# TODO: Not sure if want to query securityAdvisories or securityVulnerabilities
+# Edge gives cursor and node'
+# Keep repository in query so that only relevant vulnerabilities are returned
+query = """ 
+{
+  securityVulnerabilities(first:3, ecosystem: """ + repository + """, after: \"""" + last_cursor + """\") {
+    edges {
+      cursor
+      node {
+        advisory {
+          cwes(first: 100) {
+            nodes {
+              cweId
+            }
+          }
+          identifiers {
+            value
+            type
           }
         }
-        identifiers {
-          value
-          type
+        package {
+          name
+          ecosystem
         }
+        severity
+        vulnerableVersionRange
       }
-      package {
-        name
-        ecosystem
-      }
-      severity
-      vulnerableVersionRange
+    }
+    pageInfo {
+      endCursor
     }
   }
-}
 }
 """
 
