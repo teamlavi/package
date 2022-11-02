@@ -88,4 +88,18 @@ async def find_by_repo_pkg_vers(
 ) -> List[CVE]:
     """Find any entries by their repo, pkg, vers tuple."""
     pkg_vers_id = generate_universal_hash(repo_name, pkg_name, pkg_vers)
-    return find_by_univ_hash(pkg_vers_id)
+    return await find_by_univ_hash(tx, pkg_vers_id)
+
+
+async def get_row_count(tx: Transaction) -> int:
+    """Get how many rows there are (each row is one repo-pkg-vers-cve)."""
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT COUNT(*) FROM cves")
+        row = await cur.fetchone()
+        return row[0]  # type: ignore
+
+
+async def drop_all_rows(tx: Transaction) -> None:
+    """Drop all table rows."""
+    async with tx.cursor() as cur:
+        await cur.execute("TRUNCATE cves RESTART IDENTITY CASCADE")

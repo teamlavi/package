@@ -1,16 +1,21 @@
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.responses import PlainTextResponse
 from psycopg.types.json import set_json_dumps, set_json_loads
 import orjson
 
 from lavi_worker import config
+from lavi_worker.internal import updates
 from lavi_worker.routers import external, internal
 
 
 # Create the app
-app = FastAPI(root_path=config.EXPECTED_PREFIX)
+app = FastAPI(
+    root_path=config.EXPECTED_PREFIX,
+    title="LAVI API",
+    description="The API layer for clients of LAVI",
+)
 
 
 # Configure psycopg json funcs
@@ -29,22 +34,27 @@ app.include_router(internal.router, prefix="/internal")
 # App startup script
 @app.on_event("startup")
 async def app_startup() -> None:
-    """Verify config."""
-    # Valiadte env vars set
+    """Verify config, check if db initialized."""
+    # Validate env vars set
     if any([var is None for var in config.REQUIRED_ENV_FOR_DEPLOY]):
         raise Exception(f"Missing required env vars: {config.REQUIRED_ENV_FOR_DEPLOY}")
 
+    # Check if db initialized
+    if not await updates.is_db_initialized():
+        await updates.initialize_database()
+
 
 # Basic liveness ping
-@app.get("/ping", response_class=PlainTextResponse)
+@app.get("/ping", response_class=PlainTextResponse, tags=["maintenance"])
 def ping() -> str:
     """Ping pong."""
     return "pong"
 
 
 # Basic health ping
-@app.get("/healthy", response_class=PlainTextResponse)
-def healthy() -> str:
+@app.get("/healthy", response_class=PlainTextResponse, tags=["maintenance"])
+async def healthy() -> Response:
     """Check if wired in."""
-    # TODO: check can connect to db
-    return "true"
+    if not await updates.is_db_initialized():
+        return Response(status_code=503)
+    return Response(status_code=200)
