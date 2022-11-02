@@ -1,0 +1,18 @@
+from typing import List
+
+from lavi_worker.daos import cve
+from lavi_worker.daos.database import get_db_tx
+from lavi_worker.utils import RepoEnum
+
+
+def find_vulnerabilities_simple(
+    repo: RepoEnum, package: str, version: str
+) -> List[str]:
+    """Find CVE ids only for a single repo, package, and version."""
+
+    # Get cves from the database
+    async with await get_db_tx() as tx:
+        cves = cve.find_by_repo_pkg_vers(tx, repo.value, package, version)
+
+    # Get just the CVE ids from the objects
+    return [cve.cve_id for cve in cves]

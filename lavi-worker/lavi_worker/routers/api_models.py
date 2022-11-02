@@ -6,11 +6,6 @@ from pydantic import BaseModel
 from lavi_worker.utils import RepoEnum
 
 
-class Vuln(BaseModel):
-    cve_id: str
-    severity: str
-
-
 class FindVulnRequest(BaseModel):
     repo: RepoEnum
     package: str
@@ -18,4 +13,4 @@ class FindVulnRequest(BaseModel):
 
 
 class FindVulnResponse(BaseModel):
-    vulns: List[Vuln]
+    vulns: List[str]  # List of CVE id strings
