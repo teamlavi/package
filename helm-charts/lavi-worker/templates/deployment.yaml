@@ -18,7 +18,7 @@ spec:
         - args:
             - "--port=80"
             - "--host=0.0.0.0"
-            - "lavi_worker.main:app"
+            - "lavi_worker.routers.main:app"
           command: ["uvicorn"]
           env:
             - name: EXPECTED_PREFIX
