@@ -11,7 +11,7 @@ router = APIRouter(tags=["internal"])
 @router.post("/trigger_scraper")
 async def trigger_scraper() -> Response:
     """Trigger the scraper to refresh the database."""
-    # TODO: trigger the scraper
+    await updates.scrape_vulnerabilities()
     return Response(status_code=200)
 
 

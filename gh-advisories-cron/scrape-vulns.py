@@ -3,8 +3,7 @@ import json
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
-GitHub_access_token = "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"
-
+GitHub_access_token = ""
 
 
 def scrape_vulns(repository="PIP"):
