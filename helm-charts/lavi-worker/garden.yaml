@@ -18,7 +18,7 @@ values:
     host: ${var.hostname}
 devMode:
   command: ["uvicorn"]
-  args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.main:app"]
+  args: ["--port=80", "--host=0.0.0.0", "--reload", "lavi_worker.routers.main:app"]
   sync:
     - source: lavi_worker
       target: /src/lavi_worker

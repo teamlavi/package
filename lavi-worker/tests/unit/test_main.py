@@ -1,4 +1,4 @@
-from lavi_worker import main
+from lavi_worker.routers import main
 
 
 def test_app_exists():

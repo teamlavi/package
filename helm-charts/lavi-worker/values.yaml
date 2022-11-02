@@ -9,4 +9,15 @@ ingress:
   prefix: /lavi
   tlsSecretName: ingress-cert
 
+postgres:
+  dbname: cvedb
+  image:
+    pullPolicy: Always
+    repository: docker.io/postgres
+    tag: "15.0"
+  pvc:
+    size: 10Gi
+    storageClass: vultr-block-storage
+  replicas: 1
+
 replicas: 1
