@@ -2,18 +2,36 @@ import requests
 import json
 
 repository = "PIP"
+last_cursor_file = "lastCursor.txt"
+vulns_to_get = str(10)
+
+# Get and save cursor are functions incase decide to save somewhere else
+def get_last_cursor():
+	with open(last_cursor_file, 'r') as f:
+		return f.read()
+
+
+def save_last_cursor(last_cursor):
+	with open(last_cursor_file, 'w') as f:
+		f.write(last_cursor)
+
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
 token = ""
 
 # Get vulnerabilities after:
-last_cursor = "Y3Vyc29yOnYyOpK5MjAyMi0xMC0zMVQxODo0Mjo1OC0wNDowMM2LOA=="
+last_cursor = get_last_cursor()
 
+
+if last_cursor is None or last_cursor == "":
+	query_type = "securityVulnerabilities(first:" + vulns_to_get + ", ecosystem: " + repository + ", orderBy: {field: UPDATED_AT, direction: ASC})"
+else:
+	query_type = "securityVulnerabilities(first:" + vulns_to_get + ", ecosystem: " + repository + ", after: \"" + last_cursor + "\", orderBy: {field: UPDATED_AT, direction: ASC})"
 # Keep repository in query so that only relevant vulnerabilities are returned
 query = """ 
-{
-  securityVulnerabilities(first:10, ecosystem: """ + repository + """, after: \"""" + last_cursor + """\") {
+{""" + query_type + """
+   {
     edges {
       cursor
       node {
@@ -55,6 +73,12 @@ print(json.dumps(json.loads(response.text), indent=2))
 
 # Save for next query
 last_cursor_received = json.loads(response.text)['data']['securityVulnerabilities']['pageInfo']['endCursor']
+
+if last_cursor_received is None:
+	print("no newer vulns")
+	exit()  # stop execution, no new data
+
+save_last_cursor(last_cursor_received)
 
 # Variables to help with spelling errors
 CVE_ID = "cve_id"
