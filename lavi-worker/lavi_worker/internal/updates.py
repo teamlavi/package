@@ -97,3 +97,17 @@ async def insert_single_vulnerability(
             pkg_name=pkg_name,
             pkg_vers=pkg_vers,
         )
+
+
+async def delete_single_vulnerability(
+    repo_name: str, pkg_name: str, pkg_vers: str, cve_id: str
+) -> bool:
+    """Delete a single vuln, return whether or not the deletion was necessary."""
+    async with await get_db_tx() as tx:
+        doomed_cve = await cve.find_by_repo_pkg_vers_cve(
+            tx, repo_name, pkg_name, pkg_vers, cve_id
+        )
+        if not doomed_cve:
+            return False
+        await cve.delete(tx, doomed_cve)
+    return True

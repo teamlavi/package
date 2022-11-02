@@ -22,6 +22,13 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Resp
     return Response(status_code=200)
 
 
+@router.post("/delete_vuln")
+async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
+    """Delete a single vulnerability."""
+    await updates.delete_single_vulnerability(**delete_vuln_request.dict())
+    return Response(status_code=200)
+
+
 @router.post("/database/clear")
 async def clear_database() -> Response:
     """Clear all rows of the database tables."""

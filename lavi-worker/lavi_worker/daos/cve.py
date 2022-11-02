@@ -64,8 +64,8 @@ async def delete(tx: Transaction, cve: CVE) -> None:
     # TODO: assert the entry exists in the db before deleting
     async with tx.cursor() as cur:
         await cur.execute(
-            "DELETE FROM cves WHERE cve_id = %s",
-            (cve.cve_id,),
+            "DELETE FROM cves WHERE cve_id = %s OR pkg_vers_id = %s",
+            (cve.cve_id, cve.pkg_vers_id),
         )
 
 
@@ -89,6 +89,30 @@ async def find_by_repo_pkg_vers(
     """Find any entries by their repo, pkg, vers tuple."""
     pkg_vers_id = generate_universal_hash(repo_name, pkg_name, pkg_vers)
     return await find_by_univ_hash(tx, pkg_vers_id)
+
+
+async def find_by_univ_hash_cve(
+    tx: Transaction, pkg_vers_id: str, cve_id: str
+) -> CVE | None:
+    """Check if a specific CVE applies to a specific universal hash."""
+    # Query the database
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT * FROM cves WHERE pkg_vers_id = %s AND cve_id = %s",
+            (pkg_vers_id, cve_id),
+        )
+        raw_cve = await cur.fetchone()
+
+    # Parse output into object if appropriate, return
+    return CVE(*raw_cve) if raw_cve else None
+
+
+async def find_by_repo_pkg_vers_cve(
+    tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, cve_id: str
+) -> CVE | None:
+    """Check if a specific CVE applies to a specific repo, pkg, vers tuple."""
+    pkg_vers_id = generate_universal_hash(repo_name, pkg_name, pkg_vers)
+    return await find_by_univ_hash_cve(tx, pkg_vers_id, cve_id)
 
 
 async def get_row_count(tx: Transaction) -> int:
