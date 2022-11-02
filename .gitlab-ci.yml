@@ -9,6 +9,8 @@ stages:
 build:
   stage: build
   script:
+    - echo $PATH
+    - ls -la /root/.garden/bin
     - garden --env=ci build
 
 test:
