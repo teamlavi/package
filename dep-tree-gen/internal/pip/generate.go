@@ -25,7 +25,7 @@ func verifyPipDepTreeInstall(pythonPath string) {
 func getPackageNamesFromReq(path string) []string {
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		panic(err)
+		log.Fatal("failed to read requirements file")
 	}
 
 	pkgs := []string{}

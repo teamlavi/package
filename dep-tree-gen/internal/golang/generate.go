@@ -2,6 +2,7 @@ package golang
 
 import (
 	"bytes"
+	"log"
 	"os/exec"
 )
 
@@ -12,7 +13,7 @@ func generateTree(path string) string {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		panic(err)
+		log.Fatal("failed to call `go mod graph` for project")
 	}
 	return out.String()
 }
