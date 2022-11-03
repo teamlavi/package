@@ -5,6 +5,7 @@ import (
 	"dep-tree-gen/internal/golang"
 	"dep-tree-gen/internal/npm"
 	"dep-tree-gen/internal/pip"
+	"dep-tree-gen/internal/poetry"
 )
 
 func GetGoTreeGenerator(path string) internal.RepositoryTreeGenerator {
@@ -23,5 +24,11 @@ func GetPipTreeGenerator(path, pythonPath string) internal.RepositoryTreeGenerat
 	return pip.PipTreeGenerator{
 		Path:       path,
 		PythonPath: pythonPath,
+	}
+}
+
+func GetPoetryTreeGenerator(path string) internal.RepositoryTreeGenerator {
+	return poetry.PoetryTreeGenerator{
+		Path: path,
 	}
 }

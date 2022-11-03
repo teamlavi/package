@@ -5,10 +5,8 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"encoding/json"
-	"io/ioutil"
-
 	"dep-tree-gen/generator"
+	"lavi-cli/internal/common"
 
 	"github.com/spf13/cobra"
 )
@@ -25,14 +23,10 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
-		write, _ := cmd.Flags().GetBool("write")
 
 		poetryGen := generator.GetPoetryTreeGenerator(path)
 		cds := poetryGen.GetCDS()
-		if write {
-			file, _ := json.MarshalIndent(cds, "", " ")
-			_ = ioutil.WriteFile("cds.json", file, 0644)
-		}
+		common.PostCommand(cmd, cds)
 	},
 }
 

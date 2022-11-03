@@ -2,7 +2,6 @@ package pip
 
 import (
 	"dep-tree-gen/models"
-	"strings"
 
 	"dep-tree-gen/internal/utils"
 )
@@ -24,13 +23,13 @@ func pdpObjectArrToCds(arr []PDPObject, pkgs []string) models.CDS {
 	topLvlDependencyIds := []string{}
 
 	for _, obj := range arr {
-		id := utils.GenerateID(strings.ToLower(obj.Package.PackageName), strings.ToLower(obj.Package.InstalledVersion), "pip")
+		id := utils.GenerateID(obj.Package.PackageName, obj.Package.InstalledVersion, "pip")
 		if utils.Contains(pkgs, obj.Package.PackageName) {
 			topLvlDependencyIds = append(topLvlDependencyIds, id)
 		}
 		dependencyIds := []string{}
 		for _, dep := range obj.Dependencies {
-			dependencyIds = append(dependencyIds, utils.GenerateID(strings.ToLower(dep.PackageName), strings.ToLower(dep.InstalledVersion), "pip"))
+			dependencyIds = append(dependencyIds, utils.GenerateID(dep.PackageName, dep.InstalledVersion, "pip"))
 		}
 		nodes[id] = models.CDSNode{
 			ID:           id,

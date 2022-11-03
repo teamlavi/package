@@ -5,9 +5,8 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"lavi-cli/internal/common"
 
 	"dep-tree-gen/generator"
 
@@ -28,14 +27,10 @@ to quickly create a Cobra application.`,
 		fmt.Println("WARNING: This output may not be applicable to all systems. Please use a stronger dependency management system like poetry which includes a lockfile.")
 		path, _ := cmd.Flags().GetString("path")
 		pythonPath, _ := cmd.Flags().GetString("python")
-		write, _ := cmd.Flags().GetBool("write")
 
 		pipGen := generator.GetPipTreeGenerator(path, pythonPath)
 		cds := pipGen.GetCDS()
-		if write {
-			file, _ := json.MarshalIndent(cds, "", " ")
-			_ = ioutil.WriteFile("cds.json", file, 0644)
-		}
+		common.PostCommand(cmd, cds)
 	},
 }
 
