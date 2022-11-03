@@ -43,5 +43,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("write", "w", false, "Write cds to a file")
+	rootCmd.PersistentFlags().BoolP("write", "w", false, "Write cds to a file")
 }
