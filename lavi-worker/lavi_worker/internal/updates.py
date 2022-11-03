@@ -120,7 +120,9 @@ async def delete_single_vulnerability(
 
 
 async def scrape_vulnerabilities() -> None:
-    # Ran on repositories individually so that only relevant vulnerabilities are pulled from GitHub
+    """Scrape vulnerabilities from github, save to database."""
+    # Ran on repositories individually so that only relevant vulnerabilities are pulled
+    # from GitHub
     for repository in ["PIP"]:
         auth_headers = {"Authorization": "Bearer " + GitHub_access_token}
         last_cursor_file = "last_cursor_" + repository + ".txt"
