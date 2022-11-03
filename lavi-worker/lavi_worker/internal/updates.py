@@ -215,11 +215,11 @@ async def scrape_vulnerabilities() -> None:
             save_last_cursor(last_cursor)
 
             # Parse each vulnerability returned
-            parsed_vulnerabilities = []
+            # parsed_vulnerabilities = []
             for gh_vuln_edge in json.loads(response.text)["data"][
                 "securityVulnerabilities"
             ]["edges"]:
-                parsed_vuln = {}
+                # parsed_vuln = {}
                 gh_vuln = gh_vuln_edge["node"]
 
                 cve_id = next(
