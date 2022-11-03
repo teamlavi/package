@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -13,19 +12,6 @@ import (
 
 // using this so I dont have to rewrite stuff https://pypi.org/project/pipdeptree/\
 // this code just orchestrates calling pipdeptree
-
-// path is a path to requirements.txt
-func GenerateTree(path, pythonPath string) {
-	verifyPipDepTreeInstall(pythonPath)
-	pkgs := getPackageNamesFromReq(path)
-
-	tree := callPDP(pkgs, pythonPath)
-	cds := pdpObjectArrToCds(tree, pkgs)
-
-	file, _ := json.MarshalIndent(cds, "", " ")
-	_ = ioutil.WriteFile("test.json", file, 0644)
-}
-
 func verifyPipDepTreeInstall(pythonPath string) {
 	cmd := exec.Command(pythonPath, "-m", "pip", "install", "pipdeptree")
 	err := cmd.Run()

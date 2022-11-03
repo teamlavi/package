@@ -45,7 +45,7 @@ const CustomTableRow = ({ row, nodes }) => {
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Package Name</TableCell>
+                                    <TableCell>Indirect Dependency Name</TableCell>
                                     <TableCell align="right">Package Version</TableCell>
                                     <TableCell align="right">CVE ID</TableCell>
                                     <TableCell align="right">CVE Severity</TableCell>

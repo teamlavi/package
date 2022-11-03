@@ -5,7 +5,8 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 
 	"dep-tree-gen/generator"
 
@@ -23,9 +24,14 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("slows down based on how big the tree is")
 		path, _ := cmd.Flags().GetString("path")
-		generator.GenerateNpmTree(path)
+		write, _ := cmd.Flags().GetBool("write")
+		npmGen := generator.GetNpmTreeGenerator(path)
+		cds := npmGen.GetCDS()
+		if write {
+			file, _ := json.MarshalIndent(cds, "", " ")
+			_ = ioutil.WriteFile("cds.json", file, 0644)
+		}
 	},
 }
 

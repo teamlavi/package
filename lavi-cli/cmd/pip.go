@@ -5,7 +5,8 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 
 	"dep-tree-gen/generator"
 
@@ -23,24 +24,21 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pip called")
 		path, _ := cmd.Flags().GetString("path")
 		pythonPath, _ := cmd.Flags().GetString("python")
-		generator.GeneratePipTree(path, pythonPath)
+		write, _ := cmd.Flags().GetBool("write")
+
+		pipGen := generator.GetPipTreeGenerator(path, pythonPath)
+		cds := pipGen.GetCDS()
+		if write {
+			file, _ := json.MarshalIndent(cds, "", " ")
+			_ = ioutil.WriteFile("cds.json", file, 0644)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(pipCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// pipCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	pipCmd.Flags().StringP("python", "p", "python", "Path or alias to call python from")
 	pipCmd.Flags().String("path", "requirements.txt", "Path to requirements.txt")
 }

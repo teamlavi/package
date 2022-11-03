@@ -6,6 +6,8 @@ package cmd
 
 import (
 	"dep-tree-gen/generator"
+	"encoding/json"
+	"io/ioutil"
 
 	"github.com/spf13/cobra"
 )
@@ -22,22 +24,17 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
-		generator.GenerateGoTree(path)
+		write, _ := cmd.Flags().GetBool("write")
+		goGen := generator.GetGoTreeGenerator(path)
+		cds := goGen.GetCDS()
+		if write {
+			file, _ := json.MarshalIndent(cds, "", " ")
+			_ = ioutil.WriteFile("cds.json", file, 0644)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(goCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// goCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// goCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	goCmd.Flags().String("path", ".", "Path to project")
-
 }
