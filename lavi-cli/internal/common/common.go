@@ -4,7 +4,7 @@ import (
 	"dep-tree-gen/models"
 	"encoding/json"
 	"io/ioutil"
-	"lavi-cli/internal/server"
+	"lavi/internal/server"
 
 	"github.com/spf13/cobra"
 )
@@ -18,6 +18,6 @@ func PostCommand(cmd *cobra.Command, cds models.CDS) {
 	}
 
 	if show {
-		server.Serve()
+		server.Serve(cds)
 	}
 }

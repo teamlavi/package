@@ -6,7 +6,7 @@ package cmd
 
 import (
 	"fmt"
-	"lavi-cli/internal/common"
+	"lavi/internal/common"
 
 	"dep-tree-gen/generator"
 

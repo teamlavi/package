@@ -53,7 +53,7 @@ func poetryLockFileToCds(lockFile LockFile, pyproject Pyproject) models.CDS {
 		if k == "python" {
 			continue
 		}
-		topLvlDependencyIds = append(topLvlDependencyIds, strings.ToLower(k))
+		topLvlDependencyIds = append(topLvlDependencyIds, utils.GenerateID(k, filledVersionMap[strings.ToLower(k)], "poetry"))
 	}
 
 	output := models.CDS{

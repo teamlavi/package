@@ -1,8 +1,11 @@
 package server
 
 import (
+	"dep-tree-gen/models"
+	"encoding/json"
+	"fmt"
 	"io/fs"
-	"lavi-cli/ui"
+	"lavi/ui"
 	"net/http"
 )
 
@@ -17,4 +20,15 @@ func getFileSystem() http.FileSystem {
 	}
 
 	return http.FS(fsys)
+}
+
+type ServerConfig struct {
+	CDS models.CDS
+}
+
+func (s ServerConfig) GetCds(w http.ResponseWriter, r *http.Request) {
+	out, _ := json.Marshal(s.CDS)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, string(out))
 }

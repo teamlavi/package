@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"dep-tree-gen/models"
 	"fmt"
 	"log"
 	"net"
@@ -22,7 +23,7 @@ func isPortOpen(port int) bool {
 	return true
 }
 
-func Serve() {
+func Serve(cds models.CDS) {
 	port := 8080
 
 	for {
@@ -48,8 +49,15 @@ func Serve() {
 		}
 	}
 
+	config := ServerConfig{
+		CDS: cds,
+	}
+
+	http.HandleFunc("/api/v1/cds", config.GetCds)
 	http.Handle("/", http.FileServer(getFileSystem()))
+
 	openbrowser("http://localhost:" + strconv.Itoa(port))
+
 	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
 	if err != nil {
 		log.Fatal("failed to start api")

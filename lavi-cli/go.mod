@@ -1,4 +1,4 @@
-module lavi-cli
+module lavi
 
 go 1.18
 

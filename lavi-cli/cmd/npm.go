@@ -6,7 +6,7 @@ package cmd
 
 import (
 	"dep-tree-gen/generator"
-	"lavi-cli/internal/common"
+	"lavi/internal/common"
 
 	"github.com/spf13/cobra"
 )

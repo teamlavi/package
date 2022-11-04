@@ -66,16 +66,16 @@
    "package": "matplotlib",
    "version": "3.6.2",
    "dependencies": [
+    "4eiKuVg/MJbXtx5fDkVz6DItmkBhfl1i2CZldjnRfjY=",
     "K22iLKxZRQv1TDKb4XYOgOYScmvFDz9Df3ii+0GEqPY=",
     "/XPkp/D9doRfx7ABn1dhCm3C6PP+hUVOd7UaD7bHFkA=",
-    "nAOkEflHEoDEkLc8QVlPBluPqs7A3t5Ey8zCJi4SLZg=",
     "ziEAA188cT6lIDWeTjv9fLRukxkHsRrSrFkJNIm6YkA=",
-    "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg=",
-    "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs=",
-    "PRwXzi7eI7pfsPFpbVTj25f7yJseagKdwdsL0fjIPkY=",
-    "4eiKuVg/MJbXtx5fDkVz6DItmkBhfl1i2CZldjnRfjY=",
     "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88=",
-    "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc="
+    "PRwXzi7eI7pfsPFpbVTj25f7yJseagKdwdsL0fjIPkY=",
+    "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs=",
+    "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc=",
+    "nAOkEflHEoDEkLc8QVlPBluPqs7A3t5Ey8zCJi4SLZg=",
+    "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg="
    ]
   },
   "fAMS66uv1quRgOYSIVoDgcMOuzGHn/rQCQYaTmTDA0g=": {
@@ -95,10 +95,10 @@
    "package": "setuptools-scm",
    "version": "7.0.5",
    "dependencies": [
+    "bMrTW2ml2Z5QWAPApXvidhZKFhTY3O+7RrhrO57zGxM=",
     "nbIkP6YtUYVLK/w1twIdFrdDbaChCpUuwwArD3ceii0=",
     "956NDZX9QR7tbuwfOZu0ZKzengmM4qARPvMPjIKDf5A=",
-    "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88=",
-    "bMrTW2ml2Z5QWAPApXvidhZKFhTY3O+7RrhrO57zGxM="
+    "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88="
    ]
   },
   "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg=": {
@@ -116,8 +116,8 @@
  },
  "root": {
   "dependencies": [
-   "numpy",
-   "matplotlib"
+   "matplotlib",
+   "numpy"
   ]
  }
 }
