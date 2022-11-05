@@ -7,7 +7,9 @@ from lavi_worker.daos.database import get_db_tx
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
-GitHub_access_token = ""
+GLOBAL_CACHE = {
+    "gh_access_token": "",
+}
 
 
 async def is_db_initialized() -> bool:
@@ -121,10 +123,11 @@ async def delete_single_vulnerability(
 
 async def scrape_vulnerabilities() -> None:
     """Scrape vulnerabilities from github, save to database."""
+    global GLOBAL_CACHE
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
-    for repository in ["PIP"]:
-        auth_headers = {"Authorization": "Bearer " + GitHub_access_token}
+    for repository in ["pip"]:
+        auth_headers = {"Authorization": f"Bearer {GLOBAL_CACHE['gh_access_token']}"}
         last_cursor_file = "last_cursor_" + repository + ".txt"
 
         # Get and save cursor are functions incase decide to save somewhere else
@@ -147,7 +150,7 @@ async def scrape_vulnerabilities() -> None:
         while True:
             query_type = (
                 "securityVulnerabilities(first:100, ecosystem: "
-                + repository
+                + repository.upper()
                 + (
                     ""
                     if last_cursor is None or last_cursor == ""
@@ -251,7 +254,7 @@ async def scrape_vulnerabilities() -> None:
 
                 # TODO pkg_vers is range
                 # TODO replace insert_single_vulnerability()?
-                insert_single_vulnerability(
+                await insert_single_vulnerability(
                     cve_id,
                     url,
                     repo_name,
