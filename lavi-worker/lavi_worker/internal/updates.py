@@ -35,10 +35,10 @@ async def initialize_database() -> None:
                         repo_name VARCHAR(50) NOT NULL,
                         pkg_name VARCHAR(50) NOT NULL,
                         pkg_vers VARCHAR(50) NOT NULL,
-                        pkg_vers_id VARCHAR(100) NOT NULL
+                        univ_hash VARCHAR(100) NOT NULL
                     );
                     ALTER TABLE cves
-                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, pkg_vers_id)
+                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash)
                 """,
             )
 
