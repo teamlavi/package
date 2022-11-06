@@ -14,7 +14,7 @@ class RepoEnum(str, Enum):
 def _sha256(content: str | bytes) -> bytes:
     """Wrapper for hashlib sha256."""
     if isinstance(content, str):
-        return sha256(content.encode("UTF-8")).digest()
+        return sha256(content.lower().encode("UTF-8")).digest()
     elif isinstance(content, bytes):
         return sha256(content).digest()
     else:
