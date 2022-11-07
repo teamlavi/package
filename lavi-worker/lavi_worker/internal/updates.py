@@ -38,7 +38,7 @@ async def initialize_database() -> None:
                         univ_hash VARCHAR(100) NOT NULL
                     );
                     ALTER TABLE cves
-                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash)
+                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
                 """,
             )
 
