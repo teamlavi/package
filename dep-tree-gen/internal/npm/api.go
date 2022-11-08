@@ -21,8 +21,9 @@ func (g NpmTreeGenerator) GetCDS() models.CDS {
 		generatePackageLock(g.Path)
 	}
 
-	packageLock := parsePackageLock(g.Path)
-	cds := packageLockToCds(packageLock)
+	return parsePackageLock(g.Path).ToCDS()
+}
 
-	return cds
+func (g NpmTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	return models.CDS{}
 }

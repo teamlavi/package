@@ -13,5 +13,9 @@ func (g PoetryTreeGenerator) GetCDS() models.CDS {
 	lockFile := getPoetryLockFile(g.Path)
 	pyproject := getPoetryTomlFileDependencues(g.Path)
 
-	return poetryLockFileToCds(lockFile, pyproject)
+	return lockFile.ToCDS(pyproject)
+}
+
+func (g PoetryTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	return models.CDS{}
 }

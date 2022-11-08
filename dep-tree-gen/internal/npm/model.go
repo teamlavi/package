@@ -1,6 +1,7 @@
 package npm
 
 import (
+	"dep-tree-gen/common"
 	"dep-tree-gen/models"
 
 	"dep-tree-gen/internal/utils"
@@ -24,21 +25,21 @@ type Dependency struct {
 	Requires map[string]string `json:"requires"`
 }
 
-func packageLockToCds(lock PackageLock) models.CDS {
+func (lock PackageLock) ToCDS() models.CDS {
 	rootPkg := lock.Packages[""]
 
 	nodes := map[string]models.CDSNode{}
 	topLvlDependencyIds := []string{}
 
 	for name, data := range lock.Dependencies {
-		id := utils.GenerateID(name, data.Version, "npm")
+		id := utils.GenerateID(name, data.Version, common.NPM_REPO_NAME)
 		if _, exists := rootPkg.Dependencies[name]; exists {
 			topLvlDependencyIds = append(topLvlDependencyIds, id)
 		}
 
 		dependencyIds := []string{}
 		for depName, _ := range data.Requires {
-			dependencyIds = append(dependencyIds, utils.GenerateID(depName, lock.Dependencies[depName].Version, "npm"))
+			dependencyIds = append(dependencyIds, utils.GenerateID(depName, lock.Dependencies[depName].Version, common.NPM_REPO_NAME))
 		}
 		nodes[id] = models.CDSNode{
 			ID:           id,
@@ -49,7 +50,8 @@ func packageLockToCds(lock PackageLock) models.CDS {
 	}
 
 	output := models.CDS{
-		Repository: "npm",
+		CmdType:    common.NPM_CMD_NAME,
+		Repository: common.NPM_REPO_NAME,
 		Nodes:      nodes,
 		Root: models.CDSNode{
 			Dependencies: topLvlDependencyIds,

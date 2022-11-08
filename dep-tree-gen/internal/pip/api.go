@@ -20,3 +20,13 @@ func (g PipTreeGenerator) GetCDS() models.CDS {
 
 	return cds
 }
+
+func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	data := []string{}
+	for k, _ := range pkgs {
+		data = append(data, k)
+	}
+	tree := callPDP(data, g.PythonPath)
+	cds := pdpObjectArrToCds(tree, data)
+	return cds
+}

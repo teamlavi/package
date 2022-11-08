@@ -28,3 +28,7 @@ func (g GolangTreeGenerator) GetCDS() models.CDS {
 	cds := outputTreeToCds(name, tree)
 	return cds
 }
+
+func (g GolangTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	return g.GetCDS()
+}

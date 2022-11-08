@@ -1,6 +1,7 @@
 package poetry
 
 import (
+	"dep-tree-gen/common"
 	"dep-tree-gen/internal/utils"
 	"dep-tree-gen/models"
 	"strings"
@@ -24,7 +25,7 @@ type Pyproject struct {
 	}
 }
 
-func poetryLockFileToCds(lockFile LockFile, pyproject Pyproject) models.CDS {
+func (lockFile LockFile) ToCDS(pyproject Pyproject) models.CDS {
 
 	nodes := map[string]models.CDSNode{}
 	topLvlDependencyIds := []string{}
@@ -36,10 +37,10 @@ func poetryLockFileToCds(lockFile LockFile, pyproject Pyproject) models.CDS {
 	}
 
 	for _, obj := range lockFile.Package {
-		id := utils.GenerateID(obj.Name, obj.Version, "poetry")
+		id := utils.GenerateID(obj.Name, obj.Version, common.POETRY_REPO_NAME)
 		dependencyIds := []string{}
 		for depName, _ := range obj.Dependencies {
-			dependencyIds = append(dependencyIds, utils.GenerateID(depName, filledVersionMap[depName], "poetry"))
+			dependencyIds = append(dependencyIds, utils.GenerateID(depName, filledVersionMap[depName], common.POETRY_REPO_NAME))
 		}
 		nodes[id] = models.CDSNode{
 			ID:           id,
@@ -53,11 +54,12 @@ func poetryLockFileToCds(lockFile LockFile, pyproject Pyproject) models.CDS {
 		if k == "python" {
 			continue
 		}
-		topLvlDependencyIds = append(topLvlDependencyIds, utils.GenerateID(k, filledVersionMap[strings.ToLower(k)], "poetry"))
+		topLvlDependencyIds = append(topLvlDependencyIds, utils.GenerateID(k, filledVersionMap[strings.ToLower(k)], common.POETRY_REPO_NAME))
 	}
 
 	output := models.CDS{
-		Repository: "poetry",
+		CmdType:    common.POETRY_CMD_NAME,
+		Repository: common.POETRY_REPO_NAME,
 		Nodes:      nodes,
 		Root: models.CDSNode{
 			Dependencies: topLvlDependencyIds,
