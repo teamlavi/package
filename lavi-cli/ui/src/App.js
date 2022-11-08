@@ -49,6 +49,7 @@ function App() {
       <div style={{ width: "100%", height: "100%" }}>
       {resp && <>
         <Header 
+          cds={resp}
           cmd={resp.cmdType} 
           update={update} 
           viewCurrent={viewCurrent} 

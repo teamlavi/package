@@ -8,6 +8,10 @@ export default class Service {
         return axios.get(`${URL_PREFIX}/api/v1/cds`)
     }
 
+    static async uploadCds(cds) {
+        return axios.post(`${URL_PREFIX}/api/v1/cds`, cds)
+    }
+
     static async getOriginalCds() {
         return axios.get(`${URL_PREFIX}/api/v1/cds/original`)
     }

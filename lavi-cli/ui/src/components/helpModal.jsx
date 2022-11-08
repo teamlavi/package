@@ -18,7 +18,8 @@ const steps = [
     description: [
       `The header contains some buttons that allow for easy control over the status of your vulnerability investigation.`,
       `On the right side, there are controls for viewing the original dependency tree (which when clicked, changes to allow you to go back to the modified dependency tree), 
-                  a button to scan the modified tree, and a button to revert back to the original state of the tree.`
+                  a button to scan the modified tree, and a button to revert back to the original state of the tree.`,
+      `There is also the help button, a button to download the original dependency tree for safe keeping, and an upload button to upload a dependency tree that was previously downloaded.`
     ]
   },
   {

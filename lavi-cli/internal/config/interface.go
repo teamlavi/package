@@ -8,5 +8,6 @@ import (
 type ConfigInterface interface {
 	GetCDS() models.CDS
 	SetCDS(models.CDS)
+	SetOriginalCDS(models.CDS)
 	GetGenerator() generator.RepositoryTreeGenerator
 }

@@ -62,7 +62,7 @@ func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGener
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/v1/cds", HandlerWrapper(config.GetCds))
+	r.HandleFunc("/api/v1/cds", HandlerWrapper(config.GetSetCds))
 	r.HandleFunc("/api/v1/cds/original", HandlerWrapper(config.GetOriginalCds))
 	r.HandleFunc("/api/v1/repositories/{repoName}/versions", HandlerWrapper(config.GetVersions))
 	r.HandleFunc("/api/v1/repositories/{repoName}/install", HandlerWrapper(config.Install)) //.Methods("POST", "OPTIONS")

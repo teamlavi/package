@@ -39,6 +39,10 @@ func (s *ServerConfig) SetCDS(cds models.CDS) {
 	s.CDS = cds
 }
 
+func (s *ServerConfig) SetOriginalCDS(cds models.CDS) {
+	s.OriginalCDS = cds
+}
+
 func (s *ServerConfig) GetCDS() models.CDS {
 	return s.CDS
 }
@@ -94,8 +98,37 @@ func HandlerWrapper(handler func(w http.ResponseWriter, r *http.Request)) func(w
 	return PanicWrapper(CorsWrapper(handler))
 }
 
+func (s *ServerConfig) GetSetCds(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		s.SetCds(w, r)
+		return
+	}
+	s.GetCds(w, r)
+	return
+}
+
 func (s *ServerConfig) GetCds(w http.ResponseWriter, r *http.Request) {
 	JsonResponse(w, r, s.CDS)
+}
+
+func (s *ServerConfig) SetCds(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var t models.CDS
+	err := decoder.Decode(&t)
+	if err != nil {
+		panic(err)
+	}
+
+	if errData, ok := IsUploadedCdsValid(w, r, t, s.CDS); !ok {
+		out, _ := json.Marshal(errData)
+		w.WriteHeader(400)
+		fmt.Fprintf(w, string(out))
+		return
+	}
+
+	s.SetCDS(t)
+
+	JsonResponse(w, r, t)
 }
 
 func (s *ServerConfig) GetOriginalCds(w http.ResponseWriter, r *http.Request) {
