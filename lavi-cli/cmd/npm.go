@@ -25,7 +25,7 @@ to quickly create a Cobra application.`,
 		path, _ := cmd.Flags().GetString("path")
 		npmGen := generator.GetNpmTreeGenerator(path)
 		cds := npmGen.GetCDS()
-		common.PostCommand(cmd, cds)
+		common.PostCommand(cmd, cds, npmGen)
 	},
 }
 

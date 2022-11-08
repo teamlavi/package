@@ -1,6 +1,7 @@
 package common
 
 import (
+	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
 	"io/ioutil"
@@ -9,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func PostCommand(cmd *cobra.Command, cds models.CDS) {
+func PostCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
 	if write {
@@ -18,6 +19,6 @@ func PostCommand(cmd *cobra.Command, cds models.CDS) {
 	}
 
 	if show {
-		server.Serve(cds)
+		server.Serve(cmd, cds, gen)
 	}
 }

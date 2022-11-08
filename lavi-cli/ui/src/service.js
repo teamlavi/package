@@ -13,7 +13,7 @@ export default class Service {
     }
 
     static async getVersions(repo, pkg) {
-        return axios.get(`${URL_PREFIX}/api/v1/repositories/${repo}/packages/${pkg}/versions`)
+        return axios.get(`${URL_PREFIX}/api/v1/repositories/${repo}/versions`, {params: { name: pkg }})
     }
 
     static async runInstall(repo, changes) {

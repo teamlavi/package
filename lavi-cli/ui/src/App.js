@@ -11,10 +11,10 @@ function App() {
   const [original, setOriginal] = useState(null)
   const [resp, setResp] = useState(null)
   const [pkgs, setPkgs] = useState({})
-  const [stats, setStats] = useState({})
+  const [stats, setStats] = useState([])
 
   const [originalPkgs, setOriginalPkgs] = useState({})
-  const [originalStats, setOriginalStats] = useState({})
+  const [originalStats, setOriginalStats] = useState([])
 
   const [changedVersions, setChangedVersions] = useState({})
   const theme = createTheme({});
@@ -25,17 +25,17 @@ function App() {
       const resp = r.data
       const tempPkgs = parseApiResponse(resp)
       const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
-      setResp(resp)
       setPkgs(tempPkgs)
       setStats(tempStats)
+      setResp(resp)
     })
     Service.getOriginalCds().then(r => {
       const resp = r.data
       const tempPkgs = parseApiResponse(resp)
       const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
-      setOriginal(resp)
       setOriginalPkgs(tempPkgs)
       setOriginalStats(tempStats)
+      setOriginal(resp)
     })
   }
 
@@ -48,7 +48,15 @@ function App() {
     <ThemeProvider theme={theme}>
       <div style={{ width: "100%", height: "100%" }}>
       {resp && <>
-        <Header update={update} viewCurrent={viewCurrent} setViewCurrent={setViewCurrent} setChangedVersions={setChangedVersions} changedVersions={changedVersions} repo={resp.repository} />
+        <Header 
+          cmd={resp.cmdType} 
+          update={update} 
+          viewCurrent={viewCurrent} 
+          setViewCurrent={setViewCurrent} 
+          setChangedVersions={setChangedVersions} 
+          changedVersions={changedVersions} 
+          repo={resp.repository} 
+        />
         <div style={{ display: "flex" }}>
           <div style={{ flexGrow: 1 }}>
             <VulnerabilityTable

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getVulnDataStats, parseApiResponse } from '../utils';
-import { Collapse, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton } from "@mui/material"
+import { Collapse, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon } from "@mui/material"
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,12 +12,12 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
     const [dialogOpen, setDialogOpen] = React.useState(false)
 
 
-    const changeVers = changedVersions[row.name] 
+    const changeVers = changedVersions[row.name]
 
     return <React.Fragment>
         <ChangeVersionDialog repo={repo} ver={row.version} packageName={row.name} open={dialogOpen} onClose={(v) => {
             if (v) {
-                const cv = {...changedVersions}
+                const cv = { ...changedVersions }
                 cv[row.name] = v
                 setChangedVersions(cv)
             }
@@ -42,17 +42,26 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
             <TableCell align="right">{changeVers ? "-" : row.severities.medium}</TableCell>
             <TableCell align="right">{changeVers ? "-" : row.severities.high}</TableCell>
             <TableCell align="right">
-                {viewCurrent && <>
+                {viewCurrent ? <>
                     <IconButton onClick={() => setDialogOpen(true)}>
                         <EditIcon />
                     </IconButton>
                     {changeVers && <IconButton onClick={() => {
-                        const cv = {...changedVersions}
+                        const cv = { ...changedVersions }
                         delete cv[row.name]
                         setChangedVersions(cv)
                     }}>
                         <RefreshIcon />
                     </IconButton>}
+                </>
+                    :
+                    <>
+                        <IconButton disabled>
+                            <Icon />
+                        </IconButton>
+                        {changeVers && <IconButton disabled>
+                            <Icon />
+                        </IconButton>}
                     </>
                 }
             </TableCell>
@@ -106,6 +115,8 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
 
 function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, repo, pkgs, stats, nodes }) {
 
+    const [pkgStats, accumStats] = stats
+
     return (
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -122,8 +133,25 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                 </TableRow>
             </TableHead>
             <TableBody>
-                {Object.keys(stats).map(k =>
-                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={stats[k]} key={k} />
+                <TableRow>
+                    <TableCell><IconButton sx={{height: "20px"}}><Icon /></IconButton></TableCell>
+                    <TableCell component="th" scope="row">
+                        Totals
+                    </TableCell>
+                    <TableCell align="right" />
+                    <TableCell align="right">
+                        {accumStats.low}
+                    </TableCell>
+                    <TableCell align="right">
+                        {accumStats.medium}
+                    </TableCell>
+                    <TableCell align="right">
+                        {accumStats.high}
+                    </TableCell>
+                    <TableCell align="right"><IconButton sx={{height: "20px"}}><Icon /></IconButton></TableCell>
+                </TableRow>
+                {Object.keys(pkgStats).map(k =>
+                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={pkgStats[k]} key={k} />
                 )}
             </TableBody>
         </Table>

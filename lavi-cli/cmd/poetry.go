@@ -26,7 +26,7 @@ to quickly create a Cobra application.`,
 
 		poetryGen := generator.GetPoetryTreeGenerator(path)
 		cds := poetryGen.GetCDS()
-		common.PostCommand(cmd, cds)
+		common.PostCommand(cmd, cds, poetryGen)
 	},
 }
 

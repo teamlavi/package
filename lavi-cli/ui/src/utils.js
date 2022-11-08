@@ -73,6 +73,11 @@ function makeVulnListUnique(list) {
 
 export function getVulnDataStats(nodes, pkgs) {
     const out = []
+    const totals = {
+        high: 0,
+        medium: 0,
+        low: 0
+    }
     for (const id of Object.keys(pkgs)) {
         const node = nodes[id]
         const counts = makeCounts(pkgs[id])
@@ -82,8 +87,11 @@ export function getVulnDataStats(nodes, pkgs) {
             vulnerabilities: pkgs[id],
             severities: counts
         })
+        totals.high += counts.high
+        totals.medium += counts.medium
+        totals.low += counts.low
     }
-    return out
+    return [out, totals]
 }
 
 function makeCounts(vulnArray) {

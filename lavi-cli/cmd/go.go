@@ -25,7 +25,7 @@ to quickly create a Cobra application.`,
 		path, _ := cmd.Flags().GetString("path")
 		goGen := generator.GetGoTreeGenerator(path)
 		cds := goGen.GetCDS()
-		common.PostCommand(cmd, cds)
+		common.PostCommand(cmd, cds, goGen)
 	},
 }
 

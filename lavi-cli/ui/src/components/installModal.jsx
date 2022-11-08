@@ -24,7 +24,7 @@ InstallModal({ open, onClose, id }) {
                     setCompleted(r.data.status)
                     setError(r.data.error)
                 })
-            }, 3000)
+            }, 1000)
             setIntervalV(int)
             return () => {
                 clearInterval(int)
@@ -36,6 +36,11 @@ InstallModal({ open, onClose, id }) {
         }
     }, [open])
 
+    const closeWrapper = (st) => {
+        setText("")
+        setCompleted("installing")
+        onClose(st)
+    }
 
     return (
         <Dialog open={open} maxWidth="md" disableEscapeKeyDown onClose={(_, reason) => { }}>
@@ -58,7 +63,7 @@ InstallModal({ open, onClose, id }) {
                 </div>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => onClose(status)} disabled={status !== "error" && status !== "success"}>Close</Button>
+                <Button onClick={() => closeWrapper(status)} disabled={status !== "error" && status !== "success"}>Close</Button>
             </DialogActions>
         </Dialog>
     );

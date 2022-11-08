@@ -30,7 +30,7 @@ to quickly create a Cobra application.`,
 
 		pipGen := generator.GetPipTreeGenerator(path, pythonPath)
 		cds := pipGen.GetCDS()
-		common.PostCommand(cmd, cds)
+		common.PostCommand(cmd, cds, pipGen)
 	},
 }
 

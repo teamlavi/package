@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"fmt"
 	"log"
@@ -10,6 +11,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
 )
 
 func isPortOpen(port int) bool {
@@ -23,7 +27,7 @@ func isPortOpen(port int) bool {
 	return true
 }
 
-func Serve(cds models.CDS) {
+func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	port := 8080
 
 	for {
@@ -49,16 +53,26 @@ func Serve(cds models.CDS) {
 		}
 	}
 
-	config := ServerConfig{
-		CDS: cds,
+	config := &ServerConfig{
+		CDS:         cds,
+		OriginalCDS: cds,
+		Cmd:         cmd,
+		Generator:   gen,
 	}
 
-	http.HandleFunc("/api/v1/cds", config.GetCds)
-	http.Handle("/", http.FileServer(getFileSystem()))
+	r := mux.NewRouter()
+
+	r.HandleFunc("/api/v1/cds", HandlerWrapper(config.GetCds))
+	r.HandleFunc("/api/v1/cds/original", HandlerWrapper(config.GetOriginalCds))
+	r.HandleFunc("/api/v1/repositories/{repoName}/versions", HandlerWrapper(config.GetVersions))
+	r.HandleFunc("/api/v1/repositories/{repoName}/install", HandlerWrapper(config.Install)) //.Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/v1/dispatch/status", HandlerWrapper(config.DispatchStatus))
+	r.HandleFunc("/api/v1/dispatch/stdout", HandlerWrapper(config.DispatchStdout))
+	r.PathPrefix("/").Handler(http.FileServer(getFileSystem()))
 
 	openbrowser("http://localhost:" + strconv.Itoa(port))
 
-	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
+	err := http.ListenAndServe(":"+strconv.Itoa(port), r)
 	if err != nil {
 		log.Fatal("failed to start api")
 	}

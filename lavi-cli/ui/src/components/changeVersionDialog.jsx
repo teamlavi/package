@@ -31,28 +31,16 @@ function ChangeVersionDialog({ onClose, repo, ver, packageName, open }) {
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Change Version of {packageName}</DialogTitle>
       <DialogContent style={{ padding: "20px 24px" }}>
-      <Autocomplete
-  id="combo-box-demo"
-  options={versions}
-  sx={{ width: 300 }}
-  onChange={handleChange}
-  renderInput={(params) => <TextField {...params} label="Version" />}
-/>
-        {/* <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Version</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={version}
-            label="Version"
-            onChange={handleChange}
-          >
-            {versions.map(v => <MenuItem value={v}>{v}</MenuItem>)}
-          </Select>
-        </FormControl> */}
+        <Autocomplete
+          id="combo-box-demo"
+          options={versions}
+          sx={{ width: "100%" }}
+          onChange={handleChange}
+          renderInput={(params) => <TextField fullWidth {...params} label="Version" />}
+        />
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={onClose}>
+        <Button autoFocus onClick={() => { onClose(null) }}>
           Cancel
         </Button>
         <Button onClick={() => onClose(version)}>Ok</Button>
