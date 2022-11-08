@@ -1,7 +1,6 @@
 import './App.css';
-import axios from "axios"
+import Service from "./service"
 import React, { useEffect, useState } from 'react';
-import testResp from "./test.json"
 import { getVulnDataStats, parseApiResponse } from './utils';
 import { createTheme, ThemeProvider } from "@mui/material"
 import Header from './components/header';
@@ -9,15 +8,20 @@ import VulnerabilityTable from './components/table'
 
 function App() {
 
+  const [original, setOriginal] = useState(null)
   const [resp, setResp] = useState(null)
   const [pkgs, setPkgs] = useState({})
   const [stats, setStats] = useState({})
-  const [changedVersions, setChangedVersion] = useState({})
-  const theme = createTheme({});
 
-  useEffect(() => {
-    // call api
-    axios.get("http://localhost:8080/api/v1/cds").then(r => {
+  const [originalPkgs, setOriginalPkgs] = useState({})
+  const [originalStats, setOriginalStats] = useState({})
+
+  const [changedVersions, setChangedVersions] = useState({})
+  const theme = createTheme({});
+  const [viewCurrent, setViewCurrent] = useState(true)
+
+  const update = () => {
+    Service.getCds().then(r => {
       const resp = r.data
       const tempPkgs = parseApiResponse(resp)
       const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
@@ -25,18 +29,41 @@ function App() {
       setPkgs(tempPkgs)
       setStats(tempStats)
     })
-  }, [])
+    Service.getOriginalCds().then(r => {
+      const resp = r.data
+      const tempPkgs = parseApiResponse(resp)
+      const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
+      setOriginal(resp)
+      setOriginalPkgs(tempPkgs)
+      setOriginalStats(tempStats)
+    })
+  }
 
+  useEffect(() => {
+    // call api
+    update()
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
       <div style={{ width: "100%", height: "100%" }}>
-        <Header hasChanges={false} />
+      {resp && <>
+        <Header update={update} viewCurrent={viewCurrent} setViewCurrent={setViewCurrent} setChangedVersions={setChangedVersions} changedVersions={changedVersions} repo={resp.repository} />
         <div style={{ display: "flex" }}>
           <div style={{ flexGrow: 1 }}>
-            {resp && <VulnerabilityTable stats={stats} nodes={resp.nodes} pkgs={pkgs} />}
+            <VulnerabilityTable
+              viewCurrent={viewCurrent}
+              changedVersions={changedVersions}
+              setChangedVersions={setChangedVersions}
+              repo={resp.repository} 
+              stats={viewCurrent ? stats : originalStats} 
+              nodes={viewCurrent ? resp.nodes : original.nodes} 
+              pkgs={viewCurrent ? pkgs : originalPkgs} 
+            />
           </div>
         </div>
+        </>
+        }
       </div>
     </ThemeProvider>
   );

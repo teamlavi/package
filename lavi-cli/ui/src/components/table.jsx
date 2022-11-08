@@ -5,16 +5,28 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import EditIcon from '@mui/icons-material/Edit';
 import ChangeVersionDialog from "./changeVersionDialog"
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-const CustomTableRow = ({ row, nodes }) => {
+const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo, row, nodes }) => {
     const [open, setOpen] = React.useState(false);
     const [dialogOpen, setDialogOpen] = React.useState(false)
+
+
+    const changeVers = changedVersions[row.name] 
+
     return <React.Fragment>
-        <ChangeVersionDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+        <ChangeVersionDialog repo={repo} ver={row.version} packageName={row.name} open={dialogOpen} onClose={(v) => {
+            if (v) {
+                const cv = {...changedVersions}
+                cv[row.name] = v
+                setChangedVersions(cv)
+            }
+            setDialogOpen(false)
+        }} />
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
             <TableCell>
                 <IconButton
-                    disabled={row.vulnerabilities.length === 0}
+                    disabled={row.vulnerabilities.length === 0 || changeVers}
                     aria-label="expand row"
                     size="small"
                     onClick={() => setOpen(!open)}
@@ -25,14 +37,24 @@ const CustomTableRow = ({ row, nodes }) => {
             <TableCell component="th" scope="row">
                 {row.name}
             </TableCell>
-            <TableCell align="right">{row.version}</TableCell>
-            <TableCell align="right">{row.severities.low}</TableCell>
-            <TableCell align="right">{row.severities.medium}</TableCell>
-            <TableCell align="right">{row.severities.high}</TableCell>
+            <TableCell align="right">{changeVers ? <b>{changeVers}</b> : row.version}</TableCell>
+            <TableCell align="right">{changeVers ? "-" : row.severities.low}</TableCell>
+            <TableCell align="right">{changeVers ? "-" : row.severities.medium}</TableCell>
+            <TableCell align="right">{changeVers ? "-" : row.severities.high}</TableCell>
             <TableCell align="right">
-                <IconButton onClick={() => setDialogOpen(true)}>
-                    <EditIcon />
-                </IconButton>
+                {viewCurrent && <>
+                    <IconButton onClick={() => setDialogOpen(true)}>
+                        <EditIcon />
+                    </IconButton>
+                    {changeVers && <IconButton onClick={() => {
+                        const cv = {...changedVersions}
+                        delete cv[row.name]
+                        setChangedVersions(cv)
+                    }}>
+                        <RefreshIcon />
+                    </IconButton>}
+                    </>
+                }
             </TableCell>
         </TableRow>
         <TableRow>
@@ -82,7 +104,7 @@ const CustomTableRow = ({ row, nodes }) => {
 }
 
 
-function VulnerabilityTable({ pkgs, stats, nodes }) {
+function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, repo, pkgs, stats, nodes }) {
 
     return (
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -101,7 +123,7 @@ function VulnerabilityTable({ pkgs, stats, nodes }) {
             </TableHead>
             <TableBody>
                 {Object.keys(stats).map(k =>
-                    <CustomTableRow nodes={nodes} row={stats[k]} key={k} />
+                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={stats[k]} key={k} />
                 )}
             </TableBody>
         </Table>
