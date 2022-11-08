@@ -8,7 +8,6 @@ stages:
 test:
   stage: test
   script:
-    - garden --logger-type=basic --env=ci build
     - garden --logger-type=basic --env=ci test
   after_script:
     - kubectl delete namespace "package-ci-${CI_ID}"
