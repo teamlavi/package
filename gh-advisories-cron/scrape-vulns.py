@@ -112,9 +112,10 @@ def scrape_vulns(repository="PIP"):
 			parsed_vuln[repo] = gh_vuln['package']['ecosystem']
 			parsed_vuln[package] = gh_vuln['package']['name']
 			parsed_vuln[vulnerableVersionRange] = gh_vuln['vulnerableVersionRange']
-
 			parsed_vulnerabilities.append(parsed_vuln)
 
 		# Note: parsed_vulnerabilities might have duplicate CVE and packages with different affected version ranges
 		# print(parsed_vulnerabilities) # Print parsed data
 		# TODO insert parsed_vulnerabilities into DB
+
+scrape_vulns("GO")
