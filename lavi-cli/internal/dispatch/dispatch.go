@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"bufio"
+	"dep-tree-gen/common"
 	"errors"
 	"io"
 	"lavi/internal/config"
@@ -34,21 +35,22 @@ func Defer(err interface{}, function *Function) {
 	function.Status = "success"
 }
 
-func Dispatch(handler reflect.Value, args ...reflect.Value) string {
-	function := &Function{
-		ID:       uuid.NewString(),
-		Complete: false,
-		Handler:  handler,
-		Args:     args,
+func RunCommand(cmd *exec.Cmd, function *Function) {
+	stdout, _ := cmd.StdoutPipe()
+	cmd.Stderr = cmd.Stdout
+
+	cmd.Start()
+
+	reader := bufio.NewReader(stdout)
+	line, err := reader.ReadString('\n')
+	for err == nil {
+		function.StdoutString += line
+		line, err = reader.ReadString('\n')
 	}
-	Running[function.ID] = function
-	go func() {
-		defer func() {
-			Defer(recover(), function)
-		}()
-		function.Handler.Call(function.Args)
-	}()
-	return function.ID
+	if err != nil && !errors.Is(err, io.EOF) {
+		panic(err)
+	}
+	cmd.Wait()
 }
 
 func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, handler reflect.Value, args ...reflect.Value) string {
@@ -66,21 +68,13 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		}()
 		out := function.Handler.Call(function.Args)
 		cmd := out[0].Interface().(*exec.Cmd)
-		stdout, _ := cmd.StdoutPipe()
-		cmd.Stderr = cmd.Stdout
 
-		cmd.Start()
+		RunCommand(cmd, function)
 
-		reader := bufio.NewReader(stdout)
-		line, err := reader.ReadString('\n')
-		for err == nil {
-			function.StdoutString += line
-			line, err = reader.ReadString('\n')
+		if cfg.GetRepository() == common.GO_REPO_NAME {
+			function.StdoutString += "running go mod tidy\r\n"
+			RunCommand(exec.Command("go", "mod", "tidy"), function)
 		}
-		if err != nil && !errors.Is(err, io.EOF) {
-			panic(err)
-		}
-		cmd.Wait()
 
 		function.Status = "vulns"
 

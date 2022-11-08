@@ -43,6 +43,10 @@ func (s *ServerConfig) SetOriginalCDS(cds models.CDS) {
 	s.OriginalCDS = cds
 }
 
+func (s *ServerConfig) GetRepository() string {
+	return s.OriginalCDS.Repository
+}
+
 func (s *ServerConfig) GetCDS() models.CDS {
 	return s.CDS
 }

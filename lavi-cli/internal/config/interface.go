@@ -6,6 +6,7 @@ import (
 )
 
 type ConfigInterface interface {
+	GetRepository() string
 	GetCDS() models.CDS
 	SetCDS(models.CDS)
 	SetOriginalCDS(models.CDS)
