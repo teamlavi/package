@@ -5,6 +5,7 @@ import { getVulnDataStats, parseApiResponse } from './utils';
 import { createTheme, ThemeProvider } from "@mui/material"
 import Header from './components/header';
 import VulnerabilityTable from './components/table'
+import { SnackbarProvider } from 'notistack';
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <SnackbarProvider maxSnack={3}>
       <div style={{ width: "100%", height: "100%" }}>
       {resp && <>
         <Header 
@@ -74,6 +76,7 @@ function App() {
         </>
         }
       </div>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }

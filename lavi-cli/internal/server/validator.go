@@ -9,10 +9,10 @@ import (
 
 func IsUploadedCdsValid(w http.ResponseWriter, r *http.Request, uploaded, expected models.CDS) (map[string]string, bool) {
 	if uploaded.CmdType != expected.CmdType {
-		return map[string]string{"error": fmt.Sprintf("Provided command type (%s) does not match expected (%s)", uploaded.CmdType, expected.CmdType)}, false
+		return map[string]string{"error": fmt.Sprintf("Provided tree was generated using %s, which does not match expected (%s)", uploaded.CmdType, expected.CmdType)}, false
 	}
 	if uploaded.Repository != expected.Repository {
-		return map[string]string{"error": fmt.Sprintf("Provided repository (%s) does not match expected (%s)", uploaded.Repository, expected.Repository)}, false
+		return map[string]string{"error": fmt.Sprintf("Provided tree uses repository %s, which does not match expected (%s)", uploaded.Repository, expected.Repository)}, false
 	}
 
 	for id, data := range uploaded.Nodes {

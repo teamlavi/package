@@ -1,6 +1,7 @@
 package server
 
 import (
+	"dep-tree-gen/common"
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
@@ -149,12 +150,16 @@ func (s *ServerConfig) GetVersions(w http.ResponseWriter, r *http.Request) {
 
 	packageName := r.URL.Query().Get("name")
 
-	if repoName == "pip" {
+	if repoName == common.PIP_REPO_NAME {
 		JsonResponse(w, r, repositories.GetPipVersions(packageName))
 		return
 	}
-	if repoName == "go" {
+	if repoName == common.GO_REPO_NAME {
 		JsonResponse(w, r, repositories.GetGoVersions(packageName))
+		return
+	}
+	if repoName == common.NPM_REPO_NAME {
+		JsonResponse(w, r, repositories.GetNpmVersions(packageName))
 		return
 	}
 
@@ -177,14 +182,17 @@ func (s *ServerConfig) Install(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	if repoName == "pip" {
+	if repoName == common.PIP_REPO_NAME {
 		pythonPath, _ := s.Cmd.Flags().GetString("python")
 		JsonResponse(w, r, map[string]string{"id": repositories.PipInstall(s, pythonPath, t.Packages)})
 		return
 	}
-
-	if repoName == "go" {
+	if repoName == common.GO_REPO_NAME {
 		JsonResponse(w, r, map[string]string{"id": repositories.GoInstall(s, t.Packages)})
+		return
+	}
+	if repoName == common.NPM_REPO_NAME {
+		JsonResponse(w, r, map[string]string{"id": repositories.NpmInstall(s, t.Packages)})
 		return
 	}
 

@@ -8,6 +8,7 @@ import (
 	"lavi/internal/config"
 	"os/exec"
 	"reflect"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -36,8 +37,8 @@ func Defer(err interface{}, function *Function) {
 }
 
 func RunCommand(cmd *exec.Cmd, function *Function) {
-	stdout, _ := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
+	stdout, _ := cmd.StdoutPipe()
 
 	cmd.Start()
 
@@ -68,6 +69,8 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		}()
 		out := function.Handler.Call(function.Args)
 		cmd := out[0].Interface().(*exec.Cmd)
+
+		function.StdoutString += cmd.Path + strings.Join(cmd.Args, " ")
 
 		RunCommand(cmd, function)
 

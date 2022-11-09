@@ -16,11 +16,12 @@ export function parseApiResponse(response) {
 
     for (const dep of root.dependencies) {
         const currentNode = nodes[dep]
-        const output = parseApiResponseRecursive(currentNode, nodes)
+        const output = parseApiResponseRecursive(currentNode, nodes, [])
         vulnData[dep] = makeVulnListUnique(output)
     }
     return vulnData
 }
+
 
 // this will create duplicates because multiple packages can depends on the same packages in side a tree
 /* 
@@ -30,7 +31,7 @@ export function parseApiResponse(response) {
   \   /
     D
 */
-function parseApiResponseRecursive(currentNode, nodes) {
+function parseApiResponseRecursive(currentNode, nodes, visited) {
     if (!currentNode) {
         return []
     }
@@ -50,7 +51,12 @@ function parseApiResponseRecursive(currentNode, nodes) {
     }
     for (const dep of dependencies) {
         const n = nodes[dep]
-        const out = parseApiResponseRecursive(n, nodes)
+        if (visited[dep]) {
+            continue
+        } else {
+            visited[dep] = true
+        }
+        const out = parseApiResponseRecursive(n, nodes, visited)
         if (out) {
             tempVulnArray.push(...out)
         }

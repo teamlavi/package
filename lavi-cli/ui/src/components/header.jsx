@@ -8,6 +8,7 @@ import HelpModal from './helpModal';
 import InstallConfirmation from './installConfirmation';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
+import { useSnackbar } from 'notistack';
 
 export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, setChangedVersions, changedVersions, update }) {
     const [confirmModalOpen, setConfirmModalOpen] = useState(false)
@@ -15,6 +16,7 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
     const [helpModalOpen, setHelpModalOpen] = useState(false)
     const [id, setId] = useState("")
     const fileInputRef = React.useRef(null);
+    const { enqueueSnackbar } = useSnackbar();
 
     const runChanges = () => {
         Service.runInstall(repo, { packages: changedVersions }).then(r => {
@@ -54,7 +56,7 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
             try {
                 data = JSON.parse(e.target.result)
             } catch {
-                // failout
+                enqueueSnackbar(`Failed to read file`, { variant: "error" })
                 return
             }
             Service.uploadCds(data).then(r => {
@@ -63,8 +65,11 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
                     cv[node.package] = node.version
                 }
                 setChangedVersions(cv)
+            }).catch((e) => {
+                if (e.response) {
+                    enqueueSnackbar(e.response.data.error, { variant: 'error' })
+                }
             })
-            // upload here
         };
     }
 
