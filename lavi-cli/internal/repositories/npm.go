@@ -29,7 +29,7 @@ func GetNpmVersions(packageName string) []string {
 
 func runNpmInstall(packages map[string]string) *exec.Cmd {
 
-	commands := []string{"install", "--progress=false"}
+	commands := []string{"install", "--progress=falsec"}
 	for k, v := range packages {
 		commands = append(commands, k+"@"+v)
 	}
