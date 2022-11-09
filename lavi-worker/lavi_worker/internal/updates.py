@@ -3,6 +3,7 @@ import httpx
 import json
 
 from lavi_worker.daos import cve
+from lavi_worker.daos import package
 from lavi_worker.daos.database import get_db_tx
 
 # GitHub personal access token (classic)
@@ -47,6 +48,16 @@ async def initialize_database() -> None:
                     );
                     ALTER TABLE cves
                         ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
+                    CREATE TABLE package (
+                                repo_name VARCHAR(50) NOT NULL,
+                                pkg_name VARCHAR(50) NOT NULL,
+                                univ_hash VARCHAR(100) UNIQUE,
+                                major_vers INT NOT NULL,
+                                minor_vers INT NOT NULL,
+                                patch_vers INT NOT NULL,
+                                num_downloads INT,
+                                s3_bucket varchar(50)
+                    );
                 """,
             )
 
@@ -59,7 +70,7 @@ async def nuke_database() -> None:
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
             await cur.execute("DROP TABLE cves")
-            # ... more tables as added
+            await cur.execute("DROP TABLE package")
 
 
 async def clear_database() -> None:
@@ -69,7 +80,7 @@ async def clear_database() -> None:
     # Clear each of the tables in sequence
     async with await get_db_tx() as tx:
         await cve.drop_all_rows(tx)
-        # ... more tables as added
+        await package.drop_all_rows(tx)
 
 
 async def database_size(table: str) -> int:
@@ -106,6 +117,29 @@ async def insert_single_vulnerability(
             pkg_vers=pkg_vers,
         )
 
+
+async def insert_single_package_version(
+        repo_name: str,
+        pkg_name: str,
+        pkg_vers_id: str,
+        major_vers: int,
+        minor_vers: int,
+        patch_vers: int,
+        num_downloads: int | None,
+        s3_bucket: str | None
+) -> None:
+    """Insert a single vulnerability into the db."""
+    async with await get_db_tx() as tx:
+        await cve.create(
+        repo_name = repo_name,
+        pkg_name = pkg_name,
+        pkg_vers_id = pkg_vers_id,
+        major_vers = major_vers,
+        minor_vers = minor_vers,
+        patch_vers = patch_vers,
+        num_downloads = num_downloads,
+        s3_bucket = s3_bucket
+        )
 
 async def delete_single_vulnerability(
     repo_name: str, pkg_name: str, pkg_vers: str, cve_id: str
@@ -168,6 +202,21 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
     else:
         # unexpected
         pass
+
+async scrape_pip_packages() -> None:
+    for version:
+        insert_single_package_version()
+
+
+async scrape_npm_packages() -> None:
+    for version:
+        insert_single_package_version()
+
+async def scrape_packages() -> None:
+    """Scrape released versions for all packages in repos"""
+    scrape_pip_packages()
+    scrape_npm_packages()
+
 
 async def scrape_vulnerabilities() -> None:
     """Scrape vulnerabilities from github, save to database."""
