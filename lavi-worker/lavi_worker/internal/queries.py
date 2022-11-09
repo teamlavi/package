@@ -19,7 +19,7 @@ async def find_vulnerabilities_simple(
 
 
 async def find_full_vulnerabilities_id(
-    id: str,
+    univ_id: str,
 ) -> List[cve.CVE]:
     """Find CVE data from a universal hash."""
 
