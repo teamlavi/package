@@ -3,7 +3,6 @@ import subprocess
 import os 
 import shutil
 
-
 wd = os.getcwd()
 ui_dir = os.path.join(wd, "ui")
 
@@ -16,8 +15,8 @@ subprocess.run(["npm", "run", "build"], cwd=ui_dir)
 GOOS = ["darwin", "windows", "linux"]
 GOARCHS = {
     "darwin": ["amd64", "arm64"],
-    "windows": ["amd64", "arm"],
-    "linux": ["amd64", "arm", "arm64"]
+    "windows": ["amd64"],
+    "linux": ["amd64", "arm64"]
 }
 
 try:
