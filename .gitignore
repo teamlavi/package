@@ -3,3 +3,4 @@
 .garden
 **/.mypy_cache
 **/.pytest_cache
+/.idea/
