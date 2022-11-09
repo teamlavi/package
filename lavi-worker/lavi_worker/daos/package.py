@@ -33,24 +33,24 @@ async def create(
     async with tx.cursor() as cur:
         await cur.execute(
             """
-                INSERT INTO packages
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO package
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
-			repo_name,
-			pkg_name,
-			pkg_vers_id,
-			major_vers,
-			minor_vers,
-			patch_vers,
-			num_downloads,
-			s3_bucket
+			"repo_name",
+			"pkg_name",
+			"pkg_vers_id",
+			0,
+			0,
+			0,
+			0,
+			"s3_bucket"
             ),
         )
 
 
 async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
-        await cur.execute("SELECT COUNT(*) FROM cves")
+        await cur.execute("SELECT COUNT(*) FROM package")
         row = await cur.fetchone()
         return row[0]  # type: ignore

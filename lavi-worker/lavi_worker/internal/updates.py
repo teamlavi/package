@@ -28,8 +28,6 @@ async def is_db_initialized() -> bool:
 
 async def initialize_database() -> None:
     """Initialize the database."""
-    assert not await is_db_initialized()
-
     # Build the tables
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
@@ -50,13 +48,13 @@ async def initialize_database() -> None:
                     ALTER TABLE cves
                         ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
                     CREATE TABLE package (
+                                univ_hash VARCHAR(100) PRIMARY KEY,
                                 repo_name VARCHAR(50) NOT NULL,
                                 pkg_name VARCHAR(50) NOT NULL,
-                                univ_hash VARCHAR(100) UNIQUE,
-                                major_vers INT NOT NULL,
-                                minor_vers INT NOT NULL,
-                                patch_vers INT NOT NULL,
-                                num_downloads INT,
+                                major_vers INTEGER NOT NULL,
+                                minor_vers INTEGER NOT NULL,
+                                patch_vers INTEGER NOT NULL,
+                                num_downloads INTEGER,
                                 s3_bucket varchar(50)
                     );
                 """,
@@ -88,7 +86,7 @@ async def database_size(table: str) -> int:
     """Get the number of rows in the db."""
     if table == "cves":
         async with await get_db_tx() as tx:
-            return await cve.get_row_count(tx)
+            return await package.get_row_count(tx)
     # ... more tables as added
     else:
         raise Exception(f"Table {table} is not expected to exist")
