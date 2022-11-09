@@ -25,5 +25,5 @@ async def find_full_vulnerabilities_id(
 
     # Get cves from the database
     async with await get_db_tx() as tx:
-        cves = await cve.find_by_univ_hash(tx, id)
+        cves = await cve.find_by_univ_hash(tx, univ_id)
     return cves
