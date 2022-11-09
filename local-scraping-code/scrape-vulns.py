@@ -1,3 +1,5 @@
+"""scrape_vulnerabilities() in updates.py """
+
 import httpx
 import json
 
@@ -8,7 +10,7 @@ GitHub_access_token = ""
 
 def scrape_vulns(repository="PIP"):
 	auth_headers = {"Authorization": "Bearer " + GitHub_access_token}
-	last_cursor_file = "lastCursor"+repository+ ".txt"
+	last_cursor_file = "last_cursor_" + repository + ".txt"
 	packages = []
 
 	# Get and save cursor are functions incase decide to save somewhere else

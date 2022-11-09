@@ -1,3 +1,5 @@
+"""scrape_npm_packages() in updates.py"""
+
 import json
 import os
 

@@ -1,3 +1,5 @@
+"""Example code for querying github advisories database by repository"""
+
 import requests
 import json
 
