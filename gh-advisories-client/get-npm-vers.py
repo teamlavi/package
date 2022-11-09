@@ -12,5 +12,3 @@ version_list = json.loads(text)
 for vers in version_list:
 	major_vers, minor_vers, patch_vers = vers.split(".")
 	print(major_vers, minor_vers, patch_vers)
-
-#print(json.dumps(json.loads(r.text), indent=2))
