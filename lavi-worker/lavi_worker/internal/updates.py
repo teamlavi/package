@@ -128,9 +128,9 @@ async def insert_single_package_version(
         num_downloads: int | None,
         s3_bucket: str | None
 ) -> None:
-    """Insert a single vulnerability into the db."""
     async with await get_db_tx() as tx:
-        await cve.create(
+        await package.create(
+            tx=tx,
         repo_name = repo_name,
         pkg_name = pkg_name,
         pkg_vers_id = "", # TODO

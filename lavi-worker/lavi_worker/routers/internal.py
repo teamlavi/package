@@ -22,12 +22,27 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Resp
     return Response(status_code=200)
 
 
+@router.post("/insert_vers")
+async def insert_vers() -> Response:
+    await updates.insert_single_package_version("npm", "test", 1, 1, 1, None, None)
+    return Response(status_code=200)
+
+
 @router.post("/delete_vuln")
 async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
     """Delete a single vulnerability."""
     await updates.delete_single_vulnerability(**delete_vuln_request.dict())
     return Response(status_code=200)
 
+@router.post("/trigger_npm_scrapper")
+async def trigger_npm_scrapper() -> Response:
+    await updates.scrape_npm_packages()
+    return Response(status_code=200)
+
+@router.post("/trigger_pip_scrapper")
+async def trigger_pip_scrapper() -> Response:
+    await updates.scrape_pip_packages()
+    return Response(status_code=200)
 
 @router.post("/database/clear")
 async def clear_database() -> Response:

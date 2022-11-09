@@ -49,6 +49,8 @@ async def create(
         )
 
 
-async def delete(tx: Transaction) -> None:
-	# TODO: implement
-	pass
+async def get_row_count(tx: Transaction) -> int:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT COUNT(*) FROM cves")
+        row = await cur.fetchone()
+        return row[0]  # type: ignore
