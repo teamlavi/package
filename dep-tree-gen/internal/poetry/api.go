@@ -17,5 +17,5 @@ func (g PoetryTreeGenerator) GetCDS() models.CDS {
 }
 
 func (g PoetryTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
-	return models.CDS{}
+	return g.GetCDS()
 }

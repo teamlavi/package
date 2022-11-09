@@ -3,8 +3,8 @@ package golang
 import (
 	"bytes"
 	"dep-tree-gen/common"
-	"dep-tree-gen/internal/utils"
 	"dep-tree-gen/models"
+	"dep-tree-gen/utils"
 	"log"
 	"os/exec"
 	"strings"

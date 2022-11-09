@@ -4,7 +4,7 @@ import (
 	"dep-tree-gen/common"
 	"dep-tree-gen/models"
 
-	"dep-tree-gen/internal/utils"
+	"dep-tree-gen/utils"
 )
 
 type PDPPackage struct {

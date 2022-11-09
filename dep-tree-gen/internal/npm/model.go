@@ -4,7 +4,7 @@ import (
 	"dep-tree-gen/common"
 	"dep-tree-gen/models"
 
-	"dep-tree-gen/internal/utils"
+	"dep-tree-gen/utils"
 )
 
 type PackageLock struct {
@@ -32,6 +32,9 @@ func (lock PackageLock) ToCDS() models.CDS {
 	topLvlDependencyIds := []string{}
 
 	for name, data := range lock.Dependencies {
+		if data.Version == "file:" {
+			continue
+		}
 		id := utils.GenerateID(name, data.Version, common.NPM_REPO_NAME)
 		if _, exists := rootPkg.Dependencies[name]; exists {
 			topLvlDependencyIds = append(topLvlDependencyIds, id)
