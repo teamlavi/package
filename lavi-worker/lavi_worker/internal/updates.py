@@ -1,6 +1,7 @@
 import psycopg
 import httpx
 import json
+import os
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
@@ -121,7 +122,6 @@ async def insert_single_vulnerability(
 async def insert_single_package_version(
         repo_name: str,
         pkg_name: str,
-        pkg_vers_id: str,
         major_vers: int,
         minor_vers: int,
         patch_vers: int,
@@ -133,7 +133,7 @@ async def insert_single_package_version(
         await cve.create(
         repo_name = repo_name,
         pkg_name = pkg_name,
-        pkg_vers_id = pkg_vers_id,
+        pkg_vers_id = "", # TODO
         major_vers = major_vers,
         minor_vers = minor_vers,
         patch_vers = patch_vers,
@@ -203,19 +203,40 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
         # unexpected
         pass
 
-async scrape_pip_packages() -> None:
-    for version:
-        insert_single_package_version()
+async def scrape_pip_packages() -> None:
+    pass
 
 
-async scrape_npm_packages() -> None:
-    for version:
-        insert_single_package_version()
+async def scrape_npm_packages() -> None:
+    """Get versions for npm packages"""
+    with open("npm-packages-w-vuln.txt", 'r') as f:
+        package_list = [p.replace("'", "") for p in f.read().split(", ")]
+
+    for package in package_list:
+        if package[0] == "-":
+            continue
+        try:
+            cmd = 'npm view ' + package + '@* version --json'
+            request = os.popen(cmd).read()
+            version_list = json.loads(request)
+
+            if isinstance(version_list, str) and "-" in version_list:
+                continue
+            elif isinstance(version_list, str):
+                version_list = [version_list]
+            elif isinstance(version_list[0], list):
+                version_list = version_list[0]
+            for vers in version_list:
+                major_vers, minor_vers, patch_vers = vers.split(".")
+                await insert_single_package_version("npm", package, major_vers, minor_vers, patch_vers, None, None)
+        except:
+            print("unable to interpret versions for: ", package)
+
 
 async def scrape_packages() -> None:
     """Scrape released versions for all packages in repos"""
-    scrape_pip_packages()
-    scrape_npm_packages()
+    await scrape_pip_packages()
+    await scrape_npm_packages()
 
 
 async def scrape_vulnerabilities() -> None:
