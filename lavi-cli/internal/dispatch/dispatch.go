@@ -53,6 +53,9 @@ func RunCommand(cmd *exec.Cmd, function *Function) {
 	cmd.Wait()
 }
 
+// dispatches a goroutine thread that can be identified by the id returned
+// eventually, will probably limit to just one goroutine since we probably dont want multiple installs
+// in a single session
 func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, handler reflect.Value, args ...reflect.Value) string {
 	function := &Function{
 		ID:       uuid.NewString(),

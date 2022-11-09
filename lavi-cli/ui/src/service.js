@@ -20,8 +20,8 @@ export default class Service {
         return axios.get(`${URL_PREFIX}/api/v1/repositories/${repo}/versions`, {params: { name: pkg }})
     }
 
-    static async runInstall(repo, changes) {
-        return axios.post(`${URL_PREFIX}/api/v1/repositories/${repo}/install`, changes)
+    static async runInstall(cmd, changes) {
+        return axios.post(`${URL_PREFIX}/api/v1/install/${cmd}`, changes)
     }
 
     static async getStdout(id) {

@@ -1,79 +1,76 @@
 package server
 
 import (
-	"bufio"
-	"dep-tree-gen/generator"
-	"dep-tree-gen/models"
+	"encoding/json"
 	"fmt"
-	"log"
-	"net"
+	"lavi/internal/config"
 	"net/http"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
 )
 
-func isPortOpen(port int) bool {
-	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
-
-	if err != nil {
-		return false
-	}
-
-	ln.Close()
-	return true
+type Server struct {
+	cfg    config.ConfigInterface
+	router *mux.Router
 }
 
-func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
-	port := 8080
-
-	for {
-		if !isPortOpen(port) {
-			r := bufio.NewReader(os.Stdin)
-			fmt.Printf("Port %s is in use. Try a different port? [Y/n]: ", port)
-
-			res, err := r.ReadString('\n')
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Empty input (i.e. "\n")
-			if len(res) < 2 {
-				port += 1
-			}
-
-			if strings.ToLower(strings.TrimSpace(res))[0] != 'y' {
-				os.Exit(0)
-			}
-		} else {
-			break
+func CorsWrapper(next func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		if r.Method == "OPTIONS" {
+			return
 		}
+		next(w, r)
 	}
+}
 
-	config := &ServerConfig{
-		CDS:         cds,
-		OriginalCDS: cds,
-		Cmd:         cmd,
-		Generator:   gen,
+func PanicWrapper(next func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				out, _ := json.Marshal(errorResp)
+				w.WriteHeader(500)
+				fmt.Fprintf(w, string(out))
+			}
+		}()
+		next(w, r)
 	}
+}
 
-	r := mux.NewRouter()
+func CfgWrapper(cfg config.ConfigInterface, next func(cfg config.ConfigInterface, w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		next(cfg, w, r)
+	}
+}
 
-	r.HandleFunc("/api/v1/cds", HandlerWrapper(config.GetSetCds))
-	r.HandleFunc("/api/v1/cds/original", HandlerWrapper(config.GetOriginalCds))
-	r.HandleFunc("/api/v1/repositories/{repoName}/versions", HandlerWrapper(config.GetVersions))
-	r.HandleFunc("/api/v1/repositories/{repoName}/install", HandlerWrapper(config.Install)) //.Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/v1/dispatch/status", HandlerWrapper(config.DispatchStatus))
-	r.HandleFunc("/api/v1/dispatch/stdout", HandlerWrapper(config.DispatchStdout))
-	r.PathPrefix("/").Handler(http.FileServer(getFileSystem()))
-
-	openbrowser("http://localhost:" + strconv.Itoa(port))
-
-	err := http.ListenAndServe(":"+strconv.Itoa(port), r)
+func JsonResponse(w http.ResponseWriter, r *http.Request, body interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	out, err := json.Marshal(body)
 	if err != nil {
-		log.Fatal("failed to start api")
+		panic(err)
 	}
+	fmt.Fprintf(w, string(out))
+}
+
+func HandlerWrapper(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return PanicWrapper(CorsWrapper(handler))
+}
+
+func New(config *ServerConfig) *Server {
+	return &Server{
+		cfg:    config,
+		router: mux.NewRouter(),
+	}
+}
+
+func (s *Server) Register(path string, handler func(cfg config.ConfigInterface, w http.ResponseWriter, r *http.Request), methods ...string) {
+	methods = append(methods, "OPTIONS")
+	wrappedHandler := CfgWrapper(s.cfg, handler)
+	s.router.HandleFunc(path, HandlerWrapper(wrappedHandler)).Methods(methods...)
+}
+
+func (s *Server) Serve(port string) error {
+	return http.ListenAndServe(port, s.router)
 }

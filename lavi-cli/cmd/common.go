@@ -1,16 +1,17 @@
-package common
+package cmd
 
 import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
 	"io/ioutil"
-	"lavi/internal/server"
+	"lavi/internal"
 
 	"github.com/spf13/cobra"
 )
 
-func PostCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
+// post command function to run AFTER a command has succesfully run
+func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
 	if write {
@@ -19,6 +20,6 @@ func PostCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 	}
 
 	if show {
-		server.Serve(cmd, cds, gen)
+		internal.Serve(cmd, cds, gen)
 	}
 }

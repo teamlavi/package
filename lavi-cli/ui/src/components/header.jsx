@@ -19,7 +19,7 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
     const { enqueueSnackbar } = useSnackbar();
 
     const runChanges = () => {
-        Service.runInstall(repo, { packages: changedVersions }).then(r => {
+        Service.runInstall(cds.cmdType, { packages: changedVersions }).then(r => {
             setId(r.data.id)
             setModalOpen(true)
         })
@@ -74,7 +74,7 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
     }
 
     return <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar position="fixed">
             <Toolbar>
                 <Typography variant="h6" component="div" sx={{ marginRight: "0.25em" }}>
                     LAVI

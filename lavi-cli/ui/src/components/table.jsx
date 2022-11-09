@@ -1,6 +1,6 @@
 import React from 'react';
 import { getVulnDataStats, parseApiResponse } from '../utils';
-import { Collapse, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon } from "@mui/material"
+import { Collapse, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon, TableSortLabel } from "@mui/material"
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import EditIcon from '@mui/icons-material/Edit';
@@ -112,29 +112,104 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
     </React.Fragment>
 }
 
+const sorts = {
+    "name": (a, b) => {
+        return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0)
+    },
+    "highSev": (a, b) => {
+        return a.severities.high > b.severities.high ? -1 : (a.severities.high < b.severities.high ? 1 : 0)
+    },
+    "medSev": (a, b) => {
+        return a.severities.medium > b.severities.medium ? -1 : (a.severities.medium < b.severities.medium ? 1 : 0)
+    },
+    "lowSev": (a, b) => {
+        return a.severities.low > b.severities.low ? -1 : (a.severities.low < b.severities.low ? 1 : 0)
+    }
+}
+
 
 function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, repo, pkgs, stats, nodes }) {
 
     const [pkgStats, accumStats] = stats
+    const [sortType, setSortType] = React.useState("name")
+    const [sortDir, setSortDir] = React.useState("asc")
+
+    const createSortHandler = (p) => (event) => {
+        if (sortType === p) {
+            console.log(sortDir === "asc" ? "desc" : "asc")
+            setSortDir(sortDir === "asc" ? "desc" : "asc")
+        }
+        setSortType(p)
+    };
+
+    const values = Object.values(pkgStats)
+    values.sort(sorts[sortType])
+    if (sortDir === "desc") {
+        values.reverse()
+    }
+    
 
     return (
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
                 <TableRow>
                     <TableCell></TableCell>
-                    <TableCell>Package Name</TableCell>
+                    <TableCell
+                        sortDirection={sortType === "name" ? sortDir : false}
+                    >
+                        <TableSortLabel
+                            active={sortType === "name"}
+                            direction={sortType === "name" ? sortDir : 'asc'}
+                            onClick={createSortHandler("name")}
+                        >
+                            Name
+                        </TableSortLabel>
+                    </TableCell>
                     <TableCell align="right">
                         Package Version
                     </TableCell>
-                    <TableCell align="right">Low Severity Vulnerabilities</TableCell>
-                    <TableCell align="right">Medium Severity Vulnerabilities</TableCell>
-                    <TableCell align="right">High Severity Vulnerabilities</TableCell>
+                    <TableCell
+                        align="right"
+                        sortDirection={sortType === "lowSev" ? sortDir : false}
+                    >
+                        <TableSortLabel
+                            active={sortType === "lowSev"}
+                            direction={sortType === "lowSev" ? sortDir : 'asc'}
+                            onClick={createSortHandler("lowSev")}
+                        >
+                            Low Severity Vulnerabilities
+                        </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                        align="right"
+                        sortDirection={sortType === "medSev" ? sortDir : false}
+                    >
+                        <TableSortLabel
+                            active={sortType === "medSev"}
+                            direction={sortType === "medSev" ? sortDir : 'asc'}
+                            onClick={createSortHandler("medSev")}
+                        >
+                            Medium Severity Vulnerabilities
+                        </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                        align="right"
+                        sortDirection={sortType === "highSev" ? sortDir : false}
+                    >
+                        <TableSortLabel
+                            active={sortType === "highSev"}
+                            direction={sortType === "highSev" ? sortDir : 'asc'}
+                            onClick={createSortHandler("highSev")}
+                        >
+                            High Severity Vulnerabilities
+                        </TableSortLabel>
+                    </TableCell>
                     <TableCell align="right"></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
                 <TableRow>
-                    <TableCell><IconButton sx={{height: "20px"}}><Icon /></IconButton></TableCell>
+                    <TableCell><IconButton sx={{ height: "20px" }}><Icon /></IconButton></TableCell>
                     <TableCell component="th" scope="row">
                         Totals
                     </TableCell>
@@ -148,10 +223,10 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                     <TableCell align="right">
                         {accumStats.high}
                     </TableCell>
-                    <TableCell align="right"><IconButton sx={{height: "20px"}}><Icon /></IconButton></TableCell>
+                    <TableCell align="right"><IconButton sx={{ height: "20px" }}><Icon /></IconButton></TableCell>
                 </TableRow>
-                {Object.keys(pkgStats).map(k =>
-                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={pkgStats[k]} key={k} />
+                {values.map(k =>
+                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={k} key={k.id} />
                 )}
             </TableBody>
         </Table>

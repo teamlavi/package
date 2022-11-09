@@ -48,7 +48,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider maxSnack={3}>
-      <div style={{ width: "100%", height: "100%" }}>
       {resp && <>
         <Header 
           cds={resp}
@@ -60,8 +59,7 @@ function App() {
           changedVersions={changedVersions} 
           repo={resp.repository} 
         />
-        <div style={{ display: "flex" }}>
-          <div style={{ flexGrow: 1 }}>
+          <div style={{overflow: 'auto', marginTop: "64px", maxHeight: "calc(100vh - 64px)"}}>
             <VulnerabilityTable
               viewCurrent={viewCurrent}
               changedVersions={changedVersions}
@@ -72,10 +70,8 @@ function App() {
               pkgs={viewCurrent ? pkgs : originalPkgs} 
             />
           </div>
-        </div>
         </>
         }
-      </div>
       </SnackbarProvider>
     </ThemeProvider>
   );

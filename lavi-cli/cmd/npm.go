@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"dep-tree-gen/generator"
-	"lavi/internal/common"
 
 	"github.com/spf13/cobra"
 )
@@ -14,32 +13,16 @@ import (
 // npmCmd represents the npm command
 var npmCmd = &cobra.Command{
 	Use:   "npm",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Run LAVI against an npm project",
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
 		npmGen := generator.GetNpmTreeGenerator(path)
 		cds := npmGen.GetCDS()
-		common.PostCommand(cmd, cds, npmGen)
+		postCommand(cmd, cds, npmGen)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(npmCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// npmCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// npmCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	npmCmd.Flags().String("path", ".", "Path to project")
 }
