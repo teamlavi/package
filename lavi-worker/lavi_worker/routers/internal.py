@@ -24,7 +24,7 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Resp
 
 @router.post("/insert_vers")
 async def insert_vers() -> Response:
-    await updates.insert_single_package_version("npm", "test", 1, 1, 1, "None", "None")
+    await updates.insert_single_package_version("fff", "asdf", 1, 1, 1, 0, "None")
     return Response(status_code=200)
 
 

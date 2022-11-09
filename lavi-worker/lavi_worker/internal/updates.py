@@ -131,7 +131,6 @@ async def insert_single_package_version(
             tx=tx,
         repo_name = repo_name,
         pkg_name = pkg_name,
-        pkg_vers_id = "", # TODO
         major_vers = major_vers,
         minor_vers = minor_vers,
         patch_vers = patch_vers,
