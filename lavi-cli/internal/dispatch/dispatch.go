@@ -8,7 +8,6 @@ import (
 	"lavi/internal/config"
 	"os/exec"
 	"reflect"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -69,8 +68,6 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		}()
 		out := function.Handler.Call(function.Args)
 		cmd := out[0].Interface().(*exec.Cmd)
-
-		function.StdoutString += cmd.Path + strings.Join(cmd.Args, " ")
 
 		RunCommand(cmd, function)
 
