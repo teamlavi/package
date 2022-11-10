@@ -60,35 +60,38 @@ async def create(
 
 
 async def create_pkg_vers(
-        repo_name: str,
-        pkg_name: str,
-        major_vers: int,
-        minor_vers: int,
-        patch_vers: int,
-        num_downloads: int | None = None,
-        s3_bucket: str | None = None,
-    ) -> None:
+    tx: Transaction,
+    repo_name: str,
+    pkg_name: str,
+    major_vers: int,
+    minor_vers: int,
+    patch_vers: int,
+    num_downloads: int | None = None,
+    s3_bucket: str | None = None,
+) -> None:
     """Create a pkg_vers object in the database, return nothing if successful."""
-    univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
+    univ_hash = generate_universal_hash(
+        repo_name, pkg_name, str(major_vers) + str(minor_vers) + str(patch_vers)
+    )
     # TODO: check that row doesn't already exist OR catch resultant psycopg3 err
     async with tx.cursor() as cur:
         await cur.execute(
             """
                 INSERT INTO package
-                VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
-                cve_id,
-                severity,
-                description,
-                cwe,
-                url,
                 repo_name,
                 pkg_name,
-                pkg_vers,
+                major_vers,
+                minor_vers,
+                patch_vers,
+                num_downloads,
+                s3_bucket,
                 univ_hash,
             ),
         )
+
 
 async def delete(tx: Transaction, cve: CVE) -> None:
     """Delete the given CVE from the db."""

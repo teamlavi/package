@@ -12,13 +12,22 @@ token = ""
 
 last_cursor = None
 
-query_type = "securityAdvisories(last:100" \
-			 + ("" if last_cursor is None or last_cursor == "" else ", after: \"" + last_cursor + "\"") \
-			 + ", orderBy: {field: UPDATED_AT, direction: ASC})"
+query_type = (
+    "securityAdvisories(last:100"
+    + (
+        ""
+        if last_cursor is None or last_cursor == ""
+        else ', after: "' + last_cursor + '"'
+    )
+    + ", orderBy: {field: UPDATED_AT, direction: ASC})"
+)
 
 # Keep repository in query so that only relevant vulnerabilities are returned
-query = """ 
-{""" + query_type + """
+query = (
+    """ 
+{"""
+    + query_type
+    + """
    {
     edges {
       cursor
@@ -42,10 +51,13 @@ query = """
 }
 }
 """
+)
 
 # Add authorization token to headers
 auth_headers = {"Authorization": "Bearer " + token}
-response = requests.post("https://api.github.com/graphql", json={'query': query}, headers=auth_headers)
+response = requests.post(
+    "https://api.github.com/graphql", json={"query": query}, headers=auth_headers
+)
 
 # Print returned JSON
 print(json.dumps(json.loads(response.text), indent=2))

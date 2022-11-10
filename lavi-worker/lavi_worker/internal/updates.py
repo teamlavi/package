@@ -120,26 +120,28 @@ async def insert_single_vulnerability(
 
 
 async def insert_single_package_version(
-        repo_name: str,
-        pkg_name: str,
-        major_vers: int,
-        minor_vers: int,
-        patch_vers: int,
-        num_downloads: int | None = None,
-        s3_bucket: str | None = None,
+    repo_name: str,
+    pkg_name: str,
+    major_vers: int,
+    minor_vers: int,
+    patch_vers: int,
+    num_downloads: int | None = None,
+    s3_bucket: str | None = None,
 ) -> None:
 
     """Insert a single package version into the db."""
     async with await get_db_tx() as tx:
         await cve.create_pkg_vers(
-            repo_name = repo_name,
-            pkg_name = pkg_name,
-            major_vers = major_vers,
-            minor_vers = minor_vers,
-            patch_vers = patch_vers,
-            num_downloads = num_downloads,
-            s3_bucket = s3_bucket
+            tx=tx,
+            repo_name=repo_name,
+            pkg_name=pkg_name,
+            major_vers=major_vers,
+            minor_vers=minor_vers,
+            patch_vers=patch_vers,
+            num_downloads=num_downloads,
+            s3_bucket=s3_bucket,
         )
+
 
 async def delete_single_vulnerability(
     repo_name: str, pkg_name: str, pkg_vers: str, cve_id: str
@@ -168,15 +170,29 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
         return """SELECT * from table WHERE pkg_name=%s AND 
         (major_vers<%s OR 
         (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <=%s))""", \
-               (pkg_name, major_vers, major_vers, minor_vers, major_vers, minor_vers, minor_vers)
+        (major_vers=%s AND minor_vers=%s and patch_vers <=%s))""", (
+            pkg_name,
+            major_vers,
+            major_vers,
+            minor_vers,
+            major_vers,
+            minor_vers,
+            minor_vers,
+        )
     elif vers_range[0] == "<":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         return """SELECT * from table WHERE pkg_name=%s AND 
         (major_vers<%s OR 
         (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <%s))""", \
-               (pkg_name, major_vers, major_vers, minor_vers, major_vers, minor_vers, minor_vers)
+        (major_vers=%s AND minor_vers=%s and patch_vers <%s))""", (
+            pkg_name,
+            major_vers,
+            major_vers,
+            minor_vers,
+            major_vers,
+            minor_vers,
+            minor_vers,
+        )
     elif vers_range[0:2] == ">=" and "<" in vers_range:
         # assumes valid range
         lower, upper = vers_range[3:].replace(" < ", "").split(",")
@@ -197,16 +213,26 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
         return """SELECT * from table WHERE pkg_name=%s AND 
         (major_vers>%s OR 
         (major_vers=%s AND minor_vers>%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers >=%s))""", \
-               (pkg_name, major_vers, major_vers, minor_vers, major_vers, minor_vers, minor_vers)
+        (major_vers=%s AND minor_vers=%s and patch_vers >=%s))""", (
+            pkg_name,
+            major_vers,
+            major_vers,
+            minor_vers,
+            major_vers,
+            minor_vers,
+            minor_vers,
+        )
     else:
         # unexpected
         pass
 
+
 async def scrape_pip_packages() -> [str]:
     """Get versions for pip packages"""
-    page = requests.get('https://www.pypi.org/simple') # Getting page HTML through request
-    soup = BeautifulSoup(page.content, 'html.parser')
+    page = requests.get(
+        "https://www.pypi.org/simple"
+    )  # Getting page HTML through request
+    soup = BeautifulSoup(page.content, "html.parser")
 
     links = soup.select("a")
     packageslst = []
@@ -216,14 +242,14 @@ async def scrape_pip_packages() -> [str]:
         try:
             helper = []
             helper.append("pip")
-            temp = anchor['href']
+            temp = anchor["href"]
             temp = temp[8:-1]
             helper.append(temp)
-            page2 = f'https://pypi.python.org/pypi/{temp}/json'
-            releases = json.loads(request.urlopen(page2).read())['releases']
+            page2 = f"https://pypi.python.org/pypi/{temp}/json"
+            releases = json.loads(request.urlopen(page2).read())["releases"]
             yoMain = []
-            yo = (sorted(releases, key=parse_version, reverse=True)  )
-            #lst.append(helper)
+            yo = sorted(releases, key=parse_version, reverse=True)
+            # lst.append(helper)
             for x in yo:
                 print(x)
                 y = x.split(".")
@@ -240,17 +266,16 @@ async def scrape_pip_packages() -> [str]:
         return packageslst
 
 
-
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    with open("npm-packages-w-vuln.txt", 'r') as f:
+    with open("npm-packages-w-vuln.txt", "r") as f:
         package_list = [p.replace("'", "") for p in f.read().split(", ")]
 
     for package in package_list:
         if package[0] == "-":
             continue
         try:
-            cmd = 'npm view ' + package + '@* version --json'
+            cmd = "npm view " + package + "@* version --json"
             request = os.popen(cmd).read()
             version_list = json.loads(request)
 
@@ -262,7 +287,9 @@ async def scrape_npm_packages() -> None:
                 version_list = version_list[0]
             for vers in version_list:
                 major_vers, minor_vers, patch_vers = vers.split(".")
-                await insert_single_package_version("npm", package, major_vers, minor_vers, patch_vers, None, None)
+                await insert_single_package_version(
+                    "npm", package, major_vers, minor_vers, patch_vers, None, None
+                )
         except:
             print("unable to interpret versions for: ", package)
 

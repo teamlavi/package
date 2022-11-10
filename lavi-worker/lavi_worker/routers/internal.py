@@ -34,15 +34,18 @@ async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Resp
     await updates.delete_single_vulnerability(**delete_vuln_request.dict())
     return Response(status_code=200)
 
+
 @router.post("/trigger_npm_scrapper")
 async def trigger_npm_scrapper() -> Response:
     await updates.scrape_npm_packages()
     return Response(status_code=200)
 
+
 @router.post("/trigger_pip_scrapper")
 async def trigger_pip_scrapper() -> Response:
     await updates.scrape_pip_packages()
     return Response(status_code=200)
+
 
 @router.post("/database/clear")
 async def clear_database() -> Response:
