@@ -131,7 +131,8 @@ async def insert_single_package_version(
 
     """Insert a single package version into the db."""
     async with await get_db_tx() as tx:
-        await cve.create_pkg_vers(
+        await package.create(
+            tx=tx,
             repo_name = repo_name,
             pkg_name = pkg_name,
             major_vers = major_vers,
@@ -238,6 +239,7 @@ async def scrape_pip_packages() -> [str]:
             countExceptions += 1
 
         return packageslst
+    # TODO insert packages into table
 
 
 
