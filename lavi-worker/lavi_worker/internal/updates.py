@@ -1,6 +1,8 @@
 import psycopg
 import httpx
 import json
+import requests
+from bs4 import BeautifulSoup
 import os
 
 from lavi_worker.daos import cve
@@ -123,19 +125,20 @@ async def insert_single_package_version(
         major_vers: int,
         minor_vers: int,
         patch_vers: int,
-        num_downloads: int | None,
-        s3_bucket: str | None
+        num_downloads: int | None = None,
+        s3_bucket: str | None = None,
 ) -> None:
+
+    """Insert a single package version into the db."""
     async with await get_db_tx() as tx:
-        await package.create(
-            tx=tx,
-        repo_name = repo_name,
-        pkg_name = pkg_name,
-        major_vers = major_vers,
-        minor_vers = minor_vers,
-        patch_vers = patch_vers,
-        num_downloads = num_downloads,
-        s3_bucket = s3_bucket
+        await cve.create_pkg_vers(
+            repo_name = repo_name,
+            pkg_name = pkg_name,
+            major_vers = major_vers,
+            minor_vers = minor_vers,
+            patch_vers = patch_vers,
+            num_downloads = num_downloads,
+            s3_bucket = s3_bucket
         )
 
 async def delete_single_vulnerability(
@@ -200,8 +203,42 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
         # unexpected
         pass
 
-async def scrape_pip_packages() -> None:
-    pass
+async def scrape_pip_packages() -> [str]:
+    """Get versions for pip packages"""
+    page = requests.get('https://www.pypi.org/simple') # Getting page HTML through request
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    links = soup.select("a")
+    packageslst = []
+    count = 0
+    countExceptions = 0
+    for anchor in links[:10]:
+        try:
+            helper = []
+            helper.append("pip")
+            temp = anchor['href']
+            temp = temp[8:-1]
+            helper.append(temp)
+            page2 = f'https://pypi.python.org/pypi/{temp}/json'
+            releases = json.loads(request.urlopen(page2).read())['releases']
+            yoMain = []
+            yo = (sorted(releases, key=parse_version, reverse=True)  )
+            #lst.append(helper)
+            for x in yo:
+                print(x)
+                y = x.split(".")
+                print(y)
+                if len(y) == 3:
+                    yoMain.append(y)
+            count += 1
+            helper.append(yoMain)
+            packageslst.append(helper)
+        except:
+            count += 1
+            countExceptions += 1
+
+        return packageslst
+
 
 
 async def scrape_npm_packages() -> None:
