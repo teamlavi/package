@@ -58,6 +58,7 @@ async def create(
             ),
         )
 
+<<<<<<< HEAD
 
 async def create_pkg_vers(
     tx: Transaction,
@@ -93,6 +94,8 @@ async def create_pkg_vers(
         )
 
 
+=======
+>>>>>>> 396a424439346755ca0f58f9a104ab4519c0eed2
 async def delete(tx: Transaction, cve: CVE) -> None:
     """Delete the given CVE from the db."""
     # TODO: assert the entry exists in the db before deleting

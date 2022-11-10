@@ -141,6 +141,16 @@ async def insert_single_package_version(
             num_downloads=num_downloads,
             s3_bucket=s3_bucket,
         )
+        await package.create(
+            tx=tx,
+            repo_name = repo_name,
+            pkg_name = pkg_name,
+            major_vers = major_vers,
+            minor_vers = minor_vers,
+            patch_vers = patch_vers,
+            num_downloads = num_downloads,
+            s3_bucket = s3_bucket
+        )
 
 
 async def delete_single_vulnerability(
@@ -264,6 +274,7 @@ async def scrape_pip_packages() -> [str]:
             countExceptions += 1
 
         return packageslst
+    # TODO insert packages into table
 
 
 async def scrape_npm_packages() -> None:
