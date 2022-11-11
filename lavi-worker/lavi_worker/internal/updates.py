@@ -184,7 +184,17 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
 
     if vers_range[0] == "=":
         # only one version
-        return [vers_range[2:]]
+        major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
+        async with await get_db_tx() as tx:
+            vers_in_db = await package.vers_exists(
+                tx, pkg_name, major_vers, minor_vers, patch_vers
+            )
+            if vers_in_db:
+                return [vers_range[2:]]
+            else:
+                # TODO: any other handling here
+                print("Requesting version of package not in package database: " + pkg_name + " " + vers_range)
+                return []
     elif vers_range[:2] == "<=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
@@ -201,6 +211,12 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than_eql(
+                tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+            )
+    elif vers_range[0] == ">":
+        major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
+        async with await get_db_tx() as tx:
+            return await package.get_vers_greater_than(
                 tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
             )
     else:
