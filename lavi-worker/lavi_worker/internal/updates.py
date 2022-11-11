@@ -1,7 +1,9 @@
-import psycopg
-import httpx
-import os
 import json
+import os
+from typing import List
+
+import httpx
+import psycopg
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
@@ -159,7 +161,8 @@ async def delete_single_vulnerability(
 # Queries package table to get list of versions
 async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     """Converts a range of versions to a list of available versions in range"""
-    # verse_range format - https://docs.github.com/en/graphql/reference/objects#securityvulnerability
+    # verse_range format:
+    #   https://docs.github.com/en/graphql/reference/objects#securityvulnerability
     print(vers_range)
 
     if "," in vers_range:
@@ -200,17 +203,17 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
         return []
 
 
-async def scrape_pip_packages() -> [str]:
+async def scrape_pip_packages() -> List[str]:
     pass
 
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    for package in ["express", "async", "lodash", "cloudinary"]:
-        if package[0] == "-":
+    for package_name in ["express", "async", "lodash", "cloudinary"]:
+        if package_name[0] == "-":
             continue
         try:
-            cmd = "npm view " + package + "@* version --json"
+            cmd = "npm view " + package_name + "@* version --json"
             request = os.popen(cmd).read()
             version_list = json.loads(request)
 
@@ -223,10 +226,10 @@ async def scrape_npm_packages() -> None:
             for vers in version_list:
                 major_vers, minor_vers, patch_vers = vers.split(".")
                 await insert_single_package_version(
-                    "npm", package, major_vers, minor_vers, patch_vers, 0, "0"
+                    "npm", package_name, major_vers, minor_vers, patch_vers, 0, "0"
                 )
-        except:
-            print("unable to interpret versions for: ", package)
+        except Exception:
+            print("unable to interpret versions for: ", package_name)
 
 
 async def scrape_packages() -> None:
