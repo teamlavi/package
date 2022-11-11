@@ -1,7 +1,5 @@
 import psycopg
 import httpx
-import json
-import requests
 from bs4 import BeautifulSoup
 import os
 
@@ -197,40 +195,7 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
 
 
 async def scrape_pip_packages() -> [str]:
-    """Get versions for pip packages"""
-    page = requests.get('https://www.pypi.org/simple%27') # Getting page HTML through request
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    links = soup.select("a")
-    packageslst = []
-    count = 0
-    countExceptions = 0
-    for anchor in links[:10]:
-        try:
-            helper = []
-            helper.append("pip")
-            temp = anchor['href']
-            temp = temp[8:-1]
-            helper.append(temp)
-            page2 = f'https://pypi.python.org/pypi/%7Btemp%7D/json'
-            releases = json.loads(requests.get(page2).text)['releases']
-            # releases = json.loads(request.urlopen(page2).read())['releases']
-            versionsLst = []
-            for key in releases:
-                y = key.split(".")
-                if len(y) == 3:
-                    versionsLst.append(y)
-                elif len(y) == 2:
-                    y.append('0')
-                    versionsLst.append(y)
-            count += 1
-            helper.append(versionsLst)
-            packageslst.append(helper)
-        except:
-            count += 1
-            countExceptions += 1
-
-    return packageslst
+    pass
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
