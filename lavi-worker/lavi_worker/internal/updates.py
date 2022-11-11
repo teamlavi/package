@@ -131,13 +131,13 @@ async def insert_single_package_version(
     async with await get_db_tx() as tx:
         await package.create(
             tx=tx,
-            repo_name = repo_name,
-            pkg_name = pkg_name,
-            major_vers = major_vers,
-            minor_vers = minor_vers,
-            patch_vers = patch_vers,
-            num_downloads = num_downloads,
-            s3_bucket = s3_bucket
+            repo_name=repo_name,
+            pkg_name=pkg_name,
+            major_vers=major_vers,
+            minor_vers=minor_vers,
+            patch_vers=patch_vers,
+            num_downloads=num_downloads,
+            s3_bucket=s3_bucket,
         )
 
 
@@ -169,11 +169,11 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     if "-" in vers_range:
         # TODO maybe another way to handle?
         # drop version extension
-        vers_range = vers_range[:vers_range.index('-')]
+        vers_range = vers_range[: vers_range.index("-")]
 
-    while vers_range.count('.') < 2:
+    while vers_range.count(".") < 2:
         # if no minor or patch version included
-        vers_range += '.0'
+        vers_range += ".0"
 
     if vers_range[0] == "=":
         # only one version
@@ -181,15 +181,21 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     elif vers_range[:2] == "<=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
-            return await package.get_vers_less_than_eql(tx, pkg_name, major_vers, minor_vers, patch_vers)
+            return await package.get_vers_less_than_eql(
+                tx, pkg_name, major_vers, minor_vers, patch_vers
+            )
     elif vers_range[0] == "<":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
-            return await package.get_vers_less_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
+            return await package.get_vers_less_than(
+                tx, pkg_name, major_vers, minor_vers, patch_vers
+            )
     elif vers_range[:2] == ">=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
-            return await package.get_vers_greater_than_eql(tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers))
+            return await package.get_vers_greater_than_eql(
+                tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+            )
     else:
         return []
 
@@ -197,9 +203,10 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
 async def scrape_pip_packages() -> [str]:
     pass
 
+
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    for package in ['express', 'async', 'lodash', 'cloudinary']:
+    for package in ["express", "async", "lodash", "cloudinary"]:
         if package[0] == "-":
             continue
         try:
@@ -251,7 +258,7 @@ async def scrape_vulnerabilities() -> None:
                 f.write(last_cursor_received)
 
         # Get vulnerabilities after:
-        last_cursor = None #get_last_cursor()
+        last_cursor = None  # get_last_cursor()
 
         # Repeats until there are no new vulnerabilities
         while True:
@@ -331,7 +338,7 @@ async def scrape_vulnerabilities() -> None:
             for gh_vuln_edge in json.loads(response.text)["data"][
                 "securityVulnerabilities"
             ]["edges"]:
-                vuln_cursor = gh_vuln_edge['cursor']
+                vuln_cursor = gh_vuln_edge["cursor"]
                 gh_vuln = gh_vuln_edge["node"]
 
                 cve_id = next(
