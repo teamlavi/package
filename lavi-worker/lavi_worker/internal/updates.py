@@ -1,6 +1,7 @@
 import psycopg
 import httpx
 import os
+import json
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
