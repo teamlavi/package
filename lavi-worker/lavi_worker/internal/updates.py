@@ -1,6 +1,5 @@
 import psycopg
 import httpx
-from bs4 import BeautifulSoup
 import os
 
 from lavi_worker.daos import cve
@@ -28,6 +27,8 @@ async def is_db_initialized() -> bool:
 
 async def initialize_database() -> None:
     """Initialize the database."""
+    assert not await is_db_initialized()
+
     # Build the tables
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
