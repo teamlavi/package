@@ -23,9 +23,16 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Resp
 
 
 @router.post("/insert_vers")
-async def insert_vers() -> Response:
-    await updates.insert_single_package_version("fff", "asdf", 1, 1, 1, 0, "None")
+async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
+    await updates.insert_single_package_version(**package_ver_request.dict())
     return Response(status_code=200)
+
+@router.post("/query_vers")
+async def query_vers(query_ver_request: api_models.PackageVersRange) -> list[str]:
+    lst = await updates.vers_range_to_list(**query_ver_request.dict())
+    lst.sort()  # not necessary for most operation but nice for display
+    return lst
+
 
 
 @router.post("/delete_vuln")

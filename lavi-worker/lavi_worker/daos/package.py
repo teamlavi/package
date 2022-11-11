@@ -60,10 +60,10 @@ async def get_vers_less_than_eql(
         major_vers: str,
         minor_vers: str,
         patch_vers: str,
-) -> [str]:
+) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
-            """SELECT * from package WHERE pkg_name=%s AND 
+            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
         (major_vers<%s OR 
         (major_vers=%s AND minor_vers<%s) OR 
         (major_vers=%s AND minor_vers=%s and patch_vers <=%s))""", (
@@ -79,7 +79,7 @@ async def get_vers_less_than_eql(
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = r[0]+"."+r[1]+"."+r[2]
+            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
             vers_list.append(vers)
         return vers_list
 
@@ -89,10 +89,10 @@ async def get_vers_less_than(
         major_vers: str,
         minor_vers: str,
         patch_vers: str,
-) -> [str]:
+) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
-            """SELECT * from package WHERE pkg_name=%s AND 
+            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
         (major_vers<%s OR 
         (major_vers=%s AND minor_vers<%s) OR 
         (major_vers=%s AND minor_vers=%s and patch_vers <%s))""",
@@ -108,21 +108,21 @@ async def get_vers_less_than(
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = r[0]+"."+r[1]+"."+r[2]
+            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
             vers_list.append(vers)
         return vers_list
 
 
-async def get_vers_greater_than(
+async def get_vers_greater_than_eql(
         tx: Transaction,
         pkg_name: str,
         major_vers: str,
         minor_vers: str,
         patch_vers: str,
-) -> [str]:
+) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
-            """SELECT * from package WHERE pkg_name=%s AND 
+            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
         (major_vers>%s OR 
         (major_vers=%s AND minor_vers>%s) OR 
         (major_vers=%s AND minor_vers=%s and patch_vers >=%s))""",
@@ -138,7 +138,7 @@ async def get_vers_greater_than(
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = r[0]+"."+r[1]+"."+r[2]
+            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
             vers_list.append(vers)
         return vers_list
 
@@ -147,11 +147,11 @@ async def get_vers_inbetween(
         tx: Transaction, pkg_name:str,
         lower_major_vers: str, lower_minor_vers: str, lower_patch_vers: str,
         upper_major_vers: str, upper_minor_vers: str, upper_patch_vers: str
-) -> [str]:
+) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
             # concats queries from ?= and < sections
-            """SELECT * from package WHERE pkg_name=%s AND 
+            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
                 (major_vers>%s OR 
                 (major_vers=%s AND minor_vers>%s) OR 
                 (major_vers=%s AND minor_vers=%s and patch_vers >=%s)) AND 
@@ -168,7 +168,7 @@ async def get_vers_inbetween(
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = r[0]+"."+r[1]+"."+r[2]
+            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
             vers_list.append(vers)
         return vers_list
 

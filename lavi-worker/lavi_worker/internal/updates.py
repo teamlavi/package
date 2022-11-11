@@ -165,28 +165,27 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     if vers_range[0] == "=":
         # only one version
         return [vers_range[2:]]
-    elif vers_range[0:2] == "<=":
+    elif vers_range[:2] == "<=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
-            return package.get_vers_less_than_eql(tx, pkg_name, major_vers, minor_vers, patch_vers)
+            return await package.get_vers_less_than_eql(tx, pkg_name, major_vers, minor_vers, patch_vers)
     elif vers_range[0] == "<":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
-            return package.get_vers_less_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
-    elif vers_range[0:2] == ">=" and "<" in vers_range:
+            return await package.get_vers_less_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
+    elif vers_range[:2] == ">=" and "<" in vers_range:
         # assumes valid range
         lower, upper = vers_range[3:].replace(" < ", "").split(",")
         lower_major_vers, lower_minor_vers, lower_patch_vers = lower.split(".")
         upper_major_vers, upper_minor_vers, upper_patch_vers = upper.split(".")
         async with await get_db_tx() as tx:
-            return package.get_vers_inbetween(tx, pkg_name, lower_major_vers, lower_minor_vers, lower_patch_vers, upper_major_vers, upper_minor_vers, upper_patch_vers)
-    elif vers_range[0:2] == ">=":
+            return await package.get_vers_inbetween(tx, pkg_name, lower_major_vers, lower_minor_vers, lower_patch_vers, upper_major_vers, upper_minor_vers, upper_patch_vers)
+    elif vers_range[:2] == ">=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
-            return package.get_vers_greater_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
+            return await package.get_vers_greater_than_eql(tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers))
     else:
-        # unexpected
-        pass
+        return ["Invalid Query"]
 
 
 async def scrape_pip_packages() -> [str]:
