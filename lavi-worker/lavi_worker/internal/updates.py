@@ -338,6 +338,13 @@ async def scrape_vulnerabilities() -> None:
             print("response")
             print(json.dumps(json.loads(response.text), indent=2))
 
+            if "\"message\":\"Bad credentials\"" in response.text:
+                print("GitHub Advisory Token Error")
+                return
+            elif "errors" in json.loads(response.text).keys():
+                print("GitHub Advisory Query Error")
+                return
+
             # Save for next query
             last_cursor = json.loads(response.text)["data"]["securityVulnerabilities"][
                 "pageInfo"
