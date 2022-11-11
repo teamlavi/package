@@ -41,6 +41,7 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
             <TableCell align="right">{changeVers ? "-" : row.severities.low}</TableCell>
             <TableCell align="right">{changeVers ? "-" : row.severities.medium}</TableCell>
             <TableCell align="right">{changeVers ? "-" : row.severities.high}</TableCell>
+            <TableCell align="right">{changeVers ? "-" : row.severities.critical}</TableCell>
             <TableCell align="right">
                 {viewCurrent ? <>
                     <IconButton onClick={() => setDialogOpen(true)}>
@@ -67,16 +68,16 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
             </TableCell>
         </TableRow>
         <TableRow>
-            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                <Collapse in={open} timeout="auto" unmountOnExit>
+            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+                <Collapse in={open && !changeVers} timeout="auto" unmountOnExit>
                     <Box sx={{ margin: 1 }}>
                         <Typography variant="h6" gutterBottom component="div">
-                            Vulnerable Dependencies
+                            Vulnerabilities
                         </Typography>
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Indirect Dependency Name</TableCell>
+                                    <TableCell>Package Name</TableCell>
                                     <TableCell align="right">Package Version</TableCell>
                                     <TableCell align="right">CVE ID</TableCell>
                                     <TableCell align="right">CVE Severity</TableCell>
@@ -92,11 +93,14 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
                                                     {node.package}
                                                 </TableCell>
                                                 <TableCell align="right">{node.version}</TableCell>
-                                                <TableCell align="right">{vulnRow.cveId}</TableCell>
                                                 <TableCell align="right">
-                                                    {vulnRow.severity === 1 && "Low"}
-                                                    {vulnRow.severity === 2 && "Medium"}
-                                                    {vulnRow.severity === 3 && "High"}
+                                                    <a href={vulnRow.url} target="_blank">{vulnRow.cveId}</a>
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {vulnRow.severity === 0 && "LOW"}
+                                                    {vulnRow.severity === 1 && "MEDIUM"}
+                                                    {vulnRow.severity === 2 && "HIGH"}
+                                                    {vulnRow.severity === 3 && "CRITICAL"}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -115,6 +119,9 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
 const sorts = {
     "name": (a, b) => {
         return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0)
+    },
+    "critSev": (a, b) => {
+        return a.severities.critical > b.severities.critical ? -1 : (a.severities.critical < b.severities.critical ? 1 : 0)
     },
     "highSev": (a, b) => {
         return a.severities.high > b.severities.high ? -1 : (a.severities.high < b.severities.high ? 1 : 0)
@@ -177,7 +184,7 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                             direction={sortType === "lowSev" ? sortDir : 'asc'}
                             onClick={createSortHandler("lowSev")}
                         >
-                            Low Severity Vulnerabilities
+                            Low Severity
                         </TableSortLabel>
                     </TableCell>
                     <TableCell
@@ -189,7 +196,7 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                             direction={sortType === "medSev" ? sortDir : 'asc'}
                             onClick={createSortHandler("medSev")}
                         >
-                            Medium Severity Vulnerabilities
+                            Medium Severity
                         </TableSortLabel>
                     </TableCell>
                     <TableCell
@@ -201,7 +208,19 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                             direction={sortType === "highSev" ? sortDir : 'asc'}
                             onClick={createSortHandler("highSev")}
                         >
-                            High Severity Vulnerabilities
+                            High Severity
+                        </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                        align="right"
+                        sortDirection={sortType === "critSev" ? sortDir : false}
+                    >
+                        <TableSortLabel
+                            active={sortType === "critSev"}
+                            direction={sortType === "critSev" ? sortDir : 'asc'}
+                            onClick={createSortHandler("critSev")}
+                        >
+                            Critical Severity
                         </TableSortLabel>
                     </TableCell>
                     <TableCell align="right"></TableCell>
@@ -222,6 +241,9 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                     </TableCell>
                     <TableCell align="right">
                         {accumStats.high}
+                    </TableCell>
+                    <TableCell align="right">
+                        {accumStats.critical}
                     </TableCell>
                     <TableCell align="right"><IconButton sx={{ height: "20px" }}><Icon /></IconButton></TableCell>
                 </TableRow>

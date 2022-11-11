@@ -25,5 +25,5 @@ func (g NpmTreeGenerator) GetCDS() models.CDS {
 }
 
 func (g NpmTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
-	return models.CDS{}
+	return g.GetCDS()
 }

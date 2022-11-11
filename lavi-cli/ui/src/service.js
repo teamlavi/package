@@ -32,4 +32,12 @@ export default class Service {
         return axios.get(`${URL_PREFIX}/api/v1/dispatch/status`, { params: { id } })
     }
 
+    static async getVulns() {
+        return axios.get(`${URL_PREFIX}/api/v1/cds/vulnerabilities`)
+    }
+
+    static async getOriginalVulns() {
+        return axios.get(`${URL_PREFIX}/api/v1/cds/original/vulnerabilities`)
+    }
+
 }

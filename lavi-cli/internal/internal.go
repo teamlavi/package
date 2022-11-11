@@ -6,6 +6,7 @@ import (
 	"dep-tree-gen/models"
 	"fmt"
 	"lavi/internal/server"
+	"lavi/internal/vulnerabilities"
 	"log"
 	"net"
 	"os"
@@ -47,7 +48,7 @@ func isPortOpen(port int) bool {
 	return true
 }
 
-func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
+func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator, vulnData map[string][]vulnerabilities.Vulnerability) {
 	port := 8080
 
 	for {
@@ -77,10 +78,12 @@ func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGener
 	}
 
 	api := server.New(&server.ServerConfig{
-		CDS:         cds,
-		OriginalCDS: cds,
-		Cmd:         cmd,
-		Generator:   gen,
+		CDS:                        cds,
+		OriginalCDS:                cds,
+		Cmd:                        cmd,
+		Generator:                  gen,
+		CDSVulnerabilities:         vulnData,
+		OriginalCDSVulnerabilities: vulnData,
 	})
 
 	server.RegisterRoutes(api)

@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"dep-tree-gen/common"
 	"errors"
+	"fmt"
 	"io"
 	"lavi/internal/config"
+	"lavi/internal/vulnerabilities"
 	"os/exec"
 	"reflect"
 
@@ -90,7 +92,31 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		}
 
 		gen := cfg.GetGenerator().GetCDSForPackages(packages)
+
+		pkgIds := []string{}
+		for id, _ := range gen.Nodes {
+			pkgIds = append(pkgIds, id)
+		}
+
+		function.StdoutString += fmt.Sprintf("Scanning %d packages for vulnerabilities\r\n", len(pkgIds))
+
+		all := []vulnerabilities.BatchVulnerabilityResponse{}
+		c := 0
+		for i := 0; i < len(pkgIds); i += 100 {
+			all = append(all, vulnerabilities.ScanSet(pkgIds[i:i+100]))
+			c += 100
+			if c > len(pkgIds) {
+				c = len(pkgIds)
+			}
+			function.StdoutString += fmt.Sprintf("Completed %d packages\r\n", c)
+		}
+		function.StdoutString += "Finished scanning\r\n"
+
+		vulns := vulnerabilities.CleanupScanResults(all)
+		cleanVulns := vulnerabilities.ConvertToCleanResponse(vulns)
+
 		cfg.SetCDS(gen)
+		cfg.SetVulns(cleanVulns)
 		function.Status = "success"
 
 	}()

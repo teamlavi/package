@@ -23,21 +23,27 @@ function App() {
 
   const update = () => {
     Service.getCds().then(r => {
-      const resp = r.data
-      const tempPkgs = parseApiResponse(resp)
-      const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
-      setPkgs(tempPkgs)
-      setStats(tempStats)
-      setResp(resp)
+      Service.getVulns().then(v => {
+        const vulns = v.data
+        const resp = r.data
+        const tempPkgs = parseApiResponse(resp, vulns)
+        const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
+        setPkgs(tempPkgs)
+        setStats(tempStats)
+        setResp(resp)
+      })
     })
     Service.getOriginalCds().then(r => {
+      Service.getOriginalVulns().then(v => {
       const resp = r.data
-      const tempPkgs = parseApiResponse(resp)
+      const tempPkgs = parseApiResponse(resp, v.data)
       const tempStats = getVulnDataStats(resp.nodes, tempPkgs)
       setOriginalPkgs(tempPkgs)
       setOriginalStats(tempStats)
       setOriginal(resp)
+      })
     })
+    
   }
 
   useEffect(() => {

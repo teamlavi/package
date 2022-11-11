@@ -17,8 +17,10 @@ import (
 
 func RegisterRoutes(server *Server) {
 	server.Register("/api/v1/cds", GetCds, "GET")
+	server.Register("/api/v1/cds/vulnerabilities", GetCdsVulnerabilities, "GET")
 	server.Register("/api/v1/cds", SetCds, "POST")
 	server.Register("/api/v1/cds/original", GetOriginalCds, "GET")
+	server.Register("/api/v1/cds/original/vulnerabilities", GetOriginalCdsVulns, "GET")
 	server.Register("/api/v1/repositories/{repoName}/versions", GetVersions, "GET")
 	server.Register("/api/v1/install/{cmdType}", Install, "POST")
 	server.Register("/api/v1/dispatch/status", DispatchStatus, "GET")
@@ -65,6 +67,14 @@ func SetCds(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 
 func GetOriginalCds(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 	JsonResponse(w, r, s.GetOriginalCDS())
+}
+
+func GetCdsVulnerabilities(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	JsonResponse(w, r, s.GetVulns())
+}
+
+func GetOriginalCdsVulns(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	JsonResponse(w, r, s.GetOriginalVulns())
 }
 
 func GetVersions(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {

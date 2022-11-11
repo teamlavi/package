@@ -9,14 +9,14 @@
         "vulnerabilities": []
     }
 ] */
-export function parseApiResponse(response) {
+export function parseApiResponse(response, vulns) {
     const { root, nodes } = response
 
     const vulnData = {}
 
     for (const dep of root.dependencies) {
         const currentNode = nodes[dep]
-        const output = parseApiResponseRecursive(currentNode, nodes, [])
+        const output = parseApiResponseRecursive(currentNode, nodes, vulns, [])
         vulnData[dep] = makeVulnListUnique(output)
     }
     return vulnData
@@ -31,13 +31,13 @@ export function parseApiResponse(response) {
   \   /
     D
 */
-function parseApiResponseRecursive(currentNode, nodes, visited) {
+function parseApiResponseRecursive(currentNode, nodes, vulns, visited) {
     if (!currentNode) {
         return []
     }
 
-    const { id, dependencies, vulnerabilities } = currentNode
-    const tempVulnArray = vulnerabilities ? vulnerabilities : []
+    const { id, dependencies } = currentNode
+    const tempVulnArray = vulns[id] ? vulns[id] : []
 
     if (dependencies.length === 0) {
         if (tempVulnArray.length !== 0) {
@@ -56,7 +56,7 @@ function parseApiResponseRecursive(currentNode, nodes, visited) {
         } else {
             visited[dep] = true
         }
-        const out = parseApiResponseRecursive(n, nodes, visited)
+        const out = parseApiResponseRecursive(n, nodes, vulns, visited)
         if (out) {
             tempVulnArray.push(...out)
         }
@@ -80,6 +80,7 @@ function makeVulnListUnique(list) {
 export function getVulnDataStats(nodes, pkgs) {
     const out = []
     const totals = {
+        critical: 0,
         high: 0,
         medium: 0,
         low: 0
@@ -93,6 +94,7 @@ export function getVulnDataStats(nodes, pkgs) {
             vulnerabilities: pkgs[id],
             severities: counts
         })
+        totals.critical += counts.critical
         totals.high += counts.high
         totals.medium += counts.medium
         totals.low += counts.low
@@ -102,6 +104,7 @@ export function getVulnDataStats(nodes, pkgs) {
 
 function makeCounts(vulnArray) {
     const out = {
+        critical: 0,
         high: 0,
         medium: 0,
         low: 0
@@ -112,8 +115,10 @@ function makeCounts(vulnArray) {
                 out.low += 1
             } else if (vuln.severity === 1) {
                 out.medium += 1
-            } else {
+            } else if (vuln.severity === 2) {
                 out.high += 1
+            } else {
+                out.critical += 1
             }
         }
     }

@@ -3,15 +3,18 @@ package server
 import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
+	"lavi/internal/vulnerabilities"
 
 	"github.com/spf13/cobra"
 )
 
 type ServerConfig struct {
-	OriginalCDS models.CDS
-	CDS         models.CDS
-	Cmd         *cobra.Command
-	Generator   generator.RepositoryTreeGenerator
+	OriginalCDS                models.CDS
+	CDS                        models.CDS
+	CDSVulnerabilities         map[string][]vulnerabilities.Vulnerability
+	OriginalCDSVulnerabilities map[string][]vulnerabilities.Vulnerability
+	Cmd                        *cobra.Command
+	Generator                  generator.RepositoryTreeGenerator
 }
 
 func (s *ServerConfig) SetCDS(cds models.CDS) {
@@ -40,6 +43,18 @@ func (s *ServerConfig) GetGenerator() generator.RepositoryTreeGenerator {
 
 func (s *ServerConfig) GetCmd() *cobra.Command {
 	return s.Cmd
+}
+
+func (s *ServerConfig) GetVulns() map[string][]vulnerabilities.Vulnerability {
+	return s.CDSVulnerabilities
+}
+
+func (s *ServerConfig) GetOriginalVulns() map[string][]vulnerabilities.Vulnerability {
+	return s.OriginalCDSVulnerabilities
+}
+
+func (s *ServerConfig) SetVulns(d map[string][]vulnerabilities.Vulnerability) {
+	s.CDSVulnerabilities = d
 }
 
 // too lazy to add more error codes
