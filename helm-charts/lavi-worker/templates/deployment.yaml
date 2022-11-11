@@ -39,6 +39,13 @@ spec:
                   name: {{ include "lavi-worker.dbFullname" . }}
             - name: EXPECTED_PREFIX
               value: {{ .Values.ingress.prefix | quote }}
+              {{- if ((lookup "v1" "Secret" .Release.Namespace .Values.ghAccessToken.secretName) | len) }}
+            - name: GH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: {{ .Values.ghAccessToken.secretKey }}
+                  name: {{ .Values.ghAccessToken.secretName }}
+              {{- end }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: uvicorn
