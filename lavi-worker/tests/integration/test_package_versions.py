@@ -41,7 +41,7 @@ def test_npm_scraper():
     for repo_name, pkg_name, vers, expected in test_subcases:
         # Make the query
         query = {"repo_name": repo_name, "pkg_name": pkg_name, "vers_range": vers}
-        resp = httpx.post(f"{BASE_URL}/internal/query_vers", json=query)
+        resp = httpx.get(f"{BASE_URL}/internal/query_vers", params=query)
 
         # Ensure output well-formed
         resp.raise_for_status()

@@ -28,9 +28,12 @@ async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
     return Response(status_code=200)
 
 
-@router.post("/query_vers")
-async def query_vers(query_ver_request: api_models.PackageVersRange) -> list[str]:
-    lst = await updates.vers_range_to_list(**query_ver_request.dict())
+@router.get("/query_vers")
+async def query_vers(repo_name: str,
+    pkg_name: str,
+    vers_range: str
+) -> list[str]:
+    lst = await updates.vers_range_to_list(repo_name, pkg_name, vers_range)
     lst.sort()  # not necessary for most operation but nice for display
     return lst
 
