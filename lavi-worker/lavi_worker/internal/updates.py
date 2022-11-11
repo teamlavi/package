@@ -163,19 +163,19 @@ async def delete_single_vulnerability(
 
 # helper function for scrape_vulnerabilities()
 # Queries package table to get list of versions
-async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
-    """Converts a range of versions to a list of available versions in range"""
-    # verse_range format:
-    #   https://docs.github.com/en/graphql/reference/objects#securityvulnerability
-    print(vers_range)
+async def vers_range_to_list(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
+    """
+    Converts a range of versions to a list of available versions in range
+    verse_range format: https://docs.github.com/en/graphql/reference/objects#securityvulnerability
+    """
 
     if "," in vers_range:
         # double-sided range - separate queries and find overlap
         # could make a new SQL query, but it'd be fairly long
         # This implementation doesn't require additional code to check for inclusive/exclusive endpoints
         lower_bound, upper_bound = vers_range.split(", ")
-        lower_list = await vers_range_to_list(pkg_name, lower_bound)
-        upper_list = await vers_range_to_list(pkg_name, upper_bound)
+        lower_list = await vers_range_to_list(repo_name, pkg_name, lower_bound)
+        upper_list = await vers_range_to_list(repo_name, pkg_name, upper_bound)
         # return results inbetween edges
         return [vers for vers in lower_list if vers in upper_list]
 
@@ -193,7 +193,7 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
             vers_in_db = await package.vers_exists(
-                tx, pkg_name, major_vers, minor_vers, patch_vers
+                tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers
             )
             if vers_in_db:
                 return [vers_range[2:]]
@@ -205,25 +205,25 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_less_than_eql(
-                tx, pkg_name, major_vers, minor_vers, patch_vers
+                tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers
             )
     elif vers_range[0] == "<":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_less_than(
-                tx, pkg_name, major_vers, minor_vers, patch_vers
+                tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers
             )
     elif vers_range[:2] == ">=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than_eql(
-                tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+                tx, repo_name, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
             )
     elif vers_range[0] == ">":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than(
-                tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+                tx, repo_name, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
             )
     else:
         return []
@@ -235,7 +235,7 @@ async def scrape_pip_packages() -> List[str]:
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    for package_name in ["express", "async", "lodash", "cloudinary"]:
+    for package_name in ["express", "async", "lodash", "cloudinary", "axios"]:
         if package_name[0] == "-":
             continue
         try:
@@ -381,7 +381,7 @@ async def scrape_vulnerabilities() -> None:
                 repo_name = gh_vuln["package"]["ecosystem"]
                 pkg_name = gh_vuln["package"]["name"]
                 pkg_vers_range = gh_vuln["vulnerableVersionRange"]
-                pkg_vers_list = await vers_range_to_list(pkg_name, pkg_vers_range)
+                pkg_vers_list = await vers_range_to_list(repo_name, pkg_name, pkg_vers_range)
                 print(pkg_vers_range)
                 print(pkg_vers_list)
                 for release in pkg_vers_list:

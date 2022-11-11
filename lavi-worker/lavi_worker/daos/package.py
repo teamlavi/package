@@ -54,6 +54,7 @@ async def create(
 
 async def get_vers_less_than_eql(
     tx: Transaction,
+    repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
@@ -66,7 +67,7 @@ async def get_vers_less_than_eql(
                        minor_vers,
                        patch_vers
                 FROM PACKAGE
-                WHERE pkg_name=%s
+                WHERE repo_name=%s AND pkg_name=%s
                   AND (major_vers<%s
                        OR (major_vers=%s
                            AND minor_vers<%s)
@@ -75,6 +76,7 @@ async def get_vers_less_than_eql(
                            AND patch_vers <=%s))
             """,
             (
+                repo_name,
                 pkg_name,
                 major_vers,
                 major_vers,
@@ -94,6 +96,7 @@ async def get_vers_less_than_eql(
 
 async def get_vers_less_than(
     tx: Transaction,
+    repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
@@ -106,7 +109,7 @@ async def get_vers_less_than(
                        minor_vers,
                        patch_vers
                 FROM PACKAGE
-                WHERE pkg_name=%s
+                WHERE repo_name=%s AND pkg_name=%s
                   AND (major_vers<%s
                        OR (major_vers=%s
                            AND minor_vers<%s)
@@ -115,6 +118,7 @@ async def get_vers_less_than(
                            AND patch_vers <%s))
             """,
             (
+                repo_name,
                 pkg_name,
                 major_vers,
                 major_vers,
@@ -134,6 +138,7 @@ async def get_vers_less_than(
 
 async def get_vers_greater_than_eql(
     tx: Transaction,
+    repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
@@ -146,7 +151,7 @@ async def get_vers_greater_than_eql(
                        minor_vers,
                        patch_vers
                 FROM PACKAGE
-                WHERE pkg_name=%s
+                WHERE repo_name=%s AND pkg_name=%s
                   AND (major_vers>%s
                        OR (major_vers=%s
                            AND minor_vers>%s)
@@ -155,6 +160,7 @@ async def get_vers_greater_than_eql(
                            AND patch_vers >=%s))
             """,
             (
+                repo_name,
                 pkg_name,
                 major_vers,
                 major_vers,
@@ -173,6 +179,7 @@ async def get_vers_greater_than_eql(
 
 async def get_vers_greater_than(
     tx: Transaction,
+    repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
@@ -185,7 +192,7 @@ async def get_vers_greater_than(
                        minor_vers,
                        patch_vers
                 FROM PACKAGE
-                WHERE pkg_name=%s
+                WHERE repo_name=%s AND pkg_name=%s
                   AND (major_vers>%s
                        OR (major_vers=%s
                            AND minor_vers>%s)
@@ -194,6 +201,7 @@ async def get_vers_greater_than(
                            AND patch_vers >%s))
             """,
             (
+                repo_name,
                 pkg_name,
                 major_vers,
                 major_vers,
@@ -212,6 +220,7 @@ async def get_vers_greater_than(
 
 
 async def vers_exists(tx: Transaction,
+    repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
@@ -222,12 +231,14 @@ async def vers_exists(tx: Transaction,
             """
                 SELECT COUNT(*)
                 FROM PACKAGE
-                WHERE pkg_name=%s
-                  AND major_vers=%s
+                WHERE repo_name=%s
+                AND pkg_name=%s
+                AND major_vers=%s
                 AND minor_vers=%s
                 AND patch_vers=%s
             """,
             (
+                repo_name,
                 pkg_name,
                 major_vers,
                 minor_vers,
