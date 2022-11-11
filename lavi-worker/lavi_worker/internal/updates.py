@@ -131,16 +131,6 @@ async def insert_single_package_version(
 
     """Insert a single package version into the db."""
     async with await get_db_tx() as tx:
-        await cve.create_pkg_vers(
-            tx=tx,
-            repo_name=repo_name,
-            pkg_name=pkg_name,
-            major_vers=major_vers,
-            minor_vers=minor_vers,
-            patch_vers=patch_vers,
-            num_downloads=num_downloads,
-            s3_bucket=s3_bucket,
-        )
         await package.create(
             tx=tx,
             repo_name = repo_name,
@@ -168,8 +158,8 @@ async def delete_single_vulnerability(
 
 
 # helper function for scrape_vulnerabilities()
-# TODO run SQL and return list of version results
-def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
+# Queries package table to get list of versions
+async def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
     """Converts a range of versions to a list of available versions in range"""
     # verse_range format - https://docs.github.com/en/graphql/reference/objects#securityvulnerability
     if vers_range[0] == "=":
@@ -177,61 +167,23 @@ def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
         return [vers_range[2:]]
     elif vers_range[0:2] == "<=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
-        return """SELECT * from table WHERE pkg_name=%s AND 
-        (major_vers<%s OR 
-        (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <=%s))""", (
-            pkg_name,
-            major_vers,
-            major_vers,
-            minor_vers,
-            major_vers,
-            minor_vers,
-            minor_vers,
-        )
+        async with await get_db_tx() as tx:
+            return package.get_vers_less_than_eql(tx, pkg_name, major_vers, minor_vers, patch_vers)
     elif vers_range[0] == "<":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
-        return """SELECT * from table WHERE pkg_name=%s AND 
-        (major_vers<%s OR 
-        (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <%s))""", (
-            pkg_name,
-            major_vers,
-            major_vers,
-            minor_vers,
-            major_vers,
-            minor_vers,
-            minor_vers,
-        )
+        async with await get_db_tx() as tx:
+            return package.get_vers_less_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
     elif vers_range[0:2] == ">=" and "<" in vers_range:
         # assumes valid range
         lower, upper = vers_range[3:].replace(" < ", "").split(",")
         lower_major_vers, lower_minor_vers, lower_patch_vers = lower.split(".")
         upper_major_vers, upper_minor_vers, upper_patch_vers = upper.split(".")
-        # TODO: waiting to implement until definitely being used, pretty tedious code
-        """
-        Scenarios (incomplete)
-        major version in between
-        major version is low, minor is greater than low -> need major less than high or minor less than or patch
-        major version is low, minor is low, patch is greater than low
-
-        major version is high,
-        """
-        raise "not implemented yet"
+        async with await get_db_tx() as tx:
+            return package.get_vers_inbetween(tx, pkg_name, lower_major_vers, lower_minor_vers, lower_patch_vers, upper_major_vers, upper_minor_vers, upper_patch_vers)
     elif vers_range[0:2] == ">=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
-        return """SELECT * from table WHERE pkg_name=%s AND 
-        (major_vers>%s OR 
-        (major_vers=%s AND minor_vers>%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers >=%s))""", (
-            pkg_name,
-            major_vers,
-            major_vers,
-            minor_vers,
-            major_vers,
-            minor_vers,
-            minor_vers,
-        )
+        async with await get_db_tx() as tx:
+            return package.get_vers_greater_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
     else:
         # unexpected
         pass
