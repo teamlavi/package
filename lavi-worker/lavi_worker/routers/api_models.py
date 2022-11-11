@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 
@@ -76,6 +76,20 @@ class PackageVers(BaseModel):
                 "s3_bucket": "0",
             }
         }
+
+
+class FindVulnsIdListRequest(BaseModel):
+    ids: List[str]
+
+
+class CveResponse(BaseModel):
+    cveId: str
+    severity: str | None
+    url: str
+
+
+class FindVulnsIdListResponse(BaseModel):
+    vulns: Dict[str, List[CveResponse]]
 
 
 class InsertVulnRequest(BaseModel):
