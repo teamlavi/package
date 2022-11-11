@@ -6,12 +6,10 @@ import json
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
 from lavi_worker.daos.database import get_db_tx
+from lavi_worker import config
 
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
-GLOBAL_CACHE = {
-    "gh_access_token": "",
-}
 
 
 async def is_db_initialized() -> bool:
@@ -236,7 +234,7 @@ async def scrape_vulnerabilities() -> None:
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
     for repository in ["npm"]:
-        auth_headers = {"Authorization": f"Bearer {GLOBAL_CACHE['gh_access_token']}"}
+        auth_headers = {"Authorization": f"Bearer {config.GH_ACCESS_TOKEN}"}
         last_cursor_file = "last_cursor_" + repository + ".txt"
 
         # Get and save cursor are functions incase decide to save somewhere else
