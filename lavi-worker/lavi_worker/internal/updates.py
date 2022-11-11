@@ -88,7 +88,7 @@ async def database_size(table: str) -> int:
     """Get the number of rows in the db."""
     if table == "cves":
         async with await get_db_tx() as tx:
-            return await package.get_row_count(tx)
+            return await cve.get_row_count(tx)
     # ... more tables as added
     else:
         raise Exception(f"Table {table} is not expected to exist")
@@ -162,6 +162,21 @@ async def delete_single_vulnerability(
 async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     """Converts a range of versions to a list of available versions in range"""
     # verse_range format - https://docs.github.com/en/graphql/reference/objects#securityvulnerability
+    print(vers_range)
+
+    if "," in vers_range:
+        # TODO implement double sided range
+        return []
+
+    if "-" in vers_range:
+        # TODO maybe another way to handle?
+        # drop version extension
+        vers_range = vers_range[:vers_range.index('-')]
+
+    while vers_range.count('.') < 2:
+        # if no minor or patch version included
+        vers_range += '.0'
+
     if vers_range[0] == "=":
         # only one version
         return [vers_range[2:]]
@@ -173,19 +188,12 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_less_than(tx, pkg_name, major_vers, minor_vers, patch_vers)
-    elif vers_range[:2] == ">=" and "<" in vers_range:
-        # assumes valid range
-        lower, upper = vers_range[3:].replace(" < ", "").split(",")
-        lower_major_vers, lower_minor_vers, lower_patch_vers = lower.split(".")
-        upper_major_vers, upper_minor_vers, upper_patch_vers = upper.split(".")
-        async with await get_db_tx() as tx:
-            return await package.get_vers_inbetween(tx, pkg_name, lower_major_vers, lower_minor_vers, lower_patch_vers, upper_major_vers, upper_minor_vers, upper_patch_vers)
     elif vers_range[:2] == ">=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than_eql(tx, pkg_name, str(major_vers), str(minor_vers), str(patch_vers))
     else:
-        return ["Invalid Query"]
+        return []
 
 
 async def scrape_pip_packages() -> [str]:
@@ -226,10 +234,7 @@ async def scrape_pip_packages() -> [str]:
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    with open("npm-packages-w-vuln.txt", "r") as f:
-        package_list = [p.replace("'", "") for p in f.read().split(", ")]
-
-    for package in package_list:
+    for package in ['express', 'async', 'lodash', 'cloudinary']:
         if package[0] == "-":
             continue
         try:
@@ -263,7 +268,7 @@ async def scrape_vulnerabilities() -> None:
     global GLOBAL_CACHE
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
-    for repository in ["pip"]:
+    for repository in ["npm"]:
         auth_headers = {"Authorization": f"Bearer {GLOBAL_CACHE['gh_access_token']}"}
         last_cursor_file = "last_cursor_" + repository + ".txt"
 
@@ -281,7 +286,7 @@ async def scrape_vulnerabilities() -> None:
                 f.write(last_cursor_received)
 
         # Get vulnerabilities after:
-        last_cursor = get_last_cursor()
+        last_cursor = None #get_last_cursor()
 
         # Repeats until there are no new vulnerabilities
         while True:
@@ -343,7 +348,8 @@ async def scrape_vulnerabilities() -> None:
             )
 
             # Print returned JSON
-            # print(json.dumps(json.loads(response.text), indent=2))
+            print("response")
+            print(json.dumps(json.loads(response.text), indent=2))
 
             # Save for next query
             last_cursor = json.loads(response.text)["data"]["securityVulnerabilities"][
@@ -357,11 +363,10 @@ async def scrape_vulnerabilities() -> None:
             save_last_cursor(last_cursor)
 
             # Parse each vulnerability returned
-            # parsed_vulnerabilities = []
             for gh_vuln_edge in json.loads(response.text)["data"][
                 "securityVulnerabilities"
             ]["edges"]:
-                # parsed_vuln = {}
+                vuln_cursor = gh_vuln_edge['cursor']
                 gh_vuln = gh_vuln_edge["node"]
 
                 cve_id = next(
@@ -374,6 +379,7 @@ async def scrape_vulnerabilities() -> None:
                 )
                 if cve_id is None:
                     # No CVE, don't add to database
+                    print("no cve id for " + vuln_cursor)
                     continue
 
                 severity = gh_vuln["severity"]
@@ -388,8 +394,9 @@ async def scrape_vulnerabilities() -> None:
                 repo_name = gh_vuln["package"]["ecosystem"]
                 pkg_name = gh_vuln["package"]["name"]
                 pkg_vers_range = gh_vuln["vulnerableVersionRange"]
-                pkg_vers_list = await vers_range_to_list(pkg_vers_range)
-
+                pkg_vers_list = await vers_range_to_list(pkg_name, pkg_vers_range)
+                print(pkg_vers_range)
+                print(pkg_vers_list)
                 for release in pkg_vers_list:
                     await insert_single_vulnerability(
                         cve_id,
