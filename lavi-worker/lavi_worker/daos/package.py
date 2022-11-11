@@ -1,5 +1,3 @@
-from typing import List
-
 from attrs import define
 
 from lavi_worker.daos.database import Transaction
@@ -55,47 +53,27 @@ async def create(
 
 
 async def get_vers_less_than_eql(
-        tx: Transaction,
-        pkg_name: str,
-        major_vers: str,
-        minor_vers: str,
-        patch_vers: str,
+    tx: Transaction,
+    pkg_name: str,
+    major_vers: str,
+    minor_vers: str,
+    patch_vers: str,
 ) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
-            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
-        (major_vers<%s OR 
-        (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <=%s))""", (
-            pkg_name,
-            major_vers,
-            major_vers,
-            minor_vers,
-            major_vers,
-            minor_vers,
-            patch_vers,
-        ),
-        )
-        rows = await cur.fetchall()
-        vers_list = []
-        for r in rows:
-            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
-            vers_list.append(vers)
-        return vers_list
-
-async def get_vers_less_than(
-        tx: Transaction,
-        pkg_name: str,
-        major_vers: str,
-        minor_vers: str,
-        patch_vers: str,
-) -> list[str]:
-    async with tx.cursor() as cur:
-        await cur.execute(
-            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
-        (major_vers<%s OR 
-        (major_vers=%s AND minor_vers<%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers <%s))""",
+            """
+                SELECT major_vers,
+                       minor_vers,
+                       patch_vers
+                FROM PACKAGE
+                WHERE pkg_name=%s
+                  AND (major_vers<%s
+                       OR (major_vers=%s
+                           AND minor_vers<%s)
+                       OR (major_vers=%s
+                           AND minor_vers=%s
+                           AND patch_vers <=%s))
+            """,
             (
                 pkg_name,
                 major_vers,
@@ -104,28 +82,78 @@ async def get_vers_less_than(
                 major_vers,
                 minor_vers,
                 patch_vers,
-            ),)
+            ),
+        )
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
+            vers = str(r[0]) + "." + str(r[1]) + "." + str(r[2])
+            vers_list.append(vers)
+        return vers_list
+
+
+async def get_vers_less_than(
+    tx: Transaction,
+    pkg_name: str,
+    major_vers: str,
+    minor_vers: str,
+    patch_vers: str,
+) -> list[str]:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT major_vers,
+                       minor_vers,
+                       patch_vers
+                FROM PACKAGE
+                WHERE pkg_name=%s
+                  AND (major_vers<%s
+                       OR (major_vers=%s
+                           AND minor_vers<%s)
+                       OR (major_vers=%s
+                           AND minor_vers=%s
+                           AND patch_vers <%s))
+            """,
+            (
+                pkg_name,
+                major_vers,
+                major_vers,
+                minor_vers,
+                major_vers,
+                minor_vers,
+                patch_vers,
+            ),
+        )
+        rows = await cur.fetchall()
+        vers_list = []
+        for r in rows:
+            vers = str(r[0]) + "." + str(r[1]) + "." + str(r[2])
             vers_list.append(vers)
         return vers_list
 
 
 async def get_vers_greater_than_eql(
-        tx: Transaction,
-        pkg_name: str,
-        major_vers: str,
-        minor_vers: str,
-        patch_vers: str,
+    tx: Transaction,
+    pkg_name: str,
+    major_vers: str,
+    minor_vers: str,
+    patch_vers: str,
 ) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute(
-            """SELECT major_vers, minor_vers, patch_vers from package WHERE pkg_name=%s AND 
-        (major_vers>%s OR 
-        (major_vers=%s AND minor_vers>%s) OR 
-        (major_vers=%s AND minor_vers=%s and patch_vers >=%s))""",
+            """
+                SELECT major_vers,
+                       minor_vers,
+                       patch_vers
+                FROM PACKAGE
+                WHERE pkg_name=%s
+                  AND (major_vers>%s
+                       OR (major_vers=%s
+                           AND minor_vers>%s)
+                       OR (major_vers=%s
+                           AND minor_vers=%s
+                           AND patch_vers >=%s))
+            """,
             (
                 pkg_name,
                 major_vers,
@@ -134,11 +162,12 @@ async def get_vers_greater_than_eql(
                 major_vers,
                 minor_vers,
                 patch_vers,
-            ),)
+            ),
+        )
         rows = await cur.fetchall()
         vers_list = []
         for r in rows:
-            vers = str(r[0])+"."+str(r[1])+"."+str(r[2])
+            vers = str(r[0]) + "." + str(r[1]) + "." + str(r[2])
             vers_list.append(vers)
         return vers_list
 
@@ -148,6 +177,7 @@ async def get_row_count(tx: Transaction) -> int:
         await cur.execute("SELECT COUNT(*) FROM package")
         row = await cur.fetchone()
         return row[0]  # type: ignore
+
 
 async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""

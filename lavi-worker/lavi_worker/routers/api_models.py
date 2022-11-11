@@ -50,8 +50,8 @@ class PackageVersRange(BaseModel):
         schema_extra = {
             "example": {
                 "pkg_name": "test",
-                "vers_range": ">= 0.0.1"
-            }
+                "vers_range": ">= 0.0.1",
+            },
         }
 
 
@@ -73,7 +73,7 @@ class PackageVers(BaseModel):
                 "minor_vers": 1,
                 "patch_vers": 1,
                 "num_downloads": 0,
-                "s3_bucket": "0"
+                "s3_bucket": "0",
             }
         }
 

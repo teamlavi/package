@@ -128,7 +128,6 @@ async def insert_single_package_version(
     num_downloads: int | None = None,
     s3_bucket: str | None = None,
 ) -> None:
-
     """Insert a single package version into the db."""
     async with await get_db_tx() as tx:
         await package.create(
@@ -229,7 +228,7 @@ async def scrape_npm_packages() -> None:
                     "npm", package_name, major_vers, minor_vers, patch_vers, 0, "0"
                 )
         except Exception:
-            print("unable to interpret versions for: ", package_name)
+            print("Unable to interpret versions for {package_name}")
 
 
 async def scrape_packages() -> None:
@@ -277,7 +276,7 @@ async def scrape_vulnerabilities() -> None:
             )
 
             query = (
-                """ 
+                """
             {"""
                 + query_type
                 + """

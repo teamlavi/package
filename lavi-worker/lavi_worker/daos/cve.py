@@ -58,6 +58,7 @@ async def create(
             ),
         )
 
+
 async def delete(tx: Transaction, cve: CVE) -> None:
     """Delete the given CVE from the db."""
     # TODO: assert the entry exists in the db before deleting
