@@ -13,6 +13,8 @@ from lavi_worker import config
 # GitHub personal access token (classic)
 # https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
 
+CACHE_CURSOR: str | None = None
+
 
 async def is_db_initialized() -> bool:
     """Return whether the database has been initialized yet."""
@@ -242,28 +244,14 @@ async def scrape_packages() -> None:
 
 async def scrape_vulnerabilities() -> None:
     """Scrape vulnerabilities from github, save to database."""
-    global GLOBAL_CACHE
+    global CACHE_CURSOR
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
     for repository in ["npm"]:
         auth_headers = {"Authorization": f"Bearer {config.GH_ACCESS_TOKEN}"}
-        last_cursor_file = "last_cursor_" + repository + ".txt"
-
-        # Get and save cursor are functions incase decide to save somewhere else
-        def get_last_cursor():
-            try:
-                # TODO can I persist this data without files?
-                with open(last_cursor_file, "r+") as f:
-                    return f.read()
-            except FileNotFoundError:
-                return None
-
-        def save_last_cursor(last_cursor_received):
-            with open(last_cursor_file, "w") as f:
-                f.write(last_cursor_received)
 
         # Get vulnerabilities after:
-        last_cursor = None  # get_last_cursor()
+        last_cursor = None  # = CACHE_CURSOR
 
         # Repeats until there are no new vulnerabilities
         while True:
@@ -273,7 +261,7 @@ async def scrape_vulnerabilities() -> None:
                 + (
                     ""
                     if last_cursor is None or last_cursor == ""
-                    else ', after: "' + last_cursor + '"'
+                    else ', after: "' + last_cursor + '"'  # type: ignore
                 )
                 + ", orderBy: {field: UPDATED_AT, direction: ASC})"
             )
@@ -337,7 +325,7 @@ async def scrape_vulnerabilities() -> None:
                 print("no newer vulns")
                 return  # stop execution, no new data
 
-            save_last_cursor(last_cursor)
+            CACHE_CURSOR = last_cursor
 
             # Parse each vulnerability returned
             for gh_vuln_edge in json.loads(response.text)["data"][
