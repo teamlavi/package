@@ -68,10 +68,13 @@ async def nuke_database() -> None:
     assert await is_db_initialized()
 
     # Delete each of the tables in sequence
-    async with await get_db_tx() as tx:
-        async with tx.cursor() as cur:
-            await cur.execute("DROP TABLE cves")
-            await cur.execute("DROP TABLE package")
+    for table_name in ["cves", "package"]:
+        try:
+            async with await get_db_tx() as tx:
+                async with tx.cursor() as cur:
+                    await cur.execute("DROP TABLE %s", (table_name,))
+        except Exception:
+            print(f"Failed to delete table {table_name} - continuing anyway")
 
 
 async def clear_database() -> None:
