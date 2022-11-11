@@ -16,3 +16,14 @@ async def find_vulnerabilities_simple(
 
     # Get just the CVE ids from the objects
     return [cve.cve_id for cve in cves]
+
+
+async def find_full_vulnerabilities_id(
+    univ_id: str,
+) -> List[cve.CVE]:
+    """Find CVE data from a universal hash."""
+
+    # Get cves from the database
+    async with await get_db_tx() as tx:
+        cves = await cve.find_by_univ_hash(tx, univ_id)
+    return cves

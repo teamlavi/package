@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 
@@ -40,6 +40,20 @@ class FindVulnRequest(BaseModel):
 
 class FindVulnResponse(BaseModel):
     vulns: List[str]  # List of CVE id strings
+
+
+class FindVulnsIdListRequest(BaseModel):
+    ids: List[str]
+
+
+class CveResponse(BaseModel):
+    cveId: str
+    severity: str | None
+    url: str
+
+
+class FindVulnsIdListResponse(BaseModel):
+    vulns: Dict[str, List[CveResponse]]
 
 
 class InsertVulnRequest(BaseModel):
