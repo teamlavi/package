@@ -177,3 +177,8 @@ async def get_row_count(tx: Transaction) -> int:
         await cur.execute("SELECT COUNT(*) FROM package")
         row = await cur.fetchone()
         return row[0]  # type: ignore
+
+async def drop_all_rows(tx: Transaction) -> None:
+    """Drop all table rows."""
+    async with tx.cursor() as cur:
+        await cur.execute("TRUNCATE package RESTART IDENTITY CASCADE")

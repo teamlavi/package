@@ -159,7 +159,7 @@ async def delete_single_vulnerability(
 
 # helper function for scrape_vulnerabilities()
 # Queries package table to get list of versions
-async def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
+async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     """Converts a range of versions to a list of available versions in range"""
     # verse_range format - https://docs.github.com/en/graphql/reference/objects#securityvulnerability
     if vers_range[0] == "=":
@@ -191,10 +191,8 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> [str]:
 
 async def scrape_pip_packages() -> [str]:
     """Get versions for pip packages"""
-    page = requests.get(
-        "https://www.pypi.org/simple"
-    )  # Getting page HTML through request
-    soup = BeautifulSoup(page.content, "html.parser")
+    page = requests.get('https://www.pypi.org/simple%27') # Getting page HTML through request
+    soup = BeautifulSoup(page.content, 'html.parser')
 
     links = soup.select("a")
     packageslst = []
@@ -204,30 +202,28 @@ async def scrape_pip_packages() -> [str]:
         try:
             helper = []
             helper.append("pip")
-            temp = anchor["href"]
+            temp = anchor['href']
             temp = temp[8:-1]
             helper.append(temp)
-            page2 = f"https://pypi.python.org/pypi/{temp}/json"
-            releases = json.loads(request.urlopen(page2).read())["releases"]
-            yoMain = []
-            yo = sorted(releases, key=parse_version, reverse=True)
-            # lst.append(helper)
-            for x in yo:
-                print(x)
-                y = x.split(".")
-                print(y)
+            page2 = f'https://pypi.python.org/pypi/%7Btemp%7D/json'
+            releases = json.loads(requests.get(page2).text)['releases']
+            # releases = json.loads(request.urlopen(page2).read())['releases']
+            versionsLst = []
+            for key in releases:
+                y = key.split(".")
                 if len(y) == 3:
-                    yoMain.append(y)
+                    versionsLst.append(y)
+                elif len(y) == 2:
+                    y.append('0')
+                    versionsLst.append(y)
             count += 1
-            helper.append(yoMain)
+            helper.append(versionsLst)
             packageslst.append(helper)
         except:
             count += 1
             countExceptions += 1
 
-        return packageslst
-    # TODO insert packages into table
-
+    return packageslst
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
