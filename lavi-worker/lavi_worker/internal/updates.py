@@ -246,7 +246,7 @@ async def scrape_npm_packages() -> None:
             for vers in version_list:
                 major_vers, minor_vers, patch_vers = vers.split(".")
                 await insert_single_package_version(
-                    "npm", package, major_vers, minor_vers, patch_vers, None, None
+                    "npm", package, major_vers, minor_vers, patch_vers, 0, "0"
                 )
         except:
             print("unable to interpret versions for: ", package)
@@ -387,9 +387,10 @@ async def scrape_vulnerabilities() -> None:
                 url = gh_vuln["advisory"]["permalink"]
                 repo_name = gh_vuln["package"]["ecosystem"]
                 pkg_name = gh_vuln["package"]["name"]
-                pkg_vers = gh_vuln["vulnerableVersionRange"]
+                pkg_vers_range = gh_vuln["vulnerableVersionRange"]
+                pkg_vers_list = await vers_range_to_list(pkg_vers_range)
 
-                for release in vers_range_to_list(pkg_vers):
+                for release in pkg_vers_list:
                     await insert_single_vulnerability(
                         cve_id,
                         url,
