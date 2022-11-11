@@ -170,8 +170,14 @@ async def vers_range_to_list(pkg_name: str, vers_range: str) -> list[str]:
     print(vers_range)
 
     if "," in vers_range:
-        # TODO implement double sided range
-        return []
+        # double-sided range - separate queries and find overlap
+        # could make a new SQL query, but it'd be fairly long
+        # This implementation doesn't require additional code to check for inclusive/exclusive endpoints
+        lower_bound, upper_bound = vers_range.split(", ")
+        lower_list = await vers_range_to_list(pkg_name, lower_bound)
+        upper_list = await vers_range_to_list(pkg_name, upper_bound)
+        # return results inbetween edges
+        return [vers for vers in lower_list if vers in upper_list]
 
     if "-" in vers_range:
         # TODO maybe another way to handle?

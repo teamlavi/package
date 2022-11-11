@@ -27,6 +27,8 @@ def test_npm_scraper():
         ("lodash", "= 1.3.5", []),  # Exact that doesn't exist
         ("lodash", ">= 4.17.20", ["4.17.20", "4.17.21"]),  # Valid query
         ("lodash", "> 4.17.20", ["4.17.21"]),  # Valid query
+        ("lodash", "> 4.17.10, <= 4.17.13", ["4.17.11", "4.17.12", "4.17.13"]),  # Valid query
+        ("lodash", ">= 4.17.10, < 4.17.13", ["4.17.10", "4.17.11", "4.17.12"]),  # Valid query
     ]
 
     # Verify test cases don't have duplicates
