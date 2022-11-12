@@ -165,16 +165,20 @@ async def delete_single_vulnerability(
 
 # helper function for scrape_vulnerabilities()
 # Queries package table to get list of versions
-async def vers_range_to_list(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
+async def vers_range_to_list(
+    repo_name: str, pkg_name: str, vers_range: str
+) -> list[str]:
     """
     Converts a range of versions to a list of available versions in range
-    verse_range format: https://docs.github.com/en/graphql/reference/objects#securityvulnerability
+    verse_range format:
+    https://docs.github.com/en/graphql/reference/objects#securityvulnerability
     """
 
     if "," in vers_range:
         # double-sided range - separate queries and find overlap
         # could make a new SQL query, but it'd be fairly long
-        # This implementation doesn't require additional code to check for inclusive/exclusive endpoints
+        # This implementation doesn't require additional code to check for
+        # inclusive/exclusive endpoints
         lower_bound, upper_bound = vers_range.split(", ")
         lower_list = await vers_range_to_list(repo_name, pkg_name, lower_bound)
         upper_list = await vers_range_to_list(repo_name, pkg_name, upper_bound)
@@ -201,7 +205,12 @@ async def vers_range_to_list(repo_name: str, pkg_name: str, vers_range: str) -> 
                 return [vers_range[2:]]
             else:
                 # TODO: any other handling here
-                print("Requesting version of package not in package database: " + pkg_name + " " + vers_range)
+                print(
+                    "Requesting version of package not in package database: "
+                    + pkg_name
+                    + " "
+                    + vers_range
+                )
                 return []
     elif vers_range[:2] == "<=":
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
@@ -219,20 +228,30 @@ async def vers_range_to_list(repo_name: str, pkg_name: str, vers_range: str) -> 
         major_vers, minor_vers, patch_vers = vers_range[3:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than_eql(
-                tx, repo_name, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+                tx,
+                repo_name,
+                pkg_name,
+                str(major_vers),
+                str(minor_vers),
+                str(patch_vers),
             )
     elif vers_range[0] == ">":
         major_vers, minor_vers, patch_vers = vers_range[2:].split(".")
         async with await get_db_tx() as tx:
             return await package.get_vers_greater_than(
-                tx, repo_name, pkg_name, str(major_vers), str(minor_vers), str(patch_vers)
+                tx,
+                repo_name,
+                pkg_name,
+                str(major_vers),
+                str(minor_vers),
+                str(patch_vers),
             )
     else:
         return []
 
 
 async def scrape_pip_packages() -> List[str]:
-    pass
+    return []
 
 
 async def scrape_npm_packages() -> None:
@@ -255,7 +274,8 @@ async def scrape_npm_packages() -> None:
             for vers in version_list:
                 major_vers, minor_vers, patch_vers = vers.split(".")
                 await insert_single_package_version(
-                    "npm", package_name.lower(), major_vers, minor_vers, patch_vers)
+                    "npm", package_name.lower(), major_vers, minor_vers, patch_vers
+                )
         except Exception:
             print("Unable to interpret versions for {package_name}")
 
@@ -341,7 +361,7 @@ async def scrape_vulnerabilities() -> None:
             print("response")
             print(json.dumps(json.loads(response.text), indent=2))
 
-            if "\"message\":\"Bad credentials\"" in response.text:
+            if '"message":"Bad credentials"' in response.text:
                 print("GitHub Advisory Token Error")
                 return
             elif "errors" in json.loads(response.text).keys():
@@ -391,7 +411,9 @@ async def scrape_vulnerabilities() -> None:
                 repo_name = gh_vuln["package"]["ecosystem"].lower()
                 pkg_name = gh_vuln["package"]["name"]
                 pkg_vers_range = gh_vuln["vulnerableVersionRange"]
-                pkg_vers_list = await vers_range_to_list(repo_name, pkg_name, pkg_vers_range)
+                pkg_vers_list = await vers_range_to_list(
+                    repo_name, pkg_name, pkg_vers_range
+                )
                 print(pkg_vers_range)
                 print(pkg_vers_list)
                 for release in pkg_vers_list:

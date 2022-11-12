@@ -176,6 +176,7 @@ async def get_vers_greater_than_eql(
             vers_list.append(vers)
         return vers_list
 
+
 async def get_vers_greater_than(
     tx: Transaction,
     repo_name: str,
@@ -218,7 +219,8 @@ async def get_vers_greater_than(
         return vers_list
 
 
-async def vers_exists(tx: Transaction,
+async def vers_exists(
+    tx: Transaction,
     repo_name: str,
     pkg_name: str,
     major_vers: str,
@@ -245,7 +247,10 @@ async def vers_exists(tx: Transaction,
             ),
         )
         row = await cur.fetchone()
-        return row[0] > 0
+        if isinstance(row, list):
+            return int(row[0]) > 0
+        else:
+            return False
 
 
 async def get_row_count(tx: Transaction) -> int:

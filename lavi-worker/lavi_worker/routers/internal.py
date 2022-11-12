@@ -29,10 +29,7 @@ async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
 
 
 @router.get("/query_vers")
-async def query_vers(repo_name: str,
-    pkg_name: str,
-    vers_range: str
-) -> list[str]:
+async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
     lst = await updates.vers_range_to_list(repo_name, pkg_name, vers_range)
     lst.sort()  # not necessary for most operation but nice for display
     return lst
@@ -85,7 +82,7 @@ async def get_database_initialized() -> str:
 
 
 @router.get("/database/size", response_class=PlainTextResponse)
-async def get_database_size(table: str="cves") -> str:
+async def get_database_size(table: str = "cves") -> str:
     """Get the size of the database."""
     size = await updates.database_size(table=table)
     return str(size)
