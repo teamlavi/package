@@ -8,24 +8,48 @@ from lavi_worker.routers import api_models
 router = APIRouter(tags=["internal"])
 
 
-@router.post("/trigger_scraper")
-async def trigger_scraper() -> Response:
+@router.post("/trigger_vuln_scraper")
+async def trigger_vuln_scraper() -> Response:
     """Trigger the scraper to refresh the database."""
-    # TODO: trigger the scraper
+    await updates.scrape_vulnerabilities()
     return Response(status_code=200)
 
 
 @router.post("/insert_vuln")
-async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Response:
+async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool:
     """Insert a single vulnerability."""
-    await updates.insert_single_vulnerability(**insert_vuln_request.dict())
+    return await updates.insert_single_vulnerability(**insert_vuln_request.dict())
+
+
+@router.post("/insert_vers")
+async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
+    await updates.insert_single_package_version(**package_ver_request.dict())
     return Response(status_code=200)
+
+
+@router.get("/query_vers")
+async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
+    lst = await updates.vers_range_to_list(repo_name, pkg_name, vers_range)
+    lst.sort()  # not necessary for most operation but nice for display
+    return lst
 
 
 @router.post("/delete_vuln")
 async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
     """Delete a single vulnerability."""
     await updates.delete_single_vulnerability(**delete_vuln_request.dict())
+    return Response(status_code=200)
+
+
+@router.post("/trigger_npm_scrapper")
+async def trigger_npm_scrapper() -> Response:
+    await updates.scrape_npm_packages()
+    return Response(status_code=200)
+
+
+@router.post("/trigger_pip_scrapper")
+async def trigger_pip_scrapper() -> Response:
+    await updates.scrape_pip_packages()
     return Response(status_code=200)
 
 
@@ -57,7 +81,7 @@ async def get_database_initialized() -> str:
 
 
 @router.get("/database/size", response_class=PlainTextResponse)
-async def get_database_size() -> str:
+async def get_database_size(table: str = "cves") -> str:
     """Get the size of the database."""
-    size = await updates.database_size(table="cves")
+    size = await updates.database_size(table=table)
     return str(size)
