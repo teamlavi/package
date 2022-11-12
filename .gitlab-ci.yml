@@ -9,6 +9,9 @@ test:
   stage: test
   script:
     - garden --logger-type=basic --env=ci build
+    - garden --logger-type=basic --env=ci deploy
+    # Wait for github key to get replicated into ns
+    - sleep 15
     - garden --logger-type=basic --env=ci test
   after_script:
     - kubectl delete namespace "package-ci-${CI_ID}"
