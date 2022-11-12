@@ -16,10 +16,9 @@ async def trigger_vuln_scraper() -> Response:
 
 
 @router.post("/insert_vuln")
-async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> Response:
+async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool:
     """Insert a single vulnerability."""
-    await updates.insert_single_vulnerability(**insert_vuln_request.dict())
-    return Response(status_code=200)
+    return await updates.insert_single_vulnerability(**insert_vuln_request.dict())
 
 
 @router.post("/insert_vers")

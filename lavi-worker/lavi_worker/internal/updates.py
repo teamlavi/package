@@ -110,10 +110,10 @@ async def insert_single_vulnerability(
     severity: str | None = None,
     description: str | None = None,
     cwe: str | None = None,
-) -> None:
+) -> bool:
     """Insert a single vulnerability into the db."""
     async with await get_db_tx() as tx:
-        await cve.create(
+        return await cve.create(
             tx=tx,
             cve_id=cve_id,
             severity=severity,
