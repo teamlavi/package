@@ -276,8 +276,8 @@ async def scrape_npm_packages() -> None:
                 await insert_single_package_version(
                     "npm", package_name.lower(), major_vers, minor_vers, patch_vers
                 )
-        except Exception:
-            print("Unable to interpret versions for {package_name}")
+        except Exception as e:
+            print(f"Unable to interpret versions for {package_name}", e)
 
 
 async def scrape_packages() -> None:
