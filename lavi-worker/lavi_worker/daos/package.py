@@ -247,9 +247,11 @@ async def vers_exists(
             ),
         )
         row = await cur.fetchone()
-        print("row", row)
 
-        return int(row[0]) > 0
+        if isinstance(row, tuple):
+            return int(row[0]) > 0
+        else:
+            return False
 
 
 async def get_row_count(tx: Transaction) -> int:
