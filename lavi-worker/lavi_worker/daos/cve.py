@@ -37,8 +37,8 @@ async def create(
     repo_name: str,
     pkg_name: str,
     pkg_vers: str,
-) -> None:
-    """Create a CVE object in the database, return nothing if successful."""
+) -> bool:
+    """Create a CVE object in the database"""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
     async with tx.cursor() as cur:
         try:
@@ -59,8 +59,10 @@ async def create(
                     univ_hash,
                 ),
             )
+            return True
         except psycopg.errors.lookup("23505"):  # UniqueViolation
             print("Entry in cves already exists", repo_name, pkg_name, pkg_vers, cve_id)
+            return False
 
 
 async def delete(tx: Transaction, cve: CVE) -> None:
