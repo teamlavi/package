@@ -1,3 +1,5 @@
+import psycopg
+
 from typing import List
 
 from attrs import define
@@ -38,30 +40,31 @@ async def create(
 ) -> None:
     """Create a CVE object in the database, return nothing if successful."""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
-    # TODO: check that row doesn't already exist OR catch resultant psycopg3 err
     async with tx.cursor() as cur:
-        await cur.execute(
-            """
-                INSERT INTO cves
-                VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """,
-            (
-                cve_id,
-                severity,
-                description,
-                cwe,
-                url,
-                repo_name,
-                pkg_name,
-                pkg_vers,
-                univ_hash,
-            ),
-        )
+        try:
+            await cur.execute(
+                """
+                    INSERT INTO cves
+                    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    cve_id,
+                    severity,
+                    description,
+                    cwe,
+                    url,
+                    repo_name,
+                    pkg_name,
+                    pkg_vers,
+                    univ_hash,
+                ),
+            )
+        except psycopg.errors.lookup("23505"):  # UniqueViolation
+            print("Entry in cves already exists", repo_name, pkg_name, pkg_vers, cve_id)
 
 
 async def delete(tx: Transaction, cve: CVE) -> None:
     """Delete the given CVE from the db."""
-    # TODO: assert the entry exists in the db before deleting
     async with tx.cursor() as cur:
         await cur.execute(
             "DELETE FROM cves WHERE cve_id = %s OR univ_hash = %s",
