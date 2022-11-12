@@ -146,7 +146,5 @@ def scrape_vulns(repository="PIP"):
 
         # Note: parsed_vulnerabilities might have duplicate CVE and packages with different affected version ranges
         # print(parsed_vulnerabilities) # Print parsed data
-        # TODO insert parsed_vulnerabilities into DB
-
 
 scrape_vulns("GO")

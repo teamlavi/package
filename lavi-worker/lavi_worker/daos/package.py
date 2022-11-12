@@ -32,7 +32,6 @@ async def create(
         pkg_name,
         str(major_vers) + "." + str(minor_vers) + "." + str(patch_vers),
     )
-    # TODO: check that row doesn't already exist OR catch resultant psycopg3 err
     async with tx.cursor() as cur:
         await cur.execute(
             """

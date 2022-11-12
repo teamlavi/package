@@ -94,7 +94,9 @@ async def database_size(table: str) -> int:
     if table == "cves":
         async with await get_db_tx() as tx:
             return await cve.get_row_count(tx)
-    # ... more tables as added
+    elif table == "package":
+        async with await get_db_tx() as tx:
+            return await package.get_row_count(tx)
     else:
         raise Exception(f"Table {table} is not expected to exist")
 
@@ -249,11 +251,11 @@ async def scrape_npm_packages() -> None:
                 version_list = [version_list]
             elif isinstance(version_list[0], list):
                 version_list = version_list[0]
+
             for vers in version_list:
                 major_vers, minor_vers, patch_vers = vers.split(".")
                 await insert_single_package_version(
-                    "npm", package_name, major_vers, minor_vers, patch_vers, 0, "0"
-                )
+                    "npm", package_name.lower(), major_vers, minor_vers, patch_vers)
         except Exception:
             print("Unable to interpret versions for {package_name}")
 
@@ -276,6 +278,7 @@ async def scrape_vulnerabilities() -> None:
         last_cursor = None  # = CACHE_CURSOR
 
         # Repeats until there are no new vulnerabilities
+        # TODO: first:x how many to query at once?
         while True:
             query_type = (
                 "securityVulnerabilities(first:100, ecosystem: "
@@ -385,7 +388,7 @@ async def scrape_vulnerabilities() -> None:
                     ]
                 )
                 url = gh_vuln["advisory"]["permalink"]
-                repo_name = gh_vuln["package"]["ecosystem"]
+                repo_name = gh_vuln["package"]["ecosystem"].lower()
                 pkg_name = gh_vuln["package"]["name"]
                 pkg_vers_range = gh_vuln["vulnerableVersionRange"]
                 pkg_vers_list = await vers_range_to_list(repo_name, pkg_name, pkg_vers_range)

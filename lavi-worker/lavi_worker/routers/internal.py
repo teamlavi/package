@@ -8,8 +8,8 @@ from lavi_worker.routers import api_models
 router = APIRouter(tags=["internal"])
 
 
-@router.post("/trigger_scraper")
-async def trigger_scraper() -> Response:
+@router.post("/trigger_vuln_scraper")
+async def trigger_vuln_scraper() -> Response:
     """Trigger the scraper to refresh the database."""
     await updates.scrape_vulnerabilities()
     return Response(status_code=200)
@@ -85,7 +85,7 @@ async def get_database_initialized() -> str:
 
 
 @router.get("/database/size", response_class=PlainTextResponse)
-async def get_database_size() -> str:
+async def get_database_size(table: str="cves") -> str:
     """Get the size of the database."""
-    size = await updates.database_size(table="cves")
+    size = await updates.database_size(table=table)
     return str(size)
