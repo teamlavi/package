@@ -42,21 +42,6 @@ class FindVulnResponse(BaseModel):
     vulns: List[str]  # List of CVE id strings
 
 
-class PackageVersRange(BaseModel):
-    repo_name: str
-    pkg_name: str
-    vers_range: str
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "repo_name": "npm",
-                "pkg_name": "lodash",
-                "vers_range": ">= 0.0.1",
-            },
-        }
-
-
 class PackageVers(BaseModel):
     repo_name: str
     pkg_name: str

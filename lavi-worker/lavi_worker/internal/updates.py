@@ -10,9 +10,6 @@ from lavi_worker.daos import package
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker import config
 
-# GitHub personal access token (classic)
-# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-personal-access-token-classic
-
 CACHE_CURSOR: str | None = None
 
 
