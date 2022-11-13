@@ -72,8 +72,8 @@ async def nuke_database() -> None:
             async with await get_db_tx() as tx:
                 async with tx.cursor() as cur:
                     await cur.execute("DROP TABLE %s", (table_name,))
-        except Exception:
-            print(f"Failed to delete table {table_name} - continuing anyway")
+        except Exception as e:
+            print(f"Failed to delete table {table_name} - {str(e)}")
 
 
 async def clear_database() -> None:
