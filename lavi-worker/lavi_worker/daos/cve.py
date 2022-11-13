@@ -83,6 +83,19 @@ async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[CVE]:
     return [CVE(*raw_cve) for raw_cve in raw_cves]
 
 
+async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[str]:
+    """Find by the universal hash string."""
+    # Query the database
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT pkg_vers FROM cves WHERE pkg_name = %s AND repo_name = %s",
+            (pkg_name, repo_name),
+        )
+        versions = await cur.fetchall()
+
+    return [version[0] for version in versions]
+
+
 async def find_by_repo_pkg_vers(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
 ) -> List[CVE]:
