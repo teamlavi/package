@@ -8,14 +8,16 @@ import os
 complete_trees = {}
 
 
-def get_recent_vers(package):
-    return os.popen("npm view " + package + " version").read().strip()
+def get_version(package: str, version_range: str):
+    """Converts a version range to a singular version number (usually most recent release)"""
+    if version_range[0] == "^" or version_range == "latest":
+        return os.popen("npm view " + package + " version").read().strip()
+    else:
+        return version_range
 
 
 def get_dependencies(package, version, tab=""):
-    if version[0] == "^":
-        version = get_recent_vers(package)
-
+    version = get_version(package, version)
     print(tab, package, version)
 
     if package + version in complete_trees:
@@ -27,10 +29,10 @@ def get_dependencies(package, version, tab=""):
         complete_trees[package + version] = {}
         return {}
 
-    dependency_list = json.loads(data)["dependencies"].keys()
+    dependency_dict = json.loads(data)["dependencies"]
     this_tree = {}
-    for p in dependency_list:
-        v = get_recent_vers(p)
+    for p in dependency_dict:
+        v = get_version(p, dependency_dict.get(p))
         this_tree[p + v] = get_dependencies(p, v, tab + "\t")
     complete_trees[package + version] = this_tree
     # print(this_tree)
