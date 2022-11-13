@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from lavi_worker.internal import queries
 from lavi_worker.routers import api_models
-
+from typing import List
 
 router = APIRouter(tags=["external"])
 
@@ -36,3 +36,21 @@ async def find_vulnerable_versions(
     print("empty" if not versions else type(versions[0]))
     # Format response
     return api_models.FindVulnVersResponse(vers=versions)
+
+
+@router.post("/find_vulnerabilities_id_list")
+async def find_vulnerabilities_id_list(
+    find_all_vuln_request: api_models.FindVulnsIdListRequest,
+) -> api_models.FindVulnsIdListResponse:
+    """Find all vulnerabilities given a list of package universal hash ids."""
+    # get CVE data from the database
+    async def format_cve(pkgId: str) -> List[api_models.CveResponse]:
+        cves = await queries.find_full_vulnerabilities_id(pkgId)
+        return [
+            api_models.CveResponse(cveId=cve.cve_id, severity=cve.severity, url=cve.url)
+            for cve in cves
+        ]
+
+    return api_models.FindVulnsIdListResponse(
+        vulns={i: await format_cve(i) for i in find_all_vuln_request.ids}
+    )

@@ -132,11 +132,11 @@ def test_insert_check_cve():
 def test_double_insert_fails():
     """Test that you can't insert two of the same repo-pkg-vers-cve tuples."""
     # Insert a vulnerability (expected success)
-    httpx.post(f"{BASE_URL}/internal/insert_vuln", json=TEST_VULN).raise_for_status()
+    httpx.post(f"{BASE_URL}/internal/insert_vuln", json=TEST_VULN)
 
     # Insert the same one (expect failure)
     resp = httpx.post(f"{BASE_URL}/internal/insert_vuln", json=TEST_VULN)
-    assert resp.status_code >= 400
+    assert resp.text == "false"
 
 
 @pytest.mark.parametrize(

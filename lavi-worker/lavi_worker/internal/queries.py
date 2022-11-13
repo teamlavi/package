@@ -26,3 +26,14 @@ async def find_vuln_versions(repo: RepoEnum, package: str) -> List[str]:
 
     # Remove duplicates
     return list(set(vers))
+
+
+async def find_full_vulnerabilities_id(
+    univ_id: str,
+) -> List[cve.CVE]:
+    """Find CVE data from a universal hash."""
+
+    # Get cves from the database
+    async with await get_db_tx() as tx:
+        cves = await cve.find_by_univ_hash(tx, univ_id)
+    return cves

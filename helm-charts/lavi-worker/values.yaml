@@ -21,3 +21,7 @@ postgres:
   replicas: 1
 
 replicas: 1
+
+ghAccessToken:
+  secretKey: ghAccessToken
+  secretName: gh-access-token
