@@ -14,6 +14,14 @@ from lavi_worker import config
 CACHE_CURSOR: str | None = None
 
 
+async def is_db_initialized() -> bool:
+    return (
+        await is_table_initialized("cves")
+        and await is_table_initialized("package")
+        and await is_table_initialized("dependencies")
+    )
+
+
 async def is_table_initialized(table: str = "cves") -> bool:
     """Return whether the database has been initialized yet."""
     if table == "cves":
