@@ -6,12 +6,6 @@ import shutil
 wd = os.getcwd()
 ui_dir = os.path.join(wd, "ui")
 
-# print ("installing ui dependencies")
-# subprocess.run(["npm", "install"], cwd=ui_dir)
-
-# print ("building ui")
-# subprocess.run(["npm", "run", "build"], cwd=ui_dir)
-
 GOOS = ["darwin", "windows", "linux"]
 GOARCHS = {
     "darwin": ["amd64", "arm64"],
