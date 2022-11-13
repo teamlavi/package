@@ -54,7 +54,7 @@ async def initialize_database() -> None:
             )
             await cur.execute(
                 """
-		            CREATE TABLE package (
+					CREATE TABLE package (
 					 univ_hash VARCHAR(100) PRIMARY KEY,
 					 repo_name VARCHAR(50) NOT NULL,
 					 pkg_name VARCHAR(50) NOT NULL,
@@ -63,19 +63,19 @@ async def initialize_database() -> None:
 					 patch_vers INTEGER NOT NULL,
 					 num_downloads INTEGER,
 					 s3_bucket varchar(50)
-		             );
-		         """,
+					 );
+				 """,
             )
             await cur.execute(
                 """
-                CREATE TABLE dependencies (
-                  univ_hash VARCHAR(100) PRIMARY KEY,
-                  repo_name VARCHAR(50) NOT NULL,
-                  pkg_name VARCHAR(50) NOT NULL,
-                  pkg_vers VARCHAR(50),
-                  pkg_dependencies TEXT NOT NULL
-                );
-                """,
+				CREATE TABLE dependencies (
+				  univ_hash VARCHAR(100) PRIMARY KEY,
+				  repo_name VARCHAR(50) NOT NULL,
+				  pkg_name VARCHAR(50) NOT NULL,
+				  pkg_vers VARCHAR(50),
+				  pkg_dependencies TEXT NOT NULL
+				);
+				""",
             )
 
 
@@ -190,10 +190,10 @@ async def delete_single_vulnerability(
     return True
 
 
-async def scrape_npm_dependencies():
-    complete_trees = {}  # TODO replace with DB check?
+async def scrape_npm_dependencies() -> None:
+    complete_trees: dict[str, str] = {}  # TODO replace with DB check?
 
-    def get_version(package: str, version_range: str):
+    def get_version(package: str, version_range: str) -> str:
         """Converts a version range to a singular version number (usually most recent release)"""
         if version_range[0] == "^" or version_range == "latest":
             return os.popen("npm view " + package + " version").read().strip()
@@ -201,7 +201,7 @@ async def scrape_npm_dependencies():
             return version_range
 
     # recursive method
-    def get_dependencies(package, version, tab=""):
+    def get_dependencies(package: str, version: str, tab: str = "") -> str:
         version = get_version(package, version)
 
         if package + version in complete_trees:
@@ -210,17 +210,17 @@ async def scrape_npm_dependencies():
         data = httpx.get("https://registry.npmjs.org/" + package + "/" + version).text
 
         if "dependencies" not in json.loads(data).keys():
-            complete_trees[package + version] = {}
-            return {}
+            complete_trees[package + version] = "{}"
+            return "{}"
 
         dependency_dict = json.loads(data)["dependencies"]
         this_tree = {}
         for p in dependency_dict:
             v = get_version(p, dependency_dict.get(p))
             this_tree[p + v] = get_dependencies(p, v, tab + "\t")
-        complete_trees[package + version] = this_tree
+        complete_trees[package + version] = str(this_tree)
         # print(this_tree)
-        return this_tree
+        return str(this_tree)
 
     for (pkg_name, pkg_vers) in [("react", "18.2.0")]:
         pkg_dependencies = get_dependencies(pkg_name, pkg_vers)
@@ -371,7 +371,7 @@ async def scrape_vulnerabilities() -> None:
 
             query = (
                 """
-				{"""
+                        {"""
                 + query_type
                 + """
                {
