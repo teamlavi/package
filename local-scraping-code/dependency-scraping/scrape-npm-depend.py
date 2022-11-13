@@ -41,6 +41,6 @@ def get_dependencies(package, version, tab=""):
 
 # print(get_dependencies('react', '18.2.0'))
 
-print(get_dependencies("gl-nodeutilities-test", "^1.0.0"))
+print(get_dependencies("request", "^1.0.0"))
 
 print(complete_trees)

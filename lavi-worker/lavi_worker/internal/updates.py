@@ -190,19 +190,32 @@ async def delete_single_vulnerability(
     return True
 
 
-async def scrape_npm_dependencies() -> None:
-    complete_trees: dict[str, str] = {}  # TODO replace with DB check?
+def npm_vers_range_to_vers(pkg_name: str, vers_range: str) -> str:
+    """
+    Converts a version range to a singular version number based off rules in
+    https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies
+    """
+    # TODO: implement rules https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies
+    # TODO: use package versions db to get valid versions
+    if (
+        vers_range[0] == "^"
+        or vers_range == "latest"
+        or vers_range[0] == "*"
+        or vers_range == ""
+    ):
+        return os.popen("npm view " + pkg_name + " version").read().strip()
+    else:
+        return vers_range
 
-    def get_version(package: str, version_range: str) -> str:
-        """Converts a version range to a singular version number (usually most recent release)"""
-        if version_range[0] == "^" or version_range == "latest":
-            return os.popen("npm view " + package + " version").read().strip()
-        else:
-            return version_range
+
+async def scrape_npm_dependencies() -> None:
+    # TODO could use npm to create a package-lock then interpret it.
+    #  See /local-scraping-code/dependency-scraping/npm-tree-package-lock.py
+    complete_trees: dict[str, str] = {}  # TODO replace with DB check?
 
     # recursive method
     def get_dependencies(package: str, version: str, tab: str = "") -> str:
-        version = get_version(package, version)
+        version = npm_vers_range_to_vers(package, version)
 
         if package + version in complete_trees:
             return complete_trees[package + version]
@@ -216,13 +229,13 @@ async def scrape_npm_dependencies() -> None:
         dependency_dict = json.loads(data)["dependencies"]
         this_tree = {}
         for p in dependency_dict:
-            v = get_version(p, dependency_dict.get(p))
+            v = npm_vers_range_to_vers(p, dependency_dict.get(p))
             this_tree[p + v] = get_dependencies(p, v, tab + "\t")
         complete_trees[package + version] = str(this_tree)
         # print(this_tree)
         return str(this_tree)
 
-    for (pkg_name, pkg_vers) in [("react", "18.2.0")]:
+    for (pkg_name, pkg_vers) in [("react", "18.2.0"), ("request", "2.88.2")]:
         pkg_dependencies = get_dependencies(pkg_name, pkg_vers)
         await insert_single_dependency_tree("npm", pkg_name, pkg_vers, pkg_dependencies)
 
