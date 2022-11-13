@@ -74,14 +74,14 @@ async def initialize_database() -> Response:
     return Response(status_code=200)
 
 
-@router.get("/database/init", response_class=PlainTextResponse)
-async def get_database_initialized() -> str:
+@router.get("/database/cves_init", response_class=PlainTextResponse)
+async def get_cves_initialized() -> str:
     """Check whether the database is initialized."""
-    return "true" if await updates.is_db_initialized() else "false"  # no cap
+    return "true" if await updates.is_table_initialized("cves") else "false"  # no cap
 
 
 @router.get("/database/size", response_class=PlainTextResponse)
-async def get_database_size(table: str = "cves") -> str:
+async def get_table_size(table: str = "cves") -> str:
     """Get the size of the database."""
-    size = await updates.database_size(table=table)
+    size = await updates.table_size(table=table)
     return str(size)
