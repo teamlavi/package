@@ -71,7 +71,8 @@ async def nuke_database() -> None:
         try:
             async with await get_db_tx() as tx:
                 async with tx.cursor() as cur:
-                    await cur.execute("DROP TABLE %s", (table_name,))
+                    # Can't do server-side binding, don't let user input affect this
+                    await cur.execute(f"DROP TABLE {table_name}")
         except Exception as e:
             print(f"Failed to delete table {table_name} - {str(e)}")
 
