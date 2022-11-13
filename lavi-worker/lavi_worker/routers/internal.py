@@ -41,9 +41,15 @@ async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Resp
     return Response(status_code=200)
 
 
-@router.post("/trigger_npm_scrapper")
-async def trigger_npm_scrapper() -> Response:
-    await updates.scrape_npm_packages()
+@router.post("/trigger_npm_vers_scrapper")
+async def trigger_npm_vers_scrapper() -> Response:
+    await updates.scrape_npm_package_vers()
+    return Response(status_code=200)
+
+
+@router.post("/trigger_npm_dependency_scrapper")
+async def trigger_npm_dependency_scrapper() -> Response:
+    await updates.scrape_npm_dependencies()
     return Response(status_code=200)
 
 

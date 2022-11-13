@@ -7,6 +7,7 @@ import psycopg
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
+from lavi_worker.daos import dependencies
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker import config
 
@@ -14,6 +15,7 @@ CACHE_CURSOR: str | None = None
 
 
 async def is_db_initialized() -> bool:
+    # TODO: is table initialized instead of full db
     """Return whether the database has been initialized yet."""
     # Just check if the main table has been made
     try:
@@ -34,46 +36,60 @@ async def initialize_database() -> None:
         async with tx.cursor() as cur:
             await cur.execute(
                 """
-                    CREATE TABLE cves (
-                        id SERIAL PRIMARY KEY,
-                        cve_id VARCHAR(50) NOT NULL,
-                        severity VARCHAR(50),
-                        description TEXT,
-                        cwe TEXT,
-                        url TEXT NOT NULL,
-                        repo_name VARCHAR(50) NOT NULL,
-                        pkg_name VARCHAR(50) NOT NULL,
-                        pkg_vers VARCHAR(50) NOT NULL,
-                        univ_hash VARCHAR(100) NOT NULL
-                    );
-                    ALTER TABLE cves
-                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
-                    CREATE TABLE package (
-                                univ_hash VARCHAR(100) PRIMARY KEY,
-                                repo_name VARCHAR(50) NOT NULL,
-                                pkg_name VARCHAR(50) NOT NULL,
-                                major_vers INTEGER NOT NULL,
-                                minor_vers INTEGER NOT NULL,
-                                patch_vers INTEGER NOT NULL,
-                                num_downloads INTEGER,
-                                s3_bucket varchar(50)
-                    );
+					CREATE TABLE cves (
+						id SERIAL PRIMARY KEY,
+						cve_id VARCHAR(50) NOT NULL,
+						severity VARCHAR(50),
+						description TEXT,
+						cwe TEXT,
+						url TEXT NOT NULL,
+						repo_name VARCHAR(50) NOT NULL,
+						pkg_name VARCHAR(50) NOT NULL,
+						pkg_vers VARCHAR(50) NOT NULL,
+						univ_hash VARCHAR(100) NOT NULL
+					);
+					ALTER TABLE cves
+						ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
+						""",
+            )
+            await cur.execute(
+                """
+		            CREATE TABLE package (
+					 univ_hash VARCHAR(100) PRIMARY KEY,
+					 repo_name VARCHAR(50) NOT NULL,
+					 pkg_name VARCHAR(50) NOT NULL,
+					 major_vers INTEGER NOT NULL,
+					 minor_vers INTEGER NOT NULL,
+					 patch_vers INTEGER NOT NULL,
+					 num_downloads INTEGER,
+					 s3_bucket varchar(50)
+		             );
+		         """,
+            )
+            await cur.execute(
+                """
+                CREATE TABLE dependencies (
+                  univ_hash VARCHAR(100) PRIMARY KEY,
+                  repo_name VARCHAR(50) NOT NULL,
+                  pkg_name VARCHAR(50) NOT NULL,
+                  pkg_vers VARCHAR(50),
+                  pkg_dependencies TEXT NOT NULL
+                );
                 """,
             )
 
 
 async def nuke_database() -> None:
     """Delete database tables."""
-    assert await is_db_initialized()
 
     # Delete each of the tables in sequence
-    for table_name in ["cves", "package"]:
+    for table_name in ["cves", "package", "dependencies"]:
         try:
             async with await get_db_tx() as tx:
                 async with tx.cursor() as cur:
-                    await cur.execute("DROP TABLE %s", (table_name,))
-        except Exception:
-            print(f"Failed to delete table {table_name} - continuing anyway")
+                    await cur.execute(f"DROP TABLE {table_name};")
+        except Exception as e:
+            print(f"Failed to delete table {table_name} - continuing anyway", e)
 
 
 async def clear_database() -> None:
@@ -123,6 +139,20 @@ async def insert_single_vulnerability(
         )
 
 
+async def insert_single_dependency_tree(
+    repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
+) -> None:
+    """Insert a single vulnerability into the db."""
+    async with await get_db_tx() as tx:
+        await dependencies.create(
+            tx=tx,
+            repo_name=repo_name,
+            pkg_name=pkg_name,
+            pkg_vers=pkg_vers,
+            pkg_dependencies=pkg_dependencies,
+        )
+
+
 async def insert_single_package_version(
     repo_name: str,
     pkg_name: str,
@@ -158,6 +188,43 @@ async def delete_single_vulnerability(
             return False
         await cve.delete(tx, doomed_cve)
     return True
+
+
+async def scrape_npm_dependencies():
+    complete_trees = {}  # TODO replace with DB check?
+
+    def get_version(package: str, version_range: str):
+        """Converts a version range to a singular version number (usually most recent release)"""
+        if version_range[0] == "^" or version_range == "latest":
+            return os.popen("npm view " + package + " version").read().strip()
+        else:
+            return version_range
+
+    # recursive method
+    def get_dependencies(package, version, tab=""):
+        version = get_version(package, version)
+
+        if package + version in complete_trees:
+            return complete_trees[package + version]
+
+        data = httpx.get("https://registry.npmjs.org/" + package + "/" + version).text
+
+        if "dependencies" not in json.loads(data).keys():
+            complete_trees[package + version] = {}
+            return {}
+
+        dependency_dict = json.loads(data)["dependencies"]
+        this_tree = {}
+        for p in dependency_dict:
+            v = get_version(p, dependency_dict.get(p))
+            this_tree[p + v] = get_dependencies(p, v, tab + "\t")
+        complete_trees[package + version] = this_tree
+        # print(this_tree)
+        return this_tree
+
+    for (pkg_name, pkg_vers) in [("react", "18.2.0")]:
+        pkg_dependencies = get_dependencies(pkg_name, pkg_vers)
+        await insert_single_dependency_tree("npm", pkg_name, pkg_vers, pkg_dependencies)
 
 
 # helper function for scrape_vulnerabilities()
@@ -251,7 +318,7 @@ async def scrape_pip_packages() -> List[str]:
     return []
 
 
-async def scrape_npm_packages() -> None:
+async def scrape_npm_package_vers() -> None:
     """Get versions for npm packages"""
     for package_name in ["express", "async", "lodash", "cloudinary", "axios"]:
         if package_name[0] == "-":
@@ -275,12 +342,6 @@ async def scrape_npm_packages() -> None:
                 )
         except Exception as e:
             print(f"Unable to interpret versions for {package_name}", e)
-
-
-async def scrape_packages() -> None:
-    """Scrape released versions for all packages in repos"""
-    await scrape_pip_packages()
-    await scrape_npm_packages()
 
 
 async def scrape_vulnerabilities() -> None:
@@ -310,7 +371,7 @@ async def scrape_vulnerabilities() -> None:
 
             query = (
                 """
-            {"""
+				{"""
                 + query_type
                 + """
                {
