@@ -18,6 +18,16 @@ async def find_vulnerabilities_simple(
     return [cve.cve_id for cve in cves]
 
 
+async def find_vuln_versions(repo: RepoEnum, package: str) -> List[str]:
+
+    # Get list of versions of the package from the database
+    async with await get_db_tx() as tx:
+        vers = await cve.find_pkg_vers(tx, repo.value, package)
+
+    # Remove duplicates
+    return list(set(vers))
+
+
 async def find_full_vulnerabilities_id(
     univ_id: str,
 ) -> List[cve.CVE]:
