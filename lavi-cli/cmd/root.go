@@ -27,4 +27,6 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().BoolP("write", "w", false, "Write tree to a file")
 	rootCmd.PersistentFlags().BoolP("show", "s", false, "Show ui")
+	rootCmd.PersistentFlags().String("package", "", "Run lavi on a single package. If provided along with version, will default to running in single package mode")
+	rootCmd.PersistentFlags().String("version", "", "Run lavi on a single package. If provided along with package, will default to running in single package mode")
 }

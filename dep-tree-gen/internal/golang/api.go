@@ -32,3 +32,8 @@ func (g GolangTreeGenerator) GetCDS() models.CDS {
 func (g GolangTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 	return g.GetCDS()
 }
+
+func (g GolangTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.CDS {
+	log.Fatal("unsupported")
+	return models.CDS{}
+}

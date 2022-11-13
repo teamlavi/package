@@ -2,6 +2,7 @@ package pip
 
 import (
 	"dep-tree-gen/models"
+	"log"
 )
 
 type PipTreeGenerator struct {
@@ -29,4 +30,9 @@ func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 	tree := callPDP(data, g.PythonPath)
 	cds := pdpObjectArrToCds(tree, data)
 	return cds
+}
+
+func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.CDS {
+	log.Fatal("unsupported")
+	return models.CDS{}
 }
