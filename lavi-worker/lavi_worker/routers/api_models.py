@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 
@@ -40,6 +40,43 @@ class FindVulnRequest(BaseModel):
 
 class FindVulnResponse(BaseModel):
     vulns: List[str]  # List of CVE id strings
+
+
+class PackageVers(BaseModel):
+    repo_name: str
+    pkg_name: str
+    major_vers: int
+    minor_vers: int
+    patch_vers: int
+    num_downloads: int
+    s3_bucket: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "repo_name": "test",
+                "pkg_name": "test",
+                "major_vers": 1,
+                "minor_vers": 1,
+                "patch_vers": 1,
+                "num_downloads": 0,
+                "s3_bucket": "0",
+            }
+        }
+
+
+class FindVulnsIdListRequest(BaseModel):
+    ids: List[str]
+
+
+class CveResponse(BaseModel):
+    cveId: str
+    severity: str | None
+    url: str
+
+
+class FindVulnsIdListResponse(BaseModel):
+    vulns: Dict[str, List[CveResponse]]
 
 
 class InsertVulnRequest(BaseModel):
