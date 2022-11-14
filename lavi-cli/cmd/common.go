@@ -4,9 +4,9 @@ import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"lavi/internal"
+	internalModels "lavi/internal/models"
 	"lavi/internal/vulnerabilities"
 
 	"github.com/spf13/cobra"
@@ -22,29 +22,32 @@ func getCds(cmd *cobra.Command, gen generator.RepositoryTreeGenerator) models.CD
 	return cds
 }
 
-func display(cds models.CDS, vulns map[string][]vulnerabilities.Vulnerability) {
-	fmt.Printf("package repository: %s\n", cds.Repository)
-	fmt.Printf("total dependencies checked: %d\n", len(cds.Nodes))
-	fmt.Println("this will show more eventually")
-}
-
 // post command function to run AFTER a command has succesfully run
 func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
 	noScan, _ := cmd.Flags().GetBool("no-scan")
+	writeWithVulns, _ := cmd.Flags().GetBool("write-with-vulns")
 
 	clean := map[string][]vulnerabilities.Vulnerability{}
+	results := map[string][]vulnerabilities.VulnerabilityResponseData{}
 
 	if !noScan {
-		results := vulnerabilities.Scan(cds)
-		clean := vulnerabilities.ConvertToCleanResponse(results)
-		display(cds, clean)
+		results = vulnerabilities.Scan(cds)
+		clean = vulnerabilities.ConvertToCleanResponse(results)
+
+		display(cmd, cds, results)
 	}
 
 	if write {
-		file, _ := json.MarshalIndent(cds, "", " ")
-		_ = ioutil.WriteFile("cds.json", file, 0644)
+		fileData := []byte{}
+		if writeWithVulns {
+			fileData, _ = json.MarshalIndent(addVulnsToCds(cds, results), "", " ")
+		} else {
+			fileData, _ = json.MarshalIndent(cds, "", " ")
+		}
+
+		_ = ioutil.WriteFile("cds.json", fileData, 0644)
 	}
 
 	if show {
@@ -69,4 +72,27 @@ func tryExecuteSinglePackageMode(cmd *cobra.Command, gen generator.RepositoryTre
 	cds := gen.GenerateSinglePackageCds(pkg, version)
 
 	return true, cds
+}
+
+// will return a copy
+func addVulnsToCds(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityResponseData) internalModels.ExpandedCDS {
+	nodes := map[string]internalModels.ExpandedCDSNode{}
+	for id, node := range cds.Nodes {
+		vs := vulns[id]
+		nodes[id] = internalModels.ExpandedCDSNode{
+			ID:              id,
+			Package:         node.Package,
+			Version:         node.Version,
+			Dependencies:    node.Dependencies,
+			Vulnerabilities: vs,
+		}
+	}
+
+	out := internalModels.ExpandedCDS{
+		CmdType:    cds.CmdType,
+		Repository: cds.Repository,
+		Root:       cds.Root,
+		Nodes:      nodes,
+	}
+	return out
 }

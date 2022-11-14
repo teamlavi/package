@@ -19,7 +19,7 @@ func ScanSet(ids []string) BatchVulnerabilityResponse {
 		panic("failed to scan for vulnerabilities")
 	}
 
-	resp, err := http.Post("https://temp.lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
+	resp, err := http.Post("https://lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
 		bytes.NewBuffer(json_data))
 
 	defer resp.Body.Close()
