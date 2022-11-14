@@ -1,3 +1,4 @@
+from matplotlib.pyplot import title
 from fastapi import APIRouter
 
 from lavi_worker.internal import queries
@@ -47,7 +48,7 @@ async def find_vulnerabilities_id_list(
     async def format_cve(pkgId: str) -> List[api_models.CveResponse]:
         cves = await queries.find_full_vulnerabilities_id(pkgId)
         return [
-            api_models.CveResponse(cveId=cve.cve_id, severity=cve.severity, url=cve.url)
+            api_models.CveResponse(cveId=cve.cve_id, severity=cve.severity, url=cve.url, title=cve.description)
             for cve in cves
         ]
 
