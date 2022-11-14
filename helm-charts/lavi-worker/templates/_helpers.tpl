@@ -44,3 +44,21 @@ helm.sh/chart: {{ include "lavi-worker.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
+
+# this will break if the release name is much more than 60 chars, add a trunc if needed
+{{- define "lavi-worker.redisFullname" -}}
+{{ printf "%s-redis" (include "lavi-worker.fullname" .) }}
+{{- end }}
+
+{{- define "lavi-worker.redisSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "lavi-worker.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: redis
+{{- end }}
+
+{{- define "lavi-worker.redisLabels" -}}
+helm.sh/chart: {{ include "lavi-worker.chart" . }}
+{{ include "lavi-worker.redisSelectorLabels" . }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}

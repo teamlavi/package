@@ -38,8 +38,17 @@ class FindVulnRequest(BaseModel):
         }
 
 
+class FindVulnVersRequest(BaseModel):
+    repo: RepoEnum
+    package: str
+
+
 class FindVulnResponse(BaseModel):
     vulns: List[str]  # List of CVE id strings
+
+
+class FindVulnVersResponse(BaseModel):
+    vers: List[str]  # List of vulnerable versions
 
 
 class PackageVers(BaseModel):

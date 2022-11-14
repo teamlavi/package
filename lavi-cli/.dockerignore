@@ -1,0 +1,10 @@
+**/node_modules
+**/build
+archives
+
+poetry.lock
+pyproject.toml
+test-requirements.json
+test.json
+package.json
+package-lock.json
