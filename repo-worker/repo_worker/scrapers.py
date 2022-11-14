@@ -1,6 +1,6 @@
 from typing import Dict, List, Protocol
 
-from repo_worker.scrape_dud import DudScraper
+from repo_worker.scraper_dud import DudScraper
 from repo_worker.utils import TreeNode
 
 
