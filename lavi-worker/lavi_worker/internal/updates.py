@@ -121,11 +121,11 @@ async def clear_database() -> None:
     """Clear database rows."""
     # Clear each of the tables in sequence
     async with await get_db_tx() as tx:
-        if is_table_initialized("cve"):
+        if await is_table_initialized("cve"):
             await cve.drop_all_rows(tx)
-        if is_table_initialized("package"):
+        if await is_table_initialized("package"):
             await package.drop_all_rows(tx)
-        if is_table_initialized("dependencies"):
+        if await is_table_initialized("dependencies"):
             await dependencies.drop_all_rows(tx)
 
 
