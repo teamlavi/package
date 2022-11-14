@@ -1,3 +1,4 @@
+import json
 from base64 import b64encode
 from enum import Enum
 from hashlib import sha256
@@ -30,9 +31,11 @@ def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
 
 def compress_tree(tree: Dict[str, List[str]]) -> str:
     """Compress a tree into a smaller data structure for storage."""
-    raise NotImplementedError
+    # TODO compress the tree
+    return str(tree)
 
 
 def decompress_tree(compressed: str) -> Dict[str, List[str]]:
     """Take a compressed tree and convert back to a python object."""
-    raise NotImplementedError
+    # TODO decompress tree
+    return json.loads(compressed)
