@@ -15,68 +15,92 @@ CACHE_CURSOR: str | None = None
 
 
 async def is_db_initialized() -> bool:
-    # TODO: is table initialized instead of full db
+    return (
+        await is_table_initialized("cves")
+        and await is_table_initialized("package")
+        and await is_table_initialized("dependencies")
+    )
+
+
+async def is_table_initialized(table: str = "cves") -> bool:
     """Return whether the database has been initialized yet."""
-    # Just check if the main table has been made
-    try:
-        async with await get_db_tx() as tx:
-            await cve.get_row_count(tx)
-    except psycopg.errors.UndefinedTable:
+    if table == "cves":
+        try:
+            async with await get_db_tx() as tx:
+                await cve.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    elif table == "package":
+        try:
+            async with await get_db_tx() as tx:
+                await package.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    elif table == "dependencies":
+        try:
+            async with await get_db_tx() as tx:
+                await dependencies.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    else:
         return False
-    # Propogate any other unexpected errors
-    return True
 
 
 async def initialize_database() -> None:
     """Initialize the database."""
-    assert not await is_db_initialized()
 
     # Build the tables
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
-            await cur.execute(
-                """
-					CREATE TABLE cves (
-						id SERIAL PRIMARY KEY,
-						cve_id VARCHAR(50) NOT NULL,
-						severity VARCHAR(50),
-						description TEXT,
-						cwe TEXT,
-						url TEXT NOT NULL,
-						repo_name VARCHAR(50) NOT NULL,
-						pkg_name VARCHAR(50) NOT NULL,
-						pkg_vers VARCHAR(50) NOT NULL,
-						univ_hash VARCHAR(100) NOT NULL
-					);
-					ALTER TABLE cves
-						ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
-						""",
-            )
-            await cur.execute(
-                """
-					CREATE TABLE package (
-					 univ_hash VARCHAR(100) PRIMARY KEY,
-					 repo_name VARCHAR(50) NOT NULL,
-					 pkg_name VARCHAR(50) NOT NULL,
-					 major_vers INTEGER NOT NULL,
-					 minor_vers INTEGER NOT NULL,
-					 patch_vers INTEGER NOT NULL,
-					 num_downloads INTEGER,
-					 s3_bucket varchar(50)
-					 );
-				 """,
-            )
-            await cur.execute(
-                """
-				CREATE TABLE dependencies (
-				  univ_hash VARCHAR(100) PRIMARY KEY,
-				  repo_name VARCHAR(50) NOT NULL,
-				  pkg_name VARCHAR(50) NOT NULL,
-				  pkg_vers VARCHAR(50),
-				  pkg_dependencies TEXT NOT NULL
-				);
-				""",
-            )
+            if not await is_table_initialized("cves"):
+                await cur.execute(
+                    """
+                        CREATE TABLE cves (
+                            id SERIAL PRIMARY KEY,
+                            cve_id VARCHAR(50) NOT NULL,
+                            severity VARCHAR(50),
+                            description TEXT,
+                            cwe TEXT,
+                            url TEXT NOT NULL,
+                            repo_name VARCHAR(50) NOT NULL,
+                            pkg_name VARCHAR(50) NOT NULL,
+                            pkg_vers VARCHAR(50) NOT NULL,
+                            univ_hash VARCHAR(100) NOT NULL
+                        );
+                        ALTER TABLE cves
+                            ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
+                            """,
+                )
+            if not await is_table_initialized("package"):
+                await cur.execute(
+                    """
+                        CREATE TABLE package (
+                         univ_hash VARCHAR(100) PRIMARY KEY,
+                         repo_name VARCHAR(50) NOT NULL,
+                         pkg_name VARCHAR(50) NOT NULL,
+                         major_vers INTEGER NOT NULL,
+                         minor_vers INTEGER NOT NULL,
+                         patch_vers INTEGER NOT NULL,
+                         num_downloads INTEGER,
+                         s3_bucket varchar(50)
+                         );
+                     """,
+                )
+            if not await is_table_initialized("dependencies"):
+                await cur.execute(
+                    """
+                    CREATE TABLE dependencies (
+                      univ_hash VARCHAR(100) PRIMARY KEY,
+                      repo_name VARCHAR(50) NOT NULL,
+                      pkg_name VARCHAR(50) NOT NULL,
+                      pkg_vers VARCHAR(50),
+                      pkg_dependencies TEXT NOT NULL
+                    );
+                    """,
+                )
 
 
 async def nuke_database() -> None:
@@ -87,22 +111,25 @@ async def nuke_database() -> None:
         try:
             async with await get_db_tx() as tx:
                 async with tx.cursor() as cur:
-                    await cur.execute(f"DROP TABLE {table_name};")
+                    # Can't do server-side binding, don't let user input affect this
+                    await cur.execute(f"DROP TABLE {table_name}")
         except Exception as e:
-            print(f"Failed to delete table {table_name} - continuing anyway", e)
+            print(f"Failed to delete table {table_name} - {str(e)}")
 
 
 async def clear_database() -> None:
     """Clear database rows."""
-    assert await is_db_initialized()
-
     # Clear each of the tables in sequence
     async with await get_db_tx() as tx:
-        await cve.drop_all_rows(tx)
-        await package.drop_all_rows(tx)
+        if is_table_initialized("cve"):
+            await cve.drop_all_rows(tx)
+        if is_table_initialized("package"):
+            await package.drop_all_rows(tx)
+        if is_table_initialized("dependencies"):
+            await dependencies.drop_all_rows(tx)
 
 
-async def database_size(table: str) -> int:
+async def table_size(table: str) -> int:
     """Get the number of rows in the db."""
     if table == "cves":
         async with await get_db_tx() as tx:
@@ -110,6 +137,9 @@ async def database_size(table: str) -> int:
     elif table == "package":
         async with await get_db_tx() as tx:
             return await package.get_row_count(tx)
+    elif table == "dependencies":
+        async with await get_db_tx() as tx:
+            return await dependencies.get_row_count(tx)
     else:
         raise Exception(f"Table {table} is not expected to exist")
 
@@ -188,56 +218,6 @@ async def delete_single_vulnerability(
             return False
         await cve.delete(tx, doomed_cve)
     return True
-
-
-def npm_vers_range_to_vers(pkg_name: str, vers_range: str) -> str:
-    """
-    Converts a version range to a singular version number based off rules in
-    https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies
-    """
-    # TODO: implement rules https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies
-    # TODO: use package versions db to get valid versions
-    if (
-        vers_range[0] == "^"
-        or vers_range == "latest"
-        or vers_range[0] == "*"
-        or vers_range == ""
-    ):
-        return os.popen("npm view " + pkg_name + " version").read().strip()
-    else:
-        return vers_range
-
-
-async def scrape_npm_dependencies() -> None:
-    # TODO could use npm to create a package-lock then interpret it.
-    #  See /local-scraping-code/dependency-scraping/npm-tree-package-lock.py
-    complete_trees: dict[str, str] = {}  # TODO replace with DB check?
-
-    # recursive method
-    def get_dependencies(package: str, version: str, tab: str = "") -> str:
-        version = npm_vers_range_to_vers(package, version)
-
-        if package + version in complete_trees:
-            return complete_trees[package + version]
-
-        data = httpx.get("https://registry.npmjs.org/" + package + "/" + version).text
-
-        if "dependencies" not in json.loads(data).keys():
-            complete_trees[package + version] = "{}"
-            return "{}"
-
-        dependency_dict = json.loads(data)["dependencies"]
-        this_tree = {}
-        for p in dependency_dict:
-            v = npm_vers_range_to_vers(p, dependency_dict.get(p))
-            this_tree[p + v] = get_dependencies(p, v, tab + "\t")
-        complete_trees[package + version] = str(this_tree)
-        # print(this_tree)
-        return str(this_tree)
-
-    for (pkg_name, pkg_vers) in [("react", "18.2.0"), ("request", "2.88.2")]:
-        pkg_dependencies = get_dependencies(pkg_name, pkg_vers)
-        await insert_single_dependency_tree("npm", pkg_name, pkg_vers, pkg_dependencies)
 
 
 # helper function for scrape_vulnerabilities()
@@ -331,7 +311,7 @@ async def scrape_pip_packages() -> List[str]:
     return []
 
 
-async def scrape_npm_package_vers() -> None:
+async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
     for package_name in ["express", "async", "lodash", "cloudinary", "axios"]:
         if package_name[0] == "-":
@@ -355,6 +335,12 @@ async def scrape_npm_package_vers() -> None:
                 )
         except Exception as e:
             print(f"Unable to interpret versions for {package_name}", e)
+
+
+async def scrape_packages() -> None:
+    """Scrape released versions for all packages in repos"""
+    await scrape_pip_packages()
+    await scrape_npm_packages()
 
 
 async def scrape_vulnerabilities() -> None:
@@ -384,7 +370,7 @@ async def scrape_vulnerabilities() -> None:
 
             query = (
                 """
-                        {"""
+                {"""
                 + query_type
                 + """
                {

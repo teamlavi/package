@@ -32,11 +32,15 @@ func display(cds models.CDS, vulns map[string][]vulnerabilities.Vulnerability) {
 func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
+	noScan, _ := cmd.Flags().GetBool("no-scan")
 
-	results := vulnerabilities.Scan(cds)
-	clean := vulnerabilities.ConvertToCleanResponse(results)
+	clean := map[string][]vulnerabilities.Vulnerability{}
 
-	display(cds, clean)
+	if !noScan {
+		results := vulnerabilities.Scan(cds)
+		clean := vulnerabilities.ConvertToCleanResponse(results)
+		display(cds, clean)
+	}
 
 	if write {
 		file, _ := json.MarshalIndent(cds, "", " ")

@@ -25,9 +25,9 @@ async def create(
     async with tx.cursor() as cur:
         await cur.execute(
             """
-				INSERT INTO dependencies
-				VALUES (%s, %s, %s, %s, %s)
-			""",
+                INSERT INTO dependencies
+                VALUES (%s, %s, %s, %s, %s)
+            """,
             (
                 univ_hash,
                 repo_name,
@@ -36,3 +36,16 @@ async def create(
                 str(pkg_dependencies),
             ),
         )
+
+
+async def get_row_count(tx: Transaction) -> int:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT COUNT(*) FROM dependencies")
+        row = await cur.fetchone()
+        return row[0]  # type: ignore
+
+
+async def drop_all_rows(tx: Transaction) -> None:
+    """Drop all table rows."""
+    async with tx.cursor() as cur:
+        await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
