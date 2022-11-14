@@ -3,8 +3,8 @@
 import argparse
 import logging
 
-from repo_worker import cli_funcs, redis_funcs
 from repo_worker.config import REQUIRED_ENV_FOR_REDIS
+from repo_worker.core import cli_funcs, redis_funcs
 from repo_worker.scrapers import repo_scrapers
 
 
