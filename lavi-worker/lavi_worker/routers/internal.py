@@ -34,6 +34,11 @@ async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str
     return lst
 
 
+@router.get("/database/get_most_recent_vers", response_class=PlainTextResponse)
+async def get_most_recent_vers(repo_name: str, pkg_name: str) -> str:
+    return await updates.get_most_recent_vers(repo_name, pkg_name)
+
+
 @router.post("/delete_vuln")
 async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
     """Delete a single vulnerability."""

@@ -7,7 +7,7 @@ import psycopg
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
-from lavi_worker.daos import dependencies
+from lavi_worker.daos import dependency
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker import config
 
@@ -41,7 +41,7 @@ async def is_table_initialized(table: str = "cves") -> bool:
     elif table == "dependencies":
         try:
             async with await get_db_tx() as tx:
-                await dependencies.get_row_count(tx)
+                await dependency.get_row_count(tx)
                 return True
         except psycopg.errors.UndefinedTable:
             return False
@@ -126,7 +126,7 @@ async def clear_database() -> None:
         if is_table_initialized("package"):
             await package.drop_all_rows(tx)
         if is_table_initialized("dependencies"):
-            await dependencies.drop_all_rows(tx)
+            await dependency.drop_all_rows(tx)
 
 
 async def table_size(table: str) -> int:
@@ -139,7 +139,7 @@ async def table_size(table: str) -> int:
             return await package.get_row_count(tx)
     elif table == "dependencies":
         async with await get_db_tx() as tx:
-            return await dependencies.get_row_count(tx)
+            return await dependency.get_row_count(tx)
     else:
         raise Exception(f"Table {table} is not expected to exist")
 
@@ -174,7 +174,7 @@ async def insert_single_dependency_tree(
 ) -> None:
     """Insert a single vulnerability into the db."""
     async with await get_db_tx() as tx:
-        await dependencies.create(
+        await dependency.create(
             tx=tx,
             repo_name=repo_name,
             pkg_name=pkg_name,
@@ -311,9 +311,32 @@ async def scrape_pip_packages() -> List[str]:
     return []
 
 
-async def scrape_npm_packages() -> None:
+async def install_lavi_cli() -> None:
+    cmd = "go version"
+    request = os.popen(cmd).read()
+    print(request)
+
+
+async def get_most_recent_vers(repo_name: str, pkg_name: str) -> str:
+    async with await get_db_tx() as tx:
+        return await package.get_most_recent_vers(tx, repo_name, pkg_name)
+
+
+async def scrape_npm_dependencies() -> None:
+    await install_lavi_cli()
+    for pkg_name in ["lodash"]:
+        pkg_vers = await get_most_recent_vers("npm", pkg_name)
+        cmd = f'lavi npm --package="{pkg_name}" --version="{pkg_vers}" -w'
+        request = os.popen(cmd).read()
+        print(request)
+        with open("cds.json") as f:
+            print(f.read())
+            await insert_single_dependency_tree("npm", pkg_name, pkg_vers, f.read())
+
+
+async def scrape_npm_package_vers() -> None:
     """Get versions for npm packages"""
-    for package_name in ["express", "async", "lodash", "cloudinary", "axios"]:
+    for package_name in ["lodash", "express", "async", "lodash", "cloudinary", "axios"]:
         if package_name[0] == "-":
             continue
         try:
@@ -335,12 +358,6 @@ async def scrape_npm_packages() -> None:
                 )
         except Exception as e:
             print(f"Unable to interpret versions for {package_name}", e)
-
-
-async def scrape_packages() -> None:
-    """Scrape released versions for all packages in repos"""
-    await scrape_pip_packages()
-    await scrape_npm_packages()
 
 
 async def scrape_vulnerabilities() -> None:
