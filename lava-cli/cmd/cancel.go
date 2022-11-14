@@ -21,25 +21,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// severitiesCmd represents the severities command
-var severitiesCmd = &cobra.Command{
-	Use:   "severities",
-	Short: "Return list of vulnerable packages and severity for each vulnerability",
+// cancelCmd represents the cancel command
+var cancelCmd = &cobra.Command{
+	Use:   "cancel",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("severities called")
+		fmt.Println("cancel called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(severitiesCmd)
+	rootCmd.AddCommand(cancelCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// severitiesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// cancelCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// severitiesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// cancelCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -24,13 +24,7 @@ import (
 // depthCmd represents the depth command
 var depthCmd = &cobra.Command{
 	Use:   "depth",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Returns list of how deep each vulnerability was from the top level package (how many dependencies deep)",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("depth called")
 	},
