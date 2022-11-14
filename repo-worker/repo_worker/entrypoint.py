@@ -1,36 +1,10 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations  # Postponed annotation evaluation, remove once 3.11
-
 import argparse
 from typing import Dict, List, Protocol
 
-
-class TreeNode(object):
-    def __init__(
-        self,
-        repo: str,
-        package: str,
-        version: str,
-        children: List[TreeNode] | None = None,
-    ):
-        """Build a tree node given a hash and children."""
-        self.repo = repo
-        self.package = package
-        self.version = version
-        self.children = children
-
-    def add_child(self, child: TreeNode) -> None:
-        """Add a child node."""
-        self.children.append(child)
-
-    def add_children(self, children: List[TreeNode]) -> None:
-        """Add multiple children."""
-        self.children.extend(children)
-
-    def as_json(self) -> str:
-        """Return the tree represented as json."""
-        raise NotImplementedError
+from repo_worker.scrape_dud import DudScraper
+from repo_worker.utils import TreeNode
 
 
 class RepoScraper(Protocol):
@@ -48,8 +22,7 @@ class RepoScraper(Protocol):
 
 
 supported_repos: Dict[str, RepoScraper] = {
-    "npm": RepoScraper,
-    "pypi": RepoScraper,
+    "dud": DudScraper,
 }
 
 
