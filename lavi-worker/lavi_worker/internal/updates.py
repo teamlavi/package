@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List
 
 import httpx
 import psycopg
@@ -253,11 +252,9 @@ async def scrape_pip_packages() -> None:
     page = client.get('https://pypi.org/simple') # Getting page HTML through request
     #print(page.text)
     stringHelper = page.text.replace(" ", "")
-    links = stringHelper.split('\n')
-    count = 0
-    countSuccess = 0
-    for package in links[7:100]: #-2 for this
-
+    links = stringHelper.split("\n")
+    for pkg_name in links[7:100]:  # -2 for this
+        pkg_name = pkg_name[(pkg_name.find(">") + 1) : pkg_name.rfind("<")]
         try:
             package = package[package.find('>') + 1:package.rfind('<')]
             page2 = f'https://pypi.org/pypi/{package}/json'
