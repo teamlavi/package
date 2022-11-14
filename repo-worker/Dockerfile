@@ -13,6 +13,11 @@ RUN pip3 install --upgrade --user -r /requirements.txt
 FROM python:3.10-slim as main
 LABEL org.opencontainers.image.authors="Levi Lutz (contact.levilutz@gmail.com)"
 
+# TODO Move these lines to builder
+RUN apt-get update -y
+RUN apt-get install -y npm
+RUN apt-get clean -y
+
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=$PYTHONPATH:/src

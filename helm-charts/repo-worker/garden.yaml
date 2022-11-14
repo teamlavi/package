@@ -1,0 +1,8 @@
+kind: Module
+name: repo-worker
+type: helm
+build:
+  dependencies:
+    - repo-worker-ctr
+valueFiles:
+  - values.yaml

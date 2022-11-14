@@ -1,0 +1,5 @@
+redis:
+  image:
+    pullPolicy: Always
+    repository: docker.io/redis
+    tag: "7.0.5"
