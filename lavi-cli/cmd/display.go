@@ -94,14 +94,13 @@ func printCounts(vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
 }
 
 func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
-	fmt.Printf("package repository: %s\n", cds.Repository)
-	fmt.Printf("total dependencies checked: %d\n", len(cds.Nodes))
+	fmt.Printf("Total dependencies checked: %d\n", len(cds.Nodes))
 
 	count := countVulns(vulns)
 	if count == 0 {
-		fmt.Println("no vulnerabilities found!")
+		fmt.Println("No vulnerabilities found!")
 	} else {
-		fmt.Printf("found %d vulnerabilities\n", count)
+		fmt.Printf("Found %d vulnerabilities\n", count)
 	}
 
 	printCounts(vulns)
