@@ -17,7 +17,8 @@ var npmCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
 		npmGen := generator.GetNpmTreeGenerator(path)
-		cds := npmGen.GetCDS()
+
+		cds := getCds(cmd, npmGen)
 		postCommand(cmd, cds, npmGen)
 	},
 }

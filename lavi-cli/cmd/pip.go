@@ -23,7 +23,8 @@ var pipCmd = &cobra.Command{
 		pythonPath, _ := cmd.Flags().GetString("python")
 
 		pipGen := generator.GetPipTreeGenerator(path, pythonPath)
-		cds := pipGen.GetCDS()
+
+		cds := getCds(cmd, pipGen)
 		postCommand(cmd, cds, pipGen)
 	},
 }

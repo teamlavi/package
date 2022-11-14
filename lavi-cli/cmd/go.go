@@ -17,7 +17,8 @@ var goCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
 		goGen := generator.GetGoTreeGenerator(path)
-		cds := goGen.GetCDS()
+
+		cds := getCds(cmd, goGen)
 		postCommand(cmd, cds, goGen)
 	},
 }

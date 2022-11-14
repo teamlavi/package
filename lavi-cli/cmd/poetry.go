@@ -19,7 +19,7 @@ var poetryCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 
 		poetryGen := generator.GetPoetryTreeGenerator(path)
-		cds := poetryGen.GetCDS()
+		cds := getCds(cmd, poetryGen)
 		postCommand(cmd, cds, poetryGen)
 	},
 }

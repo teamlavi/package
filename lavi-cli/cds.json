@@ -1,123 +1,40 @@
 {
- "repository": "poetry",
+ "cmdType": "npm",
+ "repository": "npm",
  "nodes": {
-  "/XPkp/D9doRfx7ABn1dhCm3C6PP+hUVOd7UaD7bHFkA=": {
-   "id": "/XPkp/D9doRfx7ABn1dhCm3C6PP+hUVOd7UaD7bHFkA=",
-   "package": "python-dateutil",
-   "version": "2.8.2",
+  "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY=": {
+   "id": "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY=",
+   "package": "object-assign",
+   "version": "4.1.1",
+   "dependencies": []
+  },
+  "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8=": {
+   "id": "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8=",
+   "package": "react",
+   "version": "17.0.2",
    "dependencies": [
-    "fAMS66uv1quRgOYSIVoDgcMOuzGHn/rQCQYaTmTDA0g="
+    "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=",
+    "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY="
    ]
   },
-  "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88=": {
-   "id": "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88=",
-   "package": "packaging",
-   "version": "21.3",
+  "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=": {
+   "id": "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=",
+   "package": "loose-envify",
+   "version": "1.4.0",
    "dependencies": [
-    "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc="
+    "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY="
    ]
   },
-  "4eiKuVg/MJbXtx5fDkVz6DItmkBhfl1i2CZldjnRfjY=": {
-   "id": "4eiKuVg/MJbXtx5fDkVz6DItmkBhfl1i2CZldjnRfjY=",
-   "package": "kiwisolver",
-   "version": "1.4.4",
-   "dependencies": []
-  },
-  "956NDZX9QR7tbuwfOZu0ZKzengmM4qARPvMPjIKDf5A=": {
-   "id": "956NDZX9QR7tbuwfOZu0ZKzengmM4qARPvMPjIKDf5A=",
-   "package": "typing-extensions",
-   "version": "4.4.0",
-   "dependencies": []
-  },
-  "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs=": {
-   "id": "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs=",
-   "package": "numpy",
-   "version": "1.23.4",
-   "dependencies": []
-  },
-  "K22iLKxZRQv1TDKb4XYOgOYScmvFDz9Df3ii+0GEqPY=": {
-   "id": "K22iLKxZRQv1TDKb4XYOgOYScmvFDz9Df3ii+0GEqPY=",
-   "package": "pillow",
-   "version": "9.3.0",
-   "dependencies": []
-  },
-  "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc=": {
-   "id": "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc=",
-   "package": "pyparsing",
-   "version": "3.0.9",
-   "dependencies": []
-  },
-  "PRwXzi7eI7pfsPFpbVTj25f7yJseagKdwdsL0fjIPkY=": {
-   "id": "PRwXzi7eI7pfsPFpbVTj25f7yJseagKdwdsL0fjIPkY=",
-   "package": "contourpy",
-   "version": "1.0.6",
-   "dependencies": [
-    "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs="
-   ]
-  },
-  "bMrTW2ml2Z5QWAPApXvidhZKFhTY3O+7RrhrO57zGxM=": {
-   "id": "bMrTW2ml2Z5QWAPApXvidhZKFhTY3O+7RrhrO57zGxM=",
-   "package": "setuptools",
-   "version": "65.5.0",
-   "dependencies": []
-  },
-  "cdEqRqYqbM//xKYDimaLmDSn+vz5vQnxVpHc1Arf/tA=": {
-   "id": "cdEqRqYqbM//xKYDimaLmDSn+vz5vQnxVpHc1Arf/tA=",
-   "package": "matplotlib",
-   "version": "3.6.2",
-   "dependencies": [
-    "4eiKuVg/MJbXtx5fDkVz6DItmkBhfl1i2CZldjnRfjY=",
-    "K22iLKxZRQv1TDKb4XYOgOYScmvFDz9Df3ii+0GEqPY=",
-    "/XPkp/D9doRfx7ABn1dhCm3C6PP+hUVOd7UaD7bHFkA=",
-    "ziEAA188cT6lIDWeTjv9fLRukxkHsRrSrFkJNIm6YkA=",
-    "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88=",
-    "PRwXzi7eI7pfsPFpbVTj25f7yJseagKdwdsL0fjIPkY=",
-    "9Iox18SFdXCwzrNE4pvW9WlQnRMgzeGrnwD5BadYGJs=",
-    "NUL+GirTKnAiCG4aqfL2vJAZIsUEoNLwIdbkRTNfNVc=",
-    "nAOkEflHEoDEkLc8QVlPBluPqs7A3t5Ey8zCJi4SLZg=",
-    "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg="
-   ]
-  },
-  "fAMS66uv1quRgOYSIVoDgcMOuzGHn/rQCQYaTmTDA0g=": {
-   "id": "fAMS66uv1quRgOYSIVoDgcMOuzGHn/rQCQYaTmTDA0g=",
-   "package": "six",
-   "version": "1.16.0",
-   "dependencies": []
-  },
-  "nbIkP6YtUYVLK/w1twIdFrdDbaChCpUuwwArD3ceii0=": {
-   "id": "nbIkP6YtUYVLK/w1twIdFrdDbaChCpUuwwArD3ceii0=",
-   "package": "tomli",
-   "version": "2.0.1",
-   "dependencies": []
-  },
-  "sZrtDrEgBKkc26oMUaKYReBmv19zmskwhJ9JZV3dJ+Y=": {
-   "id": "sZrtDrEgBKkc26oMUaKYReBmv19zmskwhJ9JZV3dJ+Y=",
-   "package": "setuptools-scm",
-   "version": "7.0.5",
-   "dependencies": [
-    "bMrTW2ml2Z5QWAPApXvidhZKFhTY3O+7RrhrO57zGxM=",
-    "nbIkP6YtUYVLK/w1twIdFrdDbaChCpUuwwArD3ceii0=",
-    "956NDZX9QR7tbuwfOZu0ZKzengmM4qARPvMPjIKDf5A=",
-    "4NJgjCCFiPqqt8r5ctTMPRVpF8JbArIfCMmbh1RTK88="
-   ]
-  },
-  "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg=": {
-   "id": "tMwOgMTrC33M8K+Q1MD3gAhXO3jvW4imtzlXBPjHbvg=",
-   "package": "cycler",
-   "version": "0.11.0",
-   "dependencies": []
-  },
-  "ziEAA188cT6lIDWeTjv9fLRukxkHsRrSrFkJNIm6YkA=": {
-   "id": "ziEAA188cT6lIDWeTjv9fLRukxkHsRrSrFkJNIm6YkA=",
-   "package": "fonttools",
-   "version": "4.38.0",
+  "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY=": {
+   "id": "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY=",
+   "package": "js-tokens",
+   "version": "4.0.0",
    "dependencies": []
   }
  },
  "root": {
   "dependencies": [
-   "matplotlib",
-   "numpy"
+   "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8="
   ]
  }
 }
