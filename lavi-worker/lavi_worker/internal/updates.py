@@ -244,13 +244,13 @@ async def vers_range_to_list(
         # return results inbetween edges
         return [vers for vers in lower_list if vers in upper_list]
 
-    if "-" in vers_range:
+    while not vers_range[vers_range.index(" ")+1:].replace(".", "").isnumeric():
         # TODO maybe another way to handle?
         # drop version extension
-        vers_range = vers_range[: vers_range.index("-")]
+        vers_range = vers_range[:-1]
 
-    if not vers_range[vers_range.index(" ")+1:].replace(".", "").isnumeric():
-        print("EDGE CASE TO HANDLE: ", vers_range, vers_range[vers_range.index(" "):].replace(".", ""))
+    if len(vers_range) == 0:
+        # if all letters and drops the whole version_range in previous check
         return []
 
     while vers_range.count(".") < 2:
