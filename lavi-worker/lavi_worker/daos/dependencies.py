@@ -25,9 +25,9 @@ async def create(
     async with tx.cursor() as cur:
         await cur.execute(
             """
-				INSERT INTO dependencies
-				VALUES (%s, %s, %s, %s, %s)
-			""",
+                INSERT INTO dependencies
+                VALUES (%s, %s, %s, %s, %s)
+            """,
             (
                 univ_hash,
                 repo_name,
