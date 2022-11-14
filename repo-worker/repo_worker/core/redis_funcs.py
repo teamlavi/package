@@ -5,9 +5,16 @@ from typing import Dict, Tuple
 import httpx
 
 from repo_worker.config import LAVI_API_URL  # Only used if triggered
-from repo_worker.core.redis_wq import get_redis_wq
+from repo_worker.core.redis_wq import get_redis_wq, known_queue_sizes
 from repo_worker.scrapers import repo_scrapers
 from repo_worker.utils import get_recent_version, parse_version
+
+
+def refresh_queues() -> None:
+    """Refresh all the work queues with dropped tasks."""
+    wqs = [get_redis_wq(name) for name in known_queue_sizes]
+    for wq in wqs:
+        wq.refresh()
 
 
 def list_packages(repo: str) -> None:

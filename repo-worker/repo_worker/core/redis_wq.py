@@ -93,6 +93,7 @@ class RedisWQ(object):
                 dead_items.append(packed_item_str)
         for item in dead_items:
             # Only re-add to queue if it's still in processing
+            # This will also prevent duplicate lost jobs being added to work queue
             if self.db.lrem(self.processing_queue_name, 0, item):
                 self.db.lpush(self.queue_name, item)
 
