@@ -53,6 +53,7 @@ async def find_vulnerabilities_id_list(
                 severity=cve.severity,
                 url=cve.url,
                 title=cve.description,
+                patched_in=cve.first_patched_vers,
             )
             for cve in cves
         ]
