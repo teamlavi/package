@@ -4,13 +4,14 @@ from repo_worker.utils import TreeNode
 import os
 import json
 
+
 class NpmScraper(object):
     @staticmethod
     def list_packages(limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
         # install all the package names
-        os.system('npm i -g all-the-package-names')
-        package_list = os.popen('all-the-package-names').read().split()
+        os.system("npm i -g all-the-package-names")
+        package_list = os.popen("all-the-package-names").read().split()
         if limit is None:
             return package_list
         else:
@@ -30,7 +31,7 @@ class NpmScraper(object):
             elif isinstance(version_list[0], list):
                 version_list = version_list[0]
 
-            res_versions:List[str] = []
+            res_versions: List[str] = []
 
             for vers in version_list:
                 if limit is not None and len(res_versions) >= limit:
@@ -45,7 +46,6 @@ class NpmScraper(object):
         except Exception as e:
             print(f"Unable to interpret versions for {package}", e)
             return []
-
 
     @staticmethod
     def generate_dependency_tree(package: str, version: str) -> TreeNode:
