@@ -1,6 +1,7 @@
 from base64 import b64encode
 from enum import Enum
 from hashlib import sha256
+from typing import Dict, List
 
 
 class RepoEnum(str, Enum):
@@ -25,3 +26,13 @@ def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
     """Generate the hash given the basic data."""
     univ_hash: bytes = _sha256(_sha256(pkg) + _sha256(vers) + _sha256(repo))
     return b64encode(univ_hash).decode("UTF-8")
+
+
+def compress_tree(tree: Dict[str, List[str]]) -> str:
+    """Compress a tree into a smaller data structure for storage."""
+    raise NotImplementedError
+
+
+def decompress_tree(compressed: str) -> Dict[str, List[str]]:
+    """Take a compressed tree and convert back to a python object."""
+    raise NotImplementedError
