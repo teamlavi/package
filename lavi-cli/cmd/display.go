@@ -9,6 +9,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+	"github.com/spf13/cobra"
 )
 
 func addSeverityColor(severity string) string {
@@ -93,7 +94,15 @@ func printCounts(vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
 	fmt.Printf("\n")
 }
 
-func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
+func cmdHasAnyDisplayLimiters(cmd *cobra.Command) bool {
+	low, _ := cmd.Flags().GetBool("low")
+	medium, _ := cmd.Flags().GetBool("medium")
+	high, _ := cmd.Flags().GetBool("high")
+	critical, _ := cmd.Flags().GetBool("critical")
+	return low || medium || high || critical
+}
+
+func display(cmd *cobra.Command, cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
 	fmt.Printf("Total dependencies checked: %d\n", len(cds.Nodes))
 
 	count := countVulns(vulns)
@@ -133,15 +142,19 @@ func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityRes
 		}
 	})
 
-	mapFcn := func(name string) {
+	mapFcn := func(name string, flagName string) {
+		nameVal, _ := cmd.Flags().GetBool(flagName)
+		if cmdHasAnyDisplayLimiters(cmd) && !nameVal {
+			return
+		}
 		for _, w := range writers[name] {
 			w.Render()
 		}
 	}
 
-	mapFcn("CRITICAL")
-	mapFcn("HIGH")
-	mapFcn("MEDIUM")
-	mapFcn("MODERATE")
-	mapFcn("LOW")
+	mapFcn("CRITICAL", "critical")
+	mapFcn("HIGH", "high")
+	mapFcn("MEDIUM", "medium")
+	mapFcn("MODERATE", "medium")
+	mapFcn("LOW", "low")
 }

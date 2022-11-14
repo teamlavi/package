@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"lavi/internal"
+	internalModels "lavi/internal/models"
 	"lavi/internal/vulnerabilities"
 
 	"github.com/spf13/cobra"
@@ -26,19 +27,27 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
 	noScan, _ := cmd.Flags().GetBool("no-scan")
+	writeWithVulns, _ := cmd.Flags().GetBool("write-with-vulns")
 
 	clean := map[string][]vulnerabilities.Vulnerability{}
+	results := map[string][]vulnerabilities.VulnerabilityResponseData{}
 
 	if !noScan {
-		results := vulnerabilities.Scan(cds)
+		results = vulnerabilities.Scan(cds)
 		clean = vulnerabilities.ConvertToCleanResponse(results)
 
-		display(cds, results)
+		display(cmd, cds, results)
 	}
 
 	if write {
-		file, _ := json.MarshalIndent(cds, "", " ")
-		_ = ioutil.WriteFile("cds.json", file, 0644)
+		fileData := []byte{}
+		if writeWithVulns {
+			fileData, _ = json.MarshalIndent(addVulnsToCds(cds, results), "", " ")
+		} else {
+			fileData, _ = json.MarshalIndent(cds, "", " ")
+		}
+
+		_ = ioutil.WriteFile("cds.json", fileData, 0644)
 	}
 
 	if show {
@@ -63,4 +72,27 @@ func tryExecuteSinglePackageMode(cmd *cobra.Command, gen generator.RepositoryTre
 	cds := gen.GenerateSinglePackageCds(pkg, version)
 
 	return true, cds
+}
+
+// will return a copy
+func addVulnsToCds(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityResponseData) internalModels.ExpandedCDS {
+	nodes := map[string]internalModels.ExpandedCDSNode{}
+	for id, node := range cds.Nodes {
+		vs := vulns[id]
+		nodes[id] = internalModels.ExpandedCDSNode{
+			ID:              id,
+			Package:         node.Package,
+			Version:         node.Version,
+			Dependencies:    node.Dependencies,
+			Vulnerabilities: vs,
+		}
+	}
+
+	out := internalModels.ExpandedCDS{
+		CmdType:    cds.CmdType,
+		Repository: cds.Repository,
+		Root:       cds.Root,
+		Nodes:      nodes,
+	}
+	return out
 }

@@ -1,46 +1,61 @@
 {
- "cmdType": "pip",
- "repository": "pip",
+ "cmdType": "npm",
+ "repository": "npm",
  "nodes": {
-  "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=": {
-   "id": "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=",
-   "package": "certifi",
-   "version": "2022.9.24",
-   "dependencies": []
-  },
-  "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc=": {
-   "id": "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc=",
-   "package": "urllib3",
-   "version": "1.26.12",
-   "dependencies": []
-  },
-  "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=": {
-   "id": "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=",
-   "package": "idna",
-   "version": "3.4",
-   "dependencies": []
-  },
-  "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=": {
-   "id": "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=",
-   "package": "charset-normalizer",
-   "version": "2.0.12",
-   "dependencies": []
-  },
-  "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw=": {
-   "id": "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw=",
-   "package": "requests",
-   "version": "2.27.0",
-   "dependencies": [
-    "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=",
-    "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=",
-    "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=",
-    "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc="
+  "f8LeHoUBSGtKPsxEs+jAHcMRuZ8j7ivsJgSJIIT8A98=": {
+   "id": "f8LeHoUBSGtKPsxEs+jAHcMRuZ8j7ivsJgSJIIT8A98=",
+   "package": "lodash",
+   "version": "3.6.0",
+   "dependencies": [],
+   "vulnerabilities": [
+    {
+     "cveId": "CVE-2018-3721",
+     "severity": "LOW",
+     "url": "https://github.com/advisories/GHSA-fvqr-27wr-82fm",
+     "title": "Prototype Pollution in lodash"
+    },
+    {
+     "cveId": "CVE-2018-16487",
+     "severity": "HIGH",
+     "url": "https://github.com/advisories/GHSA-4xc9-xhrj-v574",
+     "title": "Prototype Pollution in lodash"
+    },
+    {
+     "cveId": "CVE-2019-1010266",
+     "severity": "MODERATE",
+     "url": "https://github.com/advisories/GHSA-x5rq-j2xg-h7qm",
+     "title": "Regular Expression Denial of Service (ReDoS) in lodash"
+    },
+    {
+     "cveId": "CVE-2019-10744",
+     "severity": "CRITICAL",
+     "url": "https://github.com/advisories/GHSA-jf85-cpcp-j695",
+     "title": "Prototype Pollution in lodash"
+    },
+    {
+     "cveId": "CVE-2020-28500",
+     "severity": "MODERATE",
+     "url": "https://github.com/advisories/GHSA-29mw-wpgm-hmr9",
+     "title": "Regular Expression Denial of Service (ReDoS) in lodash"
+    },
+    {
+     "cveId": "CVE-2021-23337",
+     "severity": "HIGH",
+     "url": "https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+     "title": "Command Injection in lodash"
+    },
+    {
+     "cveId": "CVE-2020-8203",
+     "severity": "HIGH",
+     "url": "https://github.com/advisories/GHSA-p6mc-m468-83gw",
+     "title": "Prototype Pollution in lodash"
+    }
    ]
   }
  },
  "root": {
   "dependencies": [
-   "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw="
+   "f8LeHoUBSGtKPsxEs+jAHcMRuZ8j7ivsJgSJIIT8A98="
   ]
  }
 }
