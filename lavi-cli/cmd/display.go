@@ -122,13 +122,18 @@ func display(cmd *cobra.Command, cds models.CDS, vulns map[string][]vulnerabilit
 		t.SetStyle(table.StyleLight)
 		pkg := cds.Nodes[id]
 
+		patchedIn := "-"
+		if v.PatchedIn != "" {
+			patchedIn = v.PatchedIn
+		}
+
 		t.AppendRow([]interface{}{addSeverityColor(v.Severity), v.Title})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Package", pkg.Package})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Version", pkg.Version})
 		t.AppendSeparator()
-		t.AppendRow([]interface{}{"Patched In", v.PatchedIn})
+		t.AppendRow([]interface{}{"Patched In", patchedIn})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Path", strings.Join(cds.GetPathString(id), " > ")})
 		t.AppendSeparator()
