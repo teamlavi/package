@@ -98,6 +98,7 @@ class InsertVulnRequest(BaseModel):
     severity: str | None = None
     description: str | None = None
     cwe: str | None = None
+    first_patched_vers: str | None = None
 
     class Config:
         schema_extra = {

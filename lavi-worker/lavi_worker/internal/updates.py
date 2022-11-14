@@ -67,7 +67,8 @@ async def initialize_database() -> None:
                             repo_name VARCHAR(50) NOT NULL,
                             pkg_name VARCHAR(50) NOT NULL,
                             pkg_vers VARCHAR(50) NOT NULL,
-                            univ_hash VARCHAR(100) NOT NULL
+                            univ_hash VARCHAR(100) NOT NULL,
+                            first_patched_vers VARCHAR(50)
                         );
                         ALTER TABLE cves
                             ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
@@ -152,6 +153,7 @@ async def insert_single_vulnerability(
     severity: str | None = None,
     description: str | None = None,
     cwe: str | None = None,
+    first_patched_vers: str | None = None,
 ) -> bool:
     """Insert a single vulnerability into the db."""
     async with await get_db_tx() as tx:
@@ -165,6 +167,7 @@ async def insert_single_vulnerability(
             repo_name=repo_name,
             pkg_name=pkg_name,
             pkg_vers=pkg_vers,
+            first_patched_vers=first_patched_vers,
         )
 
 
@@ -431,6 +434,9 @@ async def scrape_vulnerabilities() -> None:
                     }
                     severity
                     updatedAt
+                    firstPatchedVersion{
+                      identifier
+                    }
                     vulnerableVersionRange
                   }
                 }
@@ -506,6 +512,11 @@ async def scrape_vulnerabilities() -> None:
                 pkg_vers_list = await vers_range_to_list(
                     repo_name, pkg_name, pkg_vers_range
                 )
+                try:
+                    first_patched_vers = gh_vuln["firstPatchedVersion"]["identifier"]
+                except Exception:
+                    # Might not have a patched version
+                    first_patched_vers = None
                 print(pkg_vers_range)
                 print(pkg_vers_list)
                 for release in pkg_vers_list:
@@ -518,4 +529,5 @@ async def scrape_vulnerabilities() -> None:
                         severity,
                         description,
                         cwes,
+                        first_patched_vers,
                     )
