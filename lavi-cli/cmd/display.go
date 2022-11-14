@@ -113,7 +113,8 @@ func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityRes
 		t.SetStyle(table.StyleLight)
 		pkg := cds.Nodes[id]
 
-		t.AppendHeader(table.Row{addSeverityColor(v.Severity), v.Title})
+		t.AppendRow([]interface{}{addSeverityColor(v.Severity), v.Title})
+		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Package", pkg.Package})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Version", pkg.Version})
