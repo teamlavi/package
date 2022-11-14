@@ -1,5 +1,9 @@
+from base64 import b64decode
+from typing import Dict, List
+
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
+import orjson
 
 from lavi_worker.internal import updates
 from lavi_worker.routers import api_models
@@ -97,4 +101,7 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    ...
+    unpacked: Dict[str, List[str]] 
+    unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
+    print(f"LOOK HERE DUMMY {unpacked}")
+    return Response(status_code=200)

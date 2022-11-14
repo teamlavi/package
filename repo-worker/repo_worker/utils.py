@@ -3,7 +3,9 @@ from __future__ import annotations  # Postponed annotation evaluation, remove on
 from base64 import b64encode
 from hashlib import sha256
 import logging
-from typing import List, Tuple
+from typing import Dict, List, Tuple
+
+import orjson
 
 
 class TreeNode(object):
@@ -28,14 +30,33 @@ class TreeNode(object):
         """Add multiple children."""
         self.children.extend(children)
 
+    def _as_json(self, all_nodes: Dict[str, List[str]]) -> None:
+        """Update the all_nodes with our children as necessary, recurse."""
+        if (univ_hash := self.univ_hash()) in all_nodes:
+            return  # This node has already been inserted
+
+        # Add this node to the dict
+        all_nodes[univ_hash] = list(set(child.univ_hash() for child in self.children))
+
+        # Recurse to childrem
+        for child in self.children:
+            # Children will skip themselves if already inserted
+            child._as_json(all_nodes)
+
     def as_json(self) -> str:
         """Return the tree represented as json."""
-        # TODO generate json how api endpoints wants it
-        raise NotImplementedError
+        # Enumerate every node in the tree into a hash table
+        all_nodes: Dict[str, List[str]] = {}
+        self._as_json(all_nodes)
+        return orjson.dumps(all_nodes).decode()
 
     def as_json_b64(self) -> str:
         """Return the tree represented as json and base64-encoded."""
         return b64encode(self.as_json().encode()).decode()
+
+    def univ_hash(self) -> str:
+        """Generate our universal hash."""
+        return generate_universal_hash(self.repo, self.package, self.version)
 
     def __str__(self) -> str:
         """Get a string representation of the self."""
