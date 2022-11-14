@@ -7,6 +7,7 @@ import orjson
 
 from lavi_worker.internal import updates
 from lavi_worker.routers import api_models
+from lavi_worker.utils import compress_tree, decompress_tree
 
 
 router = APIRouter(tags=["internal"])
@@ -101,8 +102,12 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    unpacked: Dict[str, List[str]] 
+    unpacked: Dict[str, List[str]]
     unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
-    print(f"Got tree with {len(unpacked)} nodes")
-    # TODO put in db
+    print(f"insert tree endpoint got tree with {len(unpacked)} nodes")
+
+    compressed_tree = compress_tree(unpacked)
+    await updates.insert_single_dependency_tree(
+        repo, package, f"{major_vers}.{minor_vers}.{patch_vers}", compressed_tree
+    )
     return Response(status_code=200)
