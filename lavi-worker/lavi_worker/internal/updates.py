@@ -7,6 +7,7 @@ import psycopg
 
 from lavi_worker.daos import cve
 from lavi_worker.daos import package
+from lavi_worker.daos import dependencies
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker import config
 
@@ -14,60 +15,99 @@ CACHE_CURSOR: str | None = None
 
 
 async def is_db_initialized() -> bool:
+    return (
+        await is_table_initialized("cves")
+        and await is_table_initialized("package")
+        and await is_table_initialized("dependencies")
+    )
+
+
+async def is_table_initialized(table: str = "cves") -> bool:
     """Return whether the database has been initialized yet."""
-    # Just check if the main table has been made
-    try:
-        async with await get_db_tx() as tx:
-            await cve.get_row_count(tx)
-    except psycopg.errors.UndefinedTable:
+    if table == "cves":
+        try:
+            async with await get_db_tx() as tx:
+                await cve.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    elif table == "package":
+        try:
+            async with await get_db_tx() as tx:
+                await package.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    elif table == "dependencies":
+        try:
+            async with await get_db_tx() as tx:
+                await dependencies.get_row_count(tx)
+                return True
+        except psycopg.errors.UndefinedTable:
+            return False
+    else:
         return False
-    # Propogate any other unexpected errors
-    return True
 
 
 async def initialize_database() -> None:
     """Initialize the database."""
-    assert not await is_db_initialized()
 
     # Build the tables
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
-            await cur.execute(
-                """
-                    CREATE TABLE cves (
-                        id SERIAL PRIMARY KEY,
-                        cve_id VARCHAR(50) NOT NULL,
-                        severity VARCHAR(50),
-                        description TEXT,
-                        cwe TEXT,
-                        url TEXT NOT NULL,
-                        repo_name VARCHAR(50) NOT NULL,
-                        pkg_name VARCHAR(50) NOT NULL,
-                        pkg_vers VARCHAR(50) NOT NULL,
-                        univ_hash VARCHAR(100) NOT NULL
+            if not await is_table_initialized("cves"):
+                await cur.execute(
+                    """
+                        CREATE TABLE cves (
+                            id SERIAL PRIMARY KEY,
+                            cve_id VARCHAR(50) NOT NULL,
+                            severity VARCHAR(50),
+                            description TEXT,
+                            cwe TEXT,
+                            url TEXT NOT NULL,
+                            repo_name VARCHAR(50) NOT NULL,
+                            pkg_name VARCHAR(50) NOT NULL,
+                            pkg_vers VARCHAR(50) NOT NULL,
+                            univ_hash VARCHAR(100) NOT NULL
+                        );
+                        ALTER TABLE cves
+                            ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
+                            """,
+                )
+            if not await is_table_initialized("package"):
+                await cur.execute(
+                    """
+                        CREATE TABLE package (
+                         univ_hash VARCHAR(100) PRIMARY KEY,
+                         repo_name VARCHAR(50) NOT NULL,
+                         pkg_name VARCHAR(50) NOT NULL,
+                         major_vers INTEGER NOT NULL,
+                         minor_vers INTEGER NOT NULL,
+                         patch_vers INTEGER NOT NULL,
+                         num_downloads INTEGER,
+                         s3_bucket varchar(50)
+                         );
+                     """,
+                )
+            if not await is_table_initialized("dependencies"):
+                await cur.execute(
+                    """
+                    CREATE TABLE dependencies (
+                      univ_hash VARCHAR(100) PRIMARY KEY,
+                      repo_name VARCHAR(50) NOT NULL,
+                      pkg_name VARCHAR(50) NOT NULL,
+                      pkg_vers VARCHAR(50),
+                      pkg_dependencies TEXT NOT NULL
                     );
-                    ALTER TABLE cves
-                        ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
-                    CREATE TABLE package (
-                                univ_hash VARCHAR(100) PRIMARY KEY,
-                                repo_name VARCHAR(50) NOT NULL,
-                                pkg_name VARCHAR(50) NOT NULL,
-                                major_vers INTEGER NOT NULL,
-                                minor_vers INTEGER NOT NULL,
-                                patch_vers INTEGER NOT NULL,
-                                num_downloads INTEGER,
-                                s3_bucket varchar(50)
-                    );
-                """,
-            )
+                    """,
+                )
 
 
 async def nuke_database() -> None:
     """Delete database tables."""
-    assert await is_db_initialized()
 
     # Delete each of the tables in sequence
-    for table_name in ["cves", "package"]:
+    for table_name in ["cves", "package", "dependencies"]:
         try:
             async with await get_db_tx() as tx:
                 async with tx.cursor() as cur:
@@ -79,15 +119,17 @@ async def nuke_database() -> None:
 
 async def clear_database() -> None:
     """Clear database rows."""
-    assert await is_db_initialized()
-
     # Clear each of the tables in sequence
     async with await get_db_tx() as tx:
-        await cve.drop_all_rows(tx)
-        await package.drop_all_rows(tx)
+        if is_table_initialized("cve"):
+            await cve.drop_all_rows(tx)
+        if is_table_initialized("package"):
+            await package.drop_all_rows(tx)
+        if is_table_initialized("dependencies"):
+            await dependencies.drop_all_rows(tx)
 
 
-async def database_size(table: str) -> int:
+async def table_size(table: str) -> int:
     """Get the number of rows in the db."""
     if table == "cves":
         async with await get_db_tx() as tx:
@@ -95,6 +137,9 @@ async def database_size(table: str) -> int:
     elif table == "package":
         async with await get_db_tx() as tx:
             return await package.get_row_count(tx)
+    elif table == "dependencies":
+        async with await get_db_tx() as tx:
+            return await dependencies.get_row_count(tx)
     else:
         raise Exception(f"Table {table} is not expected to exist")
 
@@ -121,6 +166,20 @@ async def insert_single_vulnerability(
             repo_name=repo_name,
             pkg_name=pkg_name,
             pkg_vers=pkg_vers,
+        )
+
+
+async def insert_single_dependency_tree(
+    repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
+) -> None:
+    """Insert a single vulnerability into the db."""
+    async with await get_db_tx() as tx:
+        await dependencies.create(
+            tx=tx,
+            repo_name=repo_name,
+            pkg_name=pkg_name,
+            pkg_vers=pkg_vers,
+            pkg_dependencies=pkg_dependencies,
         )
 
 
@@ -311,7 +370,7 @@ async def scrape_vulnerabilities() -> None:
 
             query = (
                 """
-            {"""
+                {"""
                 + query_type
                 + """
                {
