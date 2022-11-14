@@ -1,40 +1,46 @@
 {
- "cmdType": "npm",
- "repository": "npm",
+ "cmdType": "pip",
+ "repository": "pip",
  "nodes": {
-  "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY=": {
-   "id": "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY=",
-   "package": "object-assign",
-   "version": "4.1.1",
+  "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=": {
+   "id": "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=",
+   "package": "certifi",
+   "version": "2022.9.24",
    "dependencies": []
   },
-  "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8=": {
-   "id": "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8=",
-   "package": "react",
-   "version": "17.0.2",
-   "dependencies": [
-    "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=",
-    "QyrGQdyZAAlr3EGmIdyI6wa1EFp8cQfXQFs79N2DeGY="
-   ]
-  },
-  "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=": {
-   "id": "c2LomhsJ/AS+2V1D5mfZqxWoN46WbAhmEuTPpe2rtA0=",
-   "package": "loose-envify",
-   "version": "1.4.0",
-   "dependencies": [
-    "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY="
-   ]
-  },
-  "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY=": {
-   "id": "fjtV+GCfk7iWvudBKiJLrCGJCVni/AikU2uj0BHC5SY=",
-   "package": "js-tokens",
-   "version": "4.0.0",
+  "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc=": {
+   "id": "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc=",
+   "package": "urllib3",
+   "version": "1.26.12",
    "dependencies": []
+  },
+  "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=": {
+   "id": "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=",
+   "package": "idna",
+   "version": "3.4",
+   "dependencies": []
+  },
+  "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=": {
+   "id": "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=",
+   "package": "charset-normalizer",
+   "version": "2.0.12",
+   "dependencies": []
+  },
+  "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw=": {
+   "id": "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw=",
+   "package": "requests",
+   "version": "2.27.0",
+   "dependencies": [
+    "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=",
+    "v+kxE1avcLCqYlUQ5XZgiYDEdtmyC/xKnTg+/+f1do8=",
+    "T04/FzvYob/SKos6C+KZoB7nQtm54BzEKefbqo3y47Q=",
+    "J2dz+ZylcomQkZWnn++QEEU9DZia+iJuswZ2P0yUasc="
+   ]
   }
  },
  "root": {
   "dependencies": [
-   "ST3zC4XzBlWvkHd/Zjvt9v4D4pIzczGxZYq5kpy6IB8="
+   "yn1EungY9Q+85sqdEEmdin6tmO1mjX7udWu5TxL+wOw="
   ]
  }
 }

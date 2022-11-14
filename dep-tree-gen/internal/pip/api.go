@@ -1,8 +1,15 @@
 package pip
 
 import (
+	"bufio"
+	"dep-tree-gen/common"
 	"dep-tree-gen/models"
+	"errors"
+	"fmt"
+	"io"
 	"log"
+	"os"
+	"os/exec"
 )
 
 type PipTreeGenerator struct {
@@ -32,7 +39,65 @@ func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 	return cds
 }
 
+func (g PipTreeGenerator) Revert(cds models.CDS) {
+	pythonPath := g.PythonPath
+	cmd := []string{"-m", "pip", "install"}
+	for _, node := range cds.Nodes {
+		cmd = append(cmd, fmt.Sprintf("%s==%s", node.Package, node.Version))
+	}
+
+	out := exec.Command(pythonPath, cmd...)
+	err := out.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.CDS {
-	log.Fatal("unsupported")
-	return models.CDS{}
+
+	pythonPath := g.PythonPath
+
+	fileData := fmt.Sprintf(`
+%s==%s
+		`, pkg, version)
+
+	currentCds := g.GetCDSForPackages(map[string]string{pkg: version})
+
+	backupReq := common.BackupFile("requirements.txt")
+
+	fileBytes := []byte(fileData)
+	err := os.WriteFile("requirements.txt", fileBytes, 0644)
+	if err != nil {
+		log.Fatal("failed to write new requirements.txt")
+	}
+
+	// need to install the dependencies for the generator to work
+	fmt.Println("installing " + fmt.Sprintf("%s==%s", pkg, version))
+	cmd := exec.Command(pythonPath, "-m", "pip", "install", fmt.Sprintf("%s==%s", pkg, version))
+	cmd.Stderr = cmd.Stdout
+	stdout, _ := cmd.StdoutPipe()
+
+	cmd.Start()
+
+	reader := bufio.NewReader(stdout)
+	line, err := reader.ReadString('\n')
+	for err == nil {
+		fmt.Println(line)
+		line, err = reader.ReadString('\n')
+	}
+	if err != nil && !errors.Is(err, io.EOF) {
+		panic(err)
+	}
+	cmd.Wait()
+
+	// now we get the new cds
+	cds := g.GetCDS()
+
+	// then revert the installation
+	fmt.Println("reverting installation")
+	g.Revert(currentCds)
+
+	// restore file if it exists
+	common.RestoreFile(backupReq, "requirements.txt")
+	return cds
 }

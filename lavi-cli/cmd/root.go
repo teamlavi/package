@@ -29,4 +29,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("show", "s", false, "Show ui")
 	rootCmd.PersistentFlags().String("package", "", "Run lavi on a single package. If provided along with version, will default to running in single package mode")
 	rootCmd.PersistentFlags().String("version", "", "Run lavi on a single package. If provided along with package, will default to running in single package mode")
+	rootCmd.PersistentFlags().Bool("no-scan", false, "Ignore scanning the tree for vulnerabilities and only create the dependency tree")
 }
