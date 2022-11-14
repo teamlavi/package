@@ -3,7 +3,7 @@
 import argparse
 import logging
 
-from repo_worker.config import REQUIRED_ENV_FOR_REDIS
+from repo_worker.config import REQUIRED_ENV_FOR_LAVI_DB, REQUIRED_ENV_FOR_REDIS
 from repo_worker.core import cli_funcs, redis_funcs
 from repo_worker.scrapers import repo_scrapers
 
@@ -45,6 +45,12 @@ def parse_cmd_args() -> argparse.Namespace:
     generate_tree.add_argument("-p", "--package", action="store")
     generate_tree.add_argument("-V", "--version", action="store")
 
+    # db-sync-versions subcommand - Send version entries to lavi db (redis-only)
+    subparsers.add_parser("db-sync-versions", help="db-sync-versions help")
+
+    # db-sync-trees subcommand - Send tree entries to lavi db (redis-only)
+    subparsers.add_parser("db-sync-trees", help="db-sync-trees help")
+
     # Do the parse
     return parser.parse_args()
 
@@ -56,6 +62,16 @@ def main() -> None:
     # Verify stuff
     if args.command is None:
         raise Exception("No command provided")
+
+    redis_only_commands = ["db-sync-versions", "db-sync-trees"]
+    if args.mode != "redis" and args.command in redis_only_commands:
+        raise Exception(f"Can only run {args.command} command in redis-mode")
+
+    lavi_db_commands = ["db-sync-versions", "db-sync-trees"]
+    if args.command in lavi_db_commands and any(
+        [var is None for var in REQUIRED_ENV_FOR_LAVI_DB]
+    ):
+        raise Exception(f"Missing required lavi env vars: {REQUIRED_ENV_FOR_LAVI_DB}")
 
     if args.mode == "redis" and any([var is None for var in REQUIRED_ENV_FOR_REDIS]):
         raise Exception(f"Missing required redis env vars: {REQUIRED_ENV_FOR_REDIS}")
@@ -117,6 +133,16 @@ def main() -> None:
         if args.command == "generate-tree":
             logging.info("Running redis-mode generate-tree")
             redis_funcs.generate_tree()
+
+        # Redis db-sync-versions command
+        if args.command == "db-sync-versions":
+            logging.info("Running redis-mode db-sync-versions")
+            redis_funcs.db_sync_versions()
+
+        # Redis db-sync-trees command
+        if args.command == "db-sync-trees":
+            logging.info("Running redis-mode db-sync-trees")
+            redis_funcs.db_sync_trees()
 
     else:
         raise Exception(f"Unrecognized execution mode: {args.mode}")
