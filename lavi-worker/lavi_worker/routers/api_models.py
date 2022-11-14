@@ -2,9 +2,12 @@ from typing import List, Dict
 
 from pydantic import BaseModel
 
+from typing import Any
 
 from lavi_worker.utils import RepoEnum
-
+from lavi_worker.utils import LevelEnum
+from lavi_worker.utils import StatusEnum
+from lavi_worker.utils import ResponseEnum
 
 class DeleteVulnRequest(BaseModel):
     repo_name: str
