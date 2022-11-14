@@ -320,6 +320,11 @@ async def vers_range_to_list(
         return []
 
 
+async def get_most_recent_vers(repo_name: str, pkg_name: str) -> str:
+    async with await get_db_tx() as tx:
+        return await package.get_most_recent_vers(tx, repo_name, pkg_name)
+
+
 async def scrape_pip_versions(pkg_name:str) -> None :
     page2 = f"https://pypi.org/pypi/{pkg_name}/json"
 
@@ -366,8 +371,6 @@ async def scrape_pip_packages() -> None:
             await scrape_pip_versions(pkg_name)
         except Exception:
             pass
-
-
 
 
 async def scrape_npm_versions(pkg_name: str) -> None:

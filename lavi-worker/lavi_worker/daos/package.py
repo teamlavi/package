@@ -254,6 +254,32 @@ async def vers_exists(
             return False
 
 
+async def get_most_recent_vers(
+    tx: Transaction,
+    repo_name: str,
+    pkg_name: str,
+) -> str:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT  major_vers, minor_vers, patch_vers
+                FROM package
+                WHERE repo_name=%s AND pkg_name=%s
+                ORDER BY major_vers DESC, minor_vers DESC, patch_vers DESC
+            """,
+            (
+                repo_name,
+                pkg_name,
+            ),
+        )
+        row = await cur.fetchone()
+
+        if isinstance(row, tuple):
+            return f"{row[0]}.{row[1]}.{row[2]}"
+        else:
+            return ""
+
+
 async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM package")
