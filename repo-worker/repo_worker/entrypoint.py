@@ -3,7 +3,9 @@
 import argparse
 import logging
 
+from repo_worker import cli_funcs
 from repo_worker.config import REQUIRED_ENV_FOR_REDIS
+from repo_worker.scrapers import repo_scrapers
 
 
 logging.basicConfig(
@@ -32,6 +34,7 @@ def parse_cmd_args() -> argparse.Namespace:
         "list-package-versions", help="list-package-versions help"
     )
     # CLI-only args
+    list_package_versions.add_argument("-r", "--repository", action="store")
     list_package_versions.add_argument("-p", "--package", action="store")
     list_package_versions.add_argument("-l", "--limit", action="store")
 
@@ -65,6 +68,33 @@ def main() -> None:
     # Execute in CLI mode - pull from stdin and push to stdout
     if args.mode == "cli":
         logging.info("Running in cli mode")
+
+        # CLI list-packages command
+        if args.command == "list-packages":
+            if args.repo not in repo_scrapers:
+                raise Exception(f"Unrecognized repository: {args.repo}")
+            logging.info("Running cli-mode list-packages")
+            cli_funcs.list_packages(args.repo, int(args.limit) if args.limit else None)
+
+        # CLI list-package-versions command
+        elif args.command == "list-package-versions":
+            if not args.repository or not args.package:
+                raise Exception("repository and package required")
+            if args.repository not in repo_scrapers:
+                raise Exception(f"Unrecognized repository: {args.repository}")
+            logging.info("Running cli-mode list-package-versions")
+            cli_funcs.list_package_versions(
+                args.repository, args.package, int(args.limit) if args.limit else None
+            )
+
+        # CLI generate-tree command
+        elif args.command == "generate-tree":
+            if not args.repository or not args.package or not args.version:
+                raise Exception("repository, package, and version required")
+            if args.repository not in repo_scrapers:
+                raise Exception(f"Unrecognized repository: {args.repository}")
+            logging.info("Running cli-mode generate-tree")
+            cli_funcs.generate_tree(args.repository, args.package, args.version)
 
     # Execute in Redis mode - pull data from and push data to redis queues
     elif args.mode == "redis":
