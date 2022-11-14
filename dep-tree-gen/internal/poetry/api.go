@@ -21,7 +21,9 @@ func (g PoetryTreeGenerator) GetCDS() models.CDS {
 	lockFile := getPoetryLockFile(g.Path)
 	pyproject := getPoetryTomlFileDependencues(g.Path)
 
-	return lockFile.ToCDS(pyproject)
+	newLf := lockFile.CorrectSpecialCharacters()
+
+	return newLf.ToCDS(pyproject)
 }
 
 func (g PoetryTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
@@ -39,7 +41,7 @@ description = ""
 authors = ["LAVI CLI"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 
 [build-system]
 requires = ["poetry-core"]
@@ -69,9 +71,13 @@ build-backend = "poetry.core.masonry.api"
 		line, err = reader.ReadString('\n')
 	}
 	if err != nil && !errors.Is(err, io.EOF) {
-		panic(err)
+		log.Fatal("unknown error occured")
 	}
-	cmd.Wait()
+	if err = cmd.Wait(); err != nil {
+		common.RestoreFile(backupPyProject, "pyproject.toml")
+		common.RestoreFile(backupPoetryLock, "poetry.lock")
+		log.Fatal("Failed to create a lockfile for " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
+	}
 
 	// now we get the cds
 	cds := g.GetCDS()
