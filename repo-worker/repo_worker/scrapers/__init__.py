@@ -6,19 +6,17 @@ from repo_worker.utils import TreeNode
 
 class RepoScraper(Protocol):
     @staticmethod
-    def list_packages(repo: str, limit: int | None = None) -> List[str]:
+    def list_packages(limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
         ...
 
     @staticmethod
-    def list_package_versions(
-        repo: str, package: str, limit: int | None = None
-    ) -> List[str]:
+    def list_package_versions(package: str, limit: int | None = None) -> List[str]:
         """Given a repository and package, return a list of available versions."""
         ...
 
     @staticmethod
-    def generate_dependency_tree(repo: str, package: str, version: str) -> TreeNode:
+    def generate_dependency_tree(package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
         ...
 
