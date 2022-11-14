@@ -85,9 +85,3 @@ async def get_database_size(table: str = "cves") -> str:
     """Get the size of the database."""
     size = await updates.database_size(table=table)
     return str(size)
-
-@router.get("/database/size2", response_class=PlainTextResponse)
-async def get_database_size(table: str = "package") -> str:
-    """Get the size of the database."""
-    size = await updates.database_size(table=table)
-    return str(size)
