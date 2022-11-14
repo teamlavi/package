@@ -9,8 +9,8 @@ type ExpandedCDSNode struct {
 	ID              string                                      `json:"id,omitempty"`
 	Package         string                                      `json:"package,omitempty"`
 	Version         string                                      `json:"version,omitempty"`
-	Dependencies    []string                                    `json:"dependencies"`
-	Vulnerabilities []vulnerabilities.VulnerabilityResponseData `json:"vulnerabilities"`
+	Dependencies    []string                                    `json:"dependencies,omitempty"`
+	Vulnerabilities []vulnerabilities.VulnerabilityResponseData `json:"vulnerabilities,omitempty"`
 }
 
 type ExpandedCDS struct {
