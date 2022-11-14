@@ -8,6 +8,7 @@ type VulnerabilityResponseData struct {
 	CVEID    string `json:"cveId"`
 	Severity string `json:"severity"`
 	Url      string `json:"url"`
+	Title    string `json:"title"`
 }
 
 // this is how I want it for the ui - convert severity from high/moderate/low to int
