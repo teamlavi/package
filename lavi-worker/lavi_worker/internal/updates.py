@@ -249,9 +249,20 @@ async def vers_range_to_list(
         # drop version extension
         vers_range = vers_range[: vers_range.index("-")]
 
+    if not vers_range[vers_range.index(" ")+1:].replace(".", "").isnumeric():
+        print("EDGE CASE TO HANDLE: ", vers_range, vers_range[vers_range.index(" "):].replace(".", ""))
+        return []
+
     while vers_range.count(".") < 2:
         # if no minor or patch version included
         vers_range += ".0"
+
+    if vers_range.count(".") != 2:
+        if vers_range[-2:] == ".0":
+            return vers_range_to_list(repo_name, pkg_name, vers_range[:-2])
+        # TODO some releases have 4 version numbers
+        print("EDGE CASE TO HANDLE", repo_name, pkg_name, vers_range)
+        return []
 
     if vers_range[0] == "=":
         # only one version
@@ -456,8 +467,8 @@ async def scrape_vulnerabilities() -> None:
             )
 
             # Print returned JSON
-            print("response")
-            print(json.dumps(json.loads(response.text), indent=2))
+            # print("response")
+            # print(json.dumps(json.loads(response.text), indent=2))
 
             if '"message":"Bad credentials"' in response.text:
                 print("GitHub Advisory Token Error")
@@ -517,8 +528,7 @@ async def scrape_vulnerabilities() -> None:
                 except Exception:
                     # Might not have a patched version
                     first_patched_vers = None
-                print(pkg_vers_range)
-                print(pkg_vers_list)
+
                 for release in pkg_vers_list:
                     await insert_single_vulnerability(
                         cve_id,
