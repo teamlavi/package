@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List
 
 import httpx
 import psycopg
@@ -307,8 +306,44 @@ async def vers_range_to_list(
         return []
 
 
-async def scrape_pip_packages() -> List[str]:
-    return []
+async def scrape_pip_packages() -> None:
+    client = httpx.Client(follow_redirects=True)
+    page = client.get("https://pypi.org/simple")  # Getting page HTML through request
+    # print(page.text)
+    stringHelper = page.text.replace(" ", "")
+    links = stringHelper.split("\n")
+    for pkg_name in links[7:100]:  # -2 for this
+        try:
+            # E203: formatter puts whitespace before : but flake8 doesn't want it
+            pkg_name = pkg_name[
+                pkg_name.find(">") + 1 : pkg_name.rfind("<")  # noqa: E203
+            ]
+            page2 = f"https://pypi.org/pypi/{pkg_name}/json"
+
+            versions = json.loads(client.get(page2).text)["releases"]
+            version_list = []
+
+            try:
+                for key in versions:
+                    versionHelper = key.split(".")
+                    if len(versionHelper) == 2:
+                        versionHelper.append("0")
+                        version_list.append(versionHelper)
+
+                    if len(versionHelper) == 3:
+                        await insert_single_package_version(
+                            "pip",
+                            str(pkg_name.lower()),
+                            int(versionHelper[0]),
+                            int(versionHelper[1]),
+                            int(versionHelper[2]),
+                        )
+                    else:
+                        pass
+            except Exception:
+                pass
+        except Exception:
+            pass
 
 
 async def scrape_npm_packages() -> None:
