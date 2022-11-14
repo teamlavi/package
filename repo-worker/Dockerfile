@@ -39,6 +39,7 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
 # Copy lavi binary to image
 COPY bin/lavi /usr/local/bin
+RUN chmod +x /usr/local/bin/lavi
 
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
