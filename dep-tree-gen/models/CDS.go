@@ -28,15 +28,16 @@ func (c CDS) IsRoot(id string) bool {
 	return contains(id, c.Root.Dependencies)
 }
 
-func (c CDS) FindRootParents(id string) []CDSNode {
+func (c CDS) GetPathString(id string) []string {
 	if c.IsRoot(id) {
-		return []CDSNode{c.Nodes[id]}
+		return []string{c.Nodes[id].Package}
 	}
-
-	out := []CDSNode{}
-	for _, node := range c.Nodes {
-		if contains(id, node.Dependencies) {
-			out = append(out, c.FindRootParents(node.ID)...)
+	out := []string{}
+	for _, n := range c.Nodes {
+		if contains(id, n.Dependencies) {
+			path := c.GetPathString(n.ID)
+			out = append(path, c.Nodes[id].Package)
+			return out
 		}
 	}
 	return out
