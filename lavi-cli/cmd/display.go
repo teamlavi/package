@@ -128,7 +128,7 @@ func display(cmd *cobra.Command, cds models.CDS, vulns map[string][]vulnerabilit
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Version", pkg.Version})
 		t.AppendSeparator()
-		t.AppendRow([]interface{}{"Patched In", "PLACEHOLDER"})
+		t.AppendRow([]interface{}{"Patched In", v.PatchedIn})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Path", strings.Join(cds.GetPathString(id), " > ")})
 		t.AppendSeparator()

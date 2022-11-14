@@ -5,10 +5,11 @@ type BatchVulnerabilityResponse struct {
 }
 
 type VulnerabilityResponseData struct {
-	CVEID    string `json:"cveId"`
-	Severity string `json:"severity"`
-	Url      string `json:"url"`
-	Title    string `json:"title"`
+	CVEID     string `json:"cveId"`
+	Severity  string `json:"severity"`
+	Url       string `json:"url"`
+	Title     string `json:"title"`
+	PatchedIn string `json:"patchedIn"`
 }
 
 // this is how I want it for the ui - convert severity from high/moderate/low to int
