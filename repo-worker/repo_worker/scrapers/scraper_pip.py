@@ -1,8 +1,10 @@
 from typing import List
 
 from repo_worker.utils import TreeNode
+from repo_worker.utils import generate_dependency_tree
 import json
 import httpx
+import os
 
 
 class PipScraper(object):
@@ -51,4 +53,11 @@ class PipScraper(object):
     @staticmethod
     def generate_dependency_tree(package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
-        raise NotImplementedError
+        cmd = f'lavi poetry --package="{package}" --version="{version}" --no-scan -w'
+        result = os.popen(cmd).read()
+        print(result)
+        if "open poetry.lock: no such file or directory" in result:
+            return None
+        with open("cds.json") as f:
+            cds = json.loads(f.read())
+        return generate_dependency_tree(cds)
