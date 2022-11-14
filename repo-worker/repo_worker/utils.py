@@ -20,7 +20,7 @@ class TreeNode(object):
         self.repo = repo
         self.package = package
         self.version = version
-        self.children = children
+        self.children = [c for c in children]  # shallow copy necessary
 
     def add_child(self, child: TreeNode) -> None:
         """Add a child node."""
