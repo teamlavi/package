@@ -118,12 +118,21 @@ class InsertVulnRequest(BaseModel):
 class LavaRequest(BaseModel):
     repo: RepoEnum
     packages: List[str] | None  #Query with only a packages in list. Can optionally include a version number. If no version number is included, the most recent release will be used.
-    bound: int | None           #limit bound on how many results the user wants to display (ex: bound=5 would be the top 5 results)
+    offset: int | None          #offset on how many results the user wants to skip(ex: offset=2 would skip the first 2 results)
+    limit: int | None           #limit on how many results the user wants to display (ex: limit=5 would only show the next 5 results)
     minDownloads: int | None    #only include packages with minDownloads package downloads and above (inclusive)
     level: LevelEnum | None     #include direct, indirect, or all vulnerabilities.Includes ALL by default if None
-    status: StatusEnum | None    #include active, patched or all vulnerabilities. Includes only ACTIVE vulnerabilities by default if None
+    status: StatusEnum | None   #include active, patched or all vulnerabilities. Includes only ACTIVE vulnerabilities by default if None
 
 #LAVA Responses
+
+#GET Response
+class LavaResponse(BaseModel):
+    status: ResponseEnum    #Options: complete, failure, or pending
+    error: str | None       #returns error message in case status=failure
+    result: Any             #If status=complete, will return job response. will be one of the responses below  
+
+#job finished successfully Responses
 class AffectedCountResponse(BaseModel):
     pkgsAffected: Dict[str, int]  #CVE id -> Number of packages affected
 

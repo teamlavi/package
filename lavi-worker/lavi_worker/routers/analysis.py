@@ -10,8 +10,8 @@ async def affected_count(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/affected_count")
-async def affected_count(jobID : str) -> api_models.AffectedCountResponse:
-    return api_models.AffectedCountResponse(pkgsAffected={"dumbCVEId": 0})
+async def affected_count(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
 
 
 
@@ -21,8 +21,9 @@ async def count(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/count")
-async def count(jobID : str) -> api_models.CountResponse:
-    return api_models.CountResponse(count=0)
+async def count(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 
@@ -32,8 +33,9 @@ async def count_dependencies(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/count_dependencies")
-async def count_dependencies(jobID : str) -> api_models.CountDepResponse:
-    return api_models.CountDepResponse(depList={"packageID123": 0})
+async def count_dependencies(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 
@@ -43,8 +45,9 @@ async def count_vul(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/count_vul")
-async def count_vul(jobID : str) -> api_models.CountVulResponse:
-    return api_models.CountVulResponse(vulCount=0)
+async def count_vul(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 
@@ -54,8 +57,9 @@ async def depth(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/depth")
-async def depth(jobID : str) -> api_models.DepthResponse:
-    return api_models.DepthResponse(vulDepth={"Some CVE ID": 0})
+async def depth(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 
@@ -65,8 +69,9 @@ async def num_downloads(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/num_downloads")
-async def num_downloads(jobID : str) -> api_models.NumDownloadsResponse:
-    return api_models.NumDownloadsResponse(downloads={"Some package ID" : 0})
+async def num_downloads(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 
@@ -76,8 +81,9 @@ async def severities(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/severities")
-async def severities(jobID : str) -> api_models.SeveritiesResponse:
-    return api_models.SeveritiesResponse(sevList={"vulPackageId": "severityType"})
+async def severities(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 #8.) ===== Types - Returns CSV with CWEs and a count of how many vulnerabilities for each CWE =====
@@ -86,8 +92,9 @@ async def types(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/types")
-async def types(jobID : str) -> api_models.TypesResponse:
-    return api_models.TypesResponse(cweList={"CWEID":0})
+async def types(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+
 
 
 #9.) ===== vulnerablePackages - Return list of vulnerable packages. =====
@@ -96,10 +103,5 @@ async def vulnerable_packages(lava_request : api_models.LavaRequest) -> str:
     return "job ID"
 
 @router.get("/vulnerable_packages")
-async def vulnerable_packages(jobID : str) -> api_models.VulPackagesResponse:
-    return api_models.VulPackagesResponse(vulList=["thisPackageIsVulID"])
-
-
-
-
-
+async def vulnerable_packages(jobID : str) -> api_models.LavaResponse:
+    return api_models.LavaResponse(status=utils.ResponseEnum.pending)

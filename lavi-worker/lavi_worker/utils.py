@@ -10,6 +10,13 @@ class RepoEnum(str, Enum):
     npm = "npm"
     golang = "golang"
 
+class ResponseEnum(str, Enum):
+    """Enumartor for LAVA GET responses"""
+
+    complete = "complete"
+    failure = "failure"
+    pending = "pending"
+
 class LevelEnum(str, Enum):
     """Enumerator for vulnerability levels for use in LavaRequest"""
 
