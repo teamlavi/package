@@ -67,15 +67,15 @@ func accumulateVulnCounts(vulns map[string][]vulnerabilities.VulnerabilityRespon
 			critical += 1
 		}
 	})
-	return []int{low, medium, high, critical}
+	return []int{critical, high, medium, low}
 }
 
 func printCounts(vulns map[string][]vulnerabilities.VulnerabilityResponseData) {
 	txt := []string{
-		text.FgHiGreen.Sprint("low"),
-		text.FgHiYellow.Sprint("medium"),
-		text.FgHiRed.Sprint("high"),
 		text.FgHiRed.Sprint("critical"),
+		text.FgHiRed.Sprint("high"),
+		text.FgHiYellow.Sprint("medium"),
+		text.FgHiGreen.Sprint("low"),
 	}
 	hasPrinted := false
 	for i, c := range accumulateVulnCounts(vulns) {
@@ -105,14 +105,40 @@ func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityRes
 
 	printCounts(vulns)
 
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Package", "Version", "Indirect?", "CVE ID", "Severity", "Url"})
+	writers := map[string][]table.Writer{}
+
 	mapOverVulns(vulns, func(id string, v vulnerabilities.VulnerabilityResponseData) {
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.SetStyle(table.StyleLight)
 		pkg := cds.Nodes[id]
-		indirect := cds.IsRoot(id)
-		t.AppendRow([]interface{}{pkg.Package, pkg.Version, indirect, v.CVEID, addSeverityColor(v.Severity), v.Url})
+
+		t.AppendHeader(table.Row{addSeverityColor(v.Severity), v.Title})
+		t.AppendRow([]interface{}{"Package", pkg.Package})
+		t.AppendSeparator()
+		t.AppendRow([]interface{}{"Version", pkg.Version})
+		t.AppendSeparator()
+		t.AppendRow([]interface{}{"Path", strings.Join(cds.GetPathString(id), " > ")})
+		t.AppendSeparator()
+		t.AppendRow([]interface{}{"Url", v.Url})
+
+		if arr, exists := writers[v.Severity]; exists {
+			arr = append(arr, t)
+			writers[v.Severity] = arr
+		} else {
+			writers[v.Severity] = []table.Writer{t}
+		}
 	})
-	t.SetStyle(table.StyleLight)
-	t.Render()
+
+	mapFcn := func(name string) {
+		for _, w := range writers[name] {
+			w.Render()
+		}
+	}
+
+	mapFcn("CRITICAL")
+	mapFcn("HIGH")
+	mapFcn("MEDIUM")
+	mapFcn("MODERATE")
+	mapFcn("LOW")
 }
