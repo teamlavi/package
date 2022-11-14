@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    {{- include "lavi-worker.redisLabels" . | nindent 4 }}
-  name: {{ include "lavi-worker.redisFullname" . }}
+    {{- include "repo-worker.redisLabels" . | nindent 4 }}
+  name: {{ include "repo-worker.redisFullname" . }}
 spec:
   replicas: 1  # Need master-slave arch for more than 1
   selector:
     matchLabels:
-      {{- include "lavi-worker.redisSelectorLabels" . | nindent 6 }}
+      {{- include "repo-worker.redisSelectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "lavi-worker.redisSelectorLabels" . | nindent 8 }}
+        {{- include "repo-worker.redisSelectorLabels" . | nindent 8 }}
     spec:
       containers:
         - image: {{ printf "%s:%s" .Values.redis.image.repository .Values.redis.image.tag | quote }}

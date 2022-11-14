@@ -20,12 +20,6 @@ postgres:
     storageClass: vultr-block-storage
   replicas: 1
 
-redis:
-  image:
-    pullPolicy: Always
-    repository: docker.io/redis
-    tag: "7.0.5"
-
 replicas: 1
 
 ghAccessToken:

@@ -1,0 +1,9 @@
+kind: Module
+name: repo-worker-ctr
+type: container
+build:
+  targetImage: main
+tests:
+  - name: lint
+    command: ["bash"]
+    args: ["tests/lint.sh"]
