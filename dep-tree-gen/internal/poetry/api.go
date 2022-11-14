@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"dep-tree-gen/common"
 	"dep-tree-gen/models"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -68,12 +70,14 @@ build-backend = "poetry.core.masonry.api"
 		fmt.Print(line)
 		line, err = reader.ReadString('\n')
 	}
-	if err != nil {
+	if err != nil && !errors.Is(err, io.EOF) {
+		log.Fatal("unknown error occured")
+	}
+	if err = cmd.Wait(); err != nil {
 		common.RestoreFile(backupPyProject, "pyproject.toml")
 		common.RestoreFile(backupPoetryLock, "poetry.lock")
 		log.Fatal("Failed to create a lockfile for " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
 	}
-	cmd.Wait()
 
 	// now we get the cds
 	cds := g.GetCDS()

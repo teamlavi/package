@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"dep-tree-gen/common"
 	"dep-tree-gen/models"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -83,11 +85,12 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 		fmt.Print(line)
 		line, err = reader.ReadString('\n')
 	}
-	if err != nil {
-		log.Fatal("Failed to install " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
-
+	if err != nil && !errors.Is(err, io.EOF) {
+		log.Fatal("unknown error occured")
 	}
-	cmd.Wait()
+	if err = cmd.Wait(); err != nil {
+		log.Fatal("Failed to install " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
+	}
 
 	// now we get the new cds
 	cds := g.GetCDS()

@@ -3,7 +3,9 @@ package dispatch
 import (
 	"bufio"
 	"dep-tree-gen/common"
+	"errors"
 	"fmt"
+	"io"
 	"lavi/internal/config"
 	"lavi/internal/vulnerabilities"
 	"os/exec"
@@ -47,11 +49,13 @@ func RunCommand(cmd *exec.Cmd, function *Function) {
 		function.StdoutString += line
 		line, err = reader.ReadString('\n')
 	}
-	if err != nil {
-		function.StdoutString += "Failed to install selected changes. Are you sure the package and version name combinations are correct?\r\n"
-
+	if err != nil && !errors.Is(err, io.EOF) {
+		panic(err)
 	}
-	cmd.Wait()
+	if err = cmd.Wait(); err != nil {
+		function.StdoutString += "Failed to install selected changes. Are you sure the package and version name combinations are correct?\r\n"
+		panic(err)
+	}
 }
 
 // dispatches a goroutine thread that can be identified by the id returned
