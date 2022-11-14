@@ -114,6 +114,12 @@ class InsertVulnRequest(BaseModel):
 
 #analysis.py Models:
 
+#LAVA Request
+class LavaRequest(BaseModel):
+    repo: RepoEnum
+    
+
+#LAVA Responses
 class AffectedCountResponse(BaseModel):
     pkgsAffected: Dict[str, int]  #CVE id -> Number of packages affected
 
