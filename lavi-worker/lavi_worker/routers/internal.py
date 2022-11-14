@@ -85,3 +85,16 @@ async def get_database_size(table: str = "cves") -> str:
     """Get the size of the database."""
     size = await updates.database_size(table=table)
     return str(size)
+
+
+@router.post("/insert_tree")
+async def insert_tree(
+    tree: api_models.InsertTreeData,
+    repo: str,
+    package: str,
+    major_vers: str,
+    minor_vers: str,
+    patch_vers: str,
+) -> Response:
+    """Insert a tree into the database"""
+    ...

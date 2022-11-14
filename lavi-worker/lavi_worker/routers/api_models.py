@@ -6,6 +6,10 @@ from pydantic import BaseModel
 from lavi_worker.utils import RepoEnum
 
 
+class InsertTreeData(BaseModel):
+    fill_me_up: str
+
+
 class DeleteVulnRequest(BaseModel):
     repo_name: str
     pkg_name: str
