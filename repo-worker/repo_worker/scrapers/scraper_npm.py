@@ -44,6 +44,7 @@ class NpmScraper(object):
             return res_versions
         except Exception as e:
             print(f"Unable to interpret versions for {package}", e)
+            return []
 
 
     @staticmethod
