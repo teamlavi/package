@@ -249,7 +249,7 @@ async def vers_range_to_list(
 
 
 async def scrape_pip_packages() -> None:
-    page = httpx.get('https://www.pypi.org/simple') # Getting page HTML through request
+    page = httpx.get("https://pypi.org/simple/")  # Getting page HTML through request
     stringHelper = page.text.replace(" ", "")
     links = stringHelper.split('\n')
     count = 0
@@ -258,7 +258,7 @@ async def scrape_pip_packages() -> None:
         package = package[package.find('>') + 1:package.rfind('<')]
         print(package)
         try:
-            page2 = f'https://pypi.python.org/pypi/{package}/json'
+            page2 = f"https://pypi.org/pypi/{package}/json"
 
 
             versions = json.loads(httpx.get(page2).text)['releases']
