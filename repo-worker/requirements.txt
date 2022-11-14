@@ -1,0 +1,11 @@
+# Execution requirements
+redis[hiredis]==4.3.4
+httpx==0.23.0
+
+# Test / lint requirements
+black==22.10.0
+flake8==5.0.4
+httpx==0.23.0
+mypy==0.982
+pytest==7.1.3
+
