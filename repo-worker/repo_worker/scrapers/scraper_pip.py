@@ -57,7 +57,8 @@ class PipScraper(object):
         result = os.popen(cmd).read()
         print(result)
         if "open poetry.lock: no such file or directory" in result:
-            return None
+            # TODO: what to return?
+            return TreeNode(package="", repo="", version="")
         with open("cds.json") as f:
             cds = json.loads(f.read())
         return generate_dependency_tree(cds)

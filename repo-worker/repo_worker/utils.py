@@ -3,7 +3,7 @@ from __future__ import annotations  # Postponed annotation evaluation, remove on
 from base64 import b64encode
 from hashlib import sha256
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 
 class TreeNode(object):
@@ -96,8 +96,12 @@ def get_recent_version(versions: List[str]) -> str:
     return highest
 
 
-def generate_dependency_tree(cds: dict):
-    def get_node(cds: dict, univ_hash: str) -> TreeNode:
+def generate_dependency_tree(
+    cds: Dict[str, Any],
+) -> TreeNode:
+    def get_node(
+        univ_hash: str,
+    ) -> TreeNode:
         """recursive function to generate tree"""
         cds_nodes = cds["nodes"]
         node_data = cds_nodes[univ_hash]
@@ -105,7 +109,7 @@ def generate_dependency_tree(cds: dict):
         # has children, generate them first
         children_node_list: List[TreeNode] = []
         for child_id in children_list:
-            children_node_list.append(get_node(cds, child_id))
+            children_node_list.append(get_node(child_id))
         return TreeNode(
             cds["repository"],
             node_data["package"],
@@ -113,4 +117,4 @@ def generate_dependency_tree(cds: dict):
             children_node_list,
         )
 
-    return get_node(cds, cds["root"]["dependencies"][0])
+    return get_node(cds["root"]["dependencies"][0])
