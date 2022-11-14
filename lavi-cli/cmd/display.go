@@ -118,6 +118,8 @@ func display(cds models.CDS, vulns map[string][]vulnerabilities.VulnerabilityRes
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Version", pkg.Version})
 		t.AppendSeparator()
+		t.AppendRow([]interface{}{"Patched In", "PLACEHOLDER"})
+		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Path", strings.Join(cds.GetPathString(id), " > ")})
 		t.AppendSeparator()
 		t.AppendRow([]interface{}{"Url", v.Url})
