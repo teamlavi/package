@@ -101,7 +101,7 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    unpacked: Dict[str, List[str]] 
+    unpacked: Dict[str, List[str]]
     unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
     print(f"Got tree with {len(unpacked)} nodes")
     # TODO put in db
