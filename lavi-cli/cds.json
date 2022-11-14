@@ -1,5 +1,5 @@
 {
- "cmdType": "pip",
+ "cmdType": "poetry",
  "repository": "pip",
  "nodes": {
   "3Ae6bCPCNAc+3/WOE6vkRFBJEpVh4VQSs/FTzaAcEtY=": {
