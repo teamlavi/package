@@ -320,6 +320,33 @@ async def vers_range_to_list(
         return []
 
 
+async def scrape_pip_versions(pkg_name:str) -> None :
+    page2 = f"https://pypi.org/pypi/{pkg_name}/json"
+
+    versions = json.loads(httpx.get(page2).text)["releases"]
+    version_list = []
+
+    try:
+        for key in versions:
+            versionHelper = key.split(".")
+            if len(versionHelper) == 2:
+                versionHelper.append("0")
+                version_list.append(versionHelper)
+
+            if len(versionHelper) == 3:
+                await insert_single_package_version(
+                    "pip",
+                    str(pkg_name.lower()),
+                    int(versionHelper[0]),
+                    int(versionHelper[1]),
+                    int(versionHelper[2]),
+                )
+            else:
+                pass
+    except Exception:
+        pass
+
+
 async def scrape_pip_packages() -> None:
     client = httpx.Client(follow_redirects=True)
     page = client.get("https://pypi.org/simple")  # Getting page HTML through request
@@ -332,58 +359,44 @@ async def scrape_pip_packages() -> None:
             pkg_name = pkg_name[
                 pkg_name.find(">") + 1 : pkg_name.rfind("<")  # noqa: E203
             ]
-            page2 = f"https://pypi.org/pypi/{pkg_name}/json"
-
-            versions = json.loads(client.get(page2).text)["releases"]
-            version_list = []
-
-            try:
-                for key in versions:
-                    versionHelper = key.split(".")
-                    if len(versionHelper) == 2:
-                        versionHelper.append("0")
-                        version_list.append(versionHelper)
-
-                    if len(versionHelper) == 3:
-                        await insert_single_package_version(
-                            "pip",
-                            str(pkg_name.lower()),
-                            int(versionHelper[0]),
-                            int(versionHelper[1]),
-                            int(versionHelper[2]),
-                        )
-                    else:
-                        pass
-            except Exception:
-                pass
+            await scrape_pip_versions(pkg_name)
         except Exception:
             pass
+
+    # hardcode list to scrape
+    for pkg_name in ["numpy"]:
+        await scrape_pip_versions(pkg_name)
+
+
+async def scrape_npm_versions(pkg_name: str) -> None:
+    if pkg_name[0] == "-":
+        return
+    try:
+        cmd = "npm view " + pkg_name + "@* version --json"
+        request = os.popen(cmd).read()
+        version_list = json.loads(request)
+
+        if isinstance(version_list, str) and "-" in version_list:
+            return
+        elif isinstance(version_list, str):
+            version_list = [version_list]
+        elif isinstance(version_list[0], list):
+            version_list = version_list[0]
+
+        for vers in version_list:
+            major_vers, minor_vers, patch_vers = vers.split(".")
+            await insert_single_package_version(
+                "npm", pkg_name.lower(), major_vers, minor_vers, patch_vers
+            )
+    except Exception as e:
+        print(f"Unable to interpret versions for {pkg_name}", e)
 
 
 async def scrape_npm_packages() -> None:
     """Get versions for npm packages"""
-    for package_name in ["express", "async", "lodash", "cloudinary", "axios"]:
-        if package_name[0] == "-":
-            continue
-        try:
-            cmd = "npm view " + package_name + "@* version --json"
-            request = os.popen(cmd).read()
-            version_list = json.loads(request)
-
-            if isinstance(version_list, str) and "-" in version_list:
-                continue
-            elif isinstance(version_list, str):
-                version_list = [version_list]
-            elif isinstance(version_list[0], list):
-                version_list = version_list[0]
-
-            for vers in version_list:
-                major_vers, minor_vers, patch_vers = vers.split(".")
-                await insert_single_package_version(
-                    "npm", package_name.lower(), major_vers, minor_vers, patch_vers
-                )
-        except Exception as e:
-            print(f"Unable to interpret versions for {package_name}", e)
+    # TODO get all npm packages
+    for pkg_name in ["express", "async", "lodash", "cloudinary", "axios"]:
+        await scrape_npm_versions(pkg_name)
 
 
 async def scrape_packages() -> None:
