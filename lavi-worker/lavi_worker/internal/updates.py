@@ -249,35 +249,38 @@ async def vers_range_to_list(
 
 
 async def scrape_pip_packages() -> None:
-    page = httpx.get('https://www.pypi.org/simple') # Getting page HTML through request
+    client = httpx.Client(follow_redirects=True)
+    page = client.get('https://pypi.org/simple') # Getting page HTML through request
+    print(page.text)
     stringHelper = page.text.replace(" ", "")
     links = stringHelper.split('\n')
     count = 0
     countSuccess = 0
     for package in links[7:100]: #-2 for this
-        package = package[package.find('>') + 1:package.rfind('<')]
-        print(package)
+
         try:
-            page2 = f'https://pypi.python.org/pypi/{package}/json'
+            package = package[package.find('>') + 1:package.rfind('<')]
+            print(package)
+            page2 = f'https://pypi.org/pypi/{package}/json'
 
 
-            versions = json.loads(httpx.get(page2).text)['releases']
-            dependencies = json.loads(httpx.get(page2).text)['info']['requires_dist']
+            versions = json.loads(client.get(page2).text)['releases']
+            dependencies = json.loads(client.get(page2).text)['info']['requires_dist']
             version_list = []
 
-            for key in versions:
-                versionHelper = key.split(".")
-                if len(versionHelper) == 3:
-                    version_list.append(versionHelper)
-                elif len(versionHelper) == 2:
-                    versionHelper.append('0')
-                    version_list.append(versionHelper)
-                await insert_single_package_version(
-                        "pip", package.lower(), versionHelper[0], versionHelper[1], versionHelper[2]
-                    )
+            try:
+                for key in versions:
+                    versionHelper = key.split(".")
+                    if len(versionHelper) == 3:
+                        version_list.append(versionHelper)
+                    elif len(versionHelper) == 2:
+                        versionHelper.append('0')
+                        version_list.append(versionHelper)
 
-            count += 1
-            countSuccess += 1
+                    count += 1
+                    countSuccess += 1
+            except:
+                count +=1
         except:
             count += 1
 
