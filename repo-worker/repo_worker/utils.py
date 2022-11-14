@@ -31,6 +31,14 @@ class TreeNode(object):
         """Return the tree represented as json."""
         raise NotImplementedError
 
+    def __str__(self) -> str:
+        """Get a string representation of the self."""
+        # Don't recursively __str__ children bc it could be cyclic
+        return (
+            f"TreeNode(repo=\"{self.repo}\", package=\"{self.package}\", "
+            f"version=\"{self.version}\")"
+        )
+
 
 def _sha256(content: str | bytes) -> bytes:
     """Wrapper for hashlib sha256."""
