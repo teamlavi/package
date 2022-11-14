@@ -6,3 +6,4 @@ package.json
 package-lock.json
 archives
 node_modules
+cds.json

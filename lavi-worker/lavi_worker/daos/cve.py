@@ -25,6 +25,7 @@ class CVE:
     pkg_name: str
     pkg_vers: str
     univ_hash: str
+    first_patched_vers: str | None
 
 
 async def create(
@@ -37,6 +38,7 @@ async def create(
     repo_name: str,
     pkg_name: str,
     pkg_vers: str,
+    first_patched_vers: str | None,
 ) -> bool:
     """Create a CVE object in the database"""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
@@ -45,7 +47,7 @@ async def create(
             await cur.execute(
                 """
                     INSERT INTO cves
-                    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     cve_id,
@@ -57,6 +59,7 @@ async def create(
                     pkg_name,
                     pkg_vers,
                     univ_hash,
+                    first_patched_vers,
                 ),
             )
             return True

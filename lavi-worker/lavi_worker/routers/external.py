@@ -33,7 +33,7 @@ async def find_vulnerable_versions(
         find_vuln_vers_request.repo,
         find_vuln_vers_request.package,
     )
-    print("empty" if not versions else type(versions[0]))
+
     # Format response
     return api_models.FindVulnVersResponse(vers=versions)
 
@@ -43,11 +43,18 @@ async def find_vulnerabilities_id_list(
     find_all_vuln_request: api_models.FindVulnsIdListRequest,
 ) -> api_models.FindVulnsIdListResponse:
     """Find all vulnerabilities given a list of package universal hash ids."""
+
     # get CVE data from the database
     async def format_cve(pkgId: str) -> List[api_models.CveResponse]:
         cves = await queries.find_full_vulnerabilities_id(pkgId)
         return [
-            api_models.CveResponse(cveId=cve.cve_id, severity=cve.severity, url=cve.url)
+            api_models.CveResponse(
+                cveId=cve.cve_id,
+                severity=cve.severity,
+                url=cve.url,
+                title=cve.description,
+                patchedIn=cve.first_patched_vers,
+            )
             for cve in cves
         ]
 

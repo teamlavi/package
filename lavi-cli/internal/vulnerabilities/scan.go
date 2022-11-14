@@ -19,7 +19,7 @@ func ScanSet(ids []string) BatchVulnerabilityResponse {
 		panic("failed to scan for vulnerabilities")
 	}
 
-	resp, err := http.Post("https://temp.lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
+	resp, err := http.Post("https://lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
 		bytes.NewBuffer(json_data))
 
 	defer resp.Body.Close()
@@ -52,6 +52,13 @@ func CleanupScanResults(all []BatchVulnerabilityResponse) map[string][]Vulnerabi
 	return res.Vulns
 }
 
+func GrabSlice(start, end int, arr []string) ([]string, int) {
+	if end > cap(arr) {
+		return arr[start:], len(arr[start:])
+	}
+	return arr[start:end], len(arr[start:end])
+}
+
 func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
 	pkgIds := []string{}
 	for id, _ := range cds.Nodes {
@@ -64,8 +71,9 @@ func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
 
 	// batch by groups of 100
 	for i := 0; i < len(pkgIds); i += 100 {
-		all = append(all, ScanSet(pkgIds[i:i+100]))
-		bar.Add(100)
+		slice, count := GrabSlice(i, i+100, pkgIds)
+		all = append(all, ScanSet(slice))
+		bar.Add(count)
 	}
 	bar.Finish()
 

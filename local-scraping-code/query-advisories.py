@@ -39,6 +39,9 @@ query = (
      }
         vulnerabilities(first:100 ) {
         nodes{
+        firstPatchedVersion{
+            identifier
+        }
         vulnerableVersionRange
         package {
           name
@@ -64,7 +67,7 @@ print(json.dumps(json.loads(response.text), indent=2))
 
 print(response.text)
 
-if "\"message\":\"Bad credentials\"" in response.text:
+if '"message":"Bad credentials"' in response.text:
     print("GitHub Advisory Token Error")
 elif "errors" in json.loads(response.text).keys():
     print("GitHub Advisory Query Error")

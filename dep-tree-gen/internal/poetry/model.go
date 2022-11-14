@@ -5,6 +5,9 @@ import (
 	"dep-tree-gen/models"
 	"dep-tree-gen/utils"
 	"strings"
+
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
 )
 
 type LockFile struct {
@@ -14,14 +17,66 @@ type LockFile struct {
 type Package struct {
 	Name         string
 	Version      string
-	Dependencies map[string]string
+	Dependencies map[string]interface{}
 }
 
 type Pyproject struct {
 	Tool struct {
 		Poetry struct {
-			Dependencies map[string]string
+			Dependencies map[string]interface{}
 		}
+	}
+}
+
+func contains(val string, arr []string) bool {
+	for _, s := range arr {
+		if s == val {
+			return true
+		}
+	}
+	return false
+}
+
+func mostSimilar(val string, arr []string) string {
+	maxScore := -1000.0
+	maxVal := ""
+	for _, s := range arr {
+		similarity := strutil.Similarity(val, s, metrics.NewLevenshtein())
+		if similarity > maxScore {
+			maxVal = s
+			maxScore = similarity
+		}
+	}
+
+	return maxVal
+}
+
+// creates a copy
+func (lockFile LockFile) CorrectSpecialCharacters() LockFile {
+	newPkgs := []Package{}
+	names := []string{}
+	for _, pkg := range lockFile.Package {
+		names = append(names, pkg.Name)
+	}
+
+	for _, pkg := range lockFile.Package {
+		newDeps := map[string]interface{}{}
+		for d, _ := range pkg.Dependencies {
+			name := d
+			if !contains(d, names) {
+				name = mostSimilar(d, names)
+			}
+			newDeps[name] = nil
+		}
+		newPkgs = append(newPkgs, Package{
+			Name:         pkg.Name,
+			Version:      pkg.Version,
+			Dependencies: newDeps,
+		})
+	}
+
+	return LockFile{
+		Package: newPkgs,
 	}
 }
 

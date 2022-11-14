@@ -1,6 +1,8 @@
 package poetry
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"path/filepath"
@@ -18,7 +20,16 @@ func verifyPoetryDependency() {
 
 func getPoetryLockFile(path string) LockFile {
 	var lf LockFile
-	_, err := toml.DecodeFile(filepath.Join(path, "poetry.lock"), &lf)
+	_, err := ioutil.ReadFile(filepath.Join(path, "poetry.lock"))
+	if err != nil {
+		fmt.Println("poetry.lock file is missing. Generating...")
+		cmd := exec.Command("poetry", "install")
+		err := cmd.Run()
+		if err != nil {
+			log.Fatal("failed to generate poetry lockfile")
+		}
+	}
+	_, err = toml.DecodeFile(filepath.Join(path, "poetry.lock"), &lf)
 	if err != nil {
 		log.Fatal("failed to parse poetry.lock")
 	}

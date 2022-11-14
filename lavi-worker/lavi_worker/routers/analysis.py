@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from lavi_worker.routers import api_models
+from lavi_worker import utils
 
 router = APIRouter(tags=["analysis"])
 
