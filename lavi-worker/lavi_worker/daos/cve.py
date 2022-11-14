@@ -1,3 +1,5 @@
+import psycopg
+
 from typing import List
 
 from attrs import define
@@ -23,6 +25,7 @@ class CVE:
     pkg_name: str
     pkg_vers: str
     univ_hash: str
+    first_patched_vers: str | None
 
 
 async def create(
@@ -35,33 +38,38 @@ async def create(
     repo_name: str,
     pkg_name: str,
     pkg_vers: str,
-) -> None:
-    """Create a CVE object in the database, return nothing if successful."""
+    first_patched_vers: str | None,
+) -> bool:
+    """Create a CVE object in the database"""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
-    # TODO: check that row doesn't already exist OR catch resultant psycopg3 err
     async with tx.cursor() as cur:
-        await cur.execute(
-            """
-                INSERT INTO cves
-                VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """,
-            (
-                cve_id,
-                severity,
-                description,
-                cwe,
-                url,
-                repo_name,
-                pkg_name,
-                pkg_vers,
-                univ_hash,
-            ),
-        )
+        try:
+            await cur.execute(
+                """
+                    INSERT INTO cves
+                    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    cve_id,
+                    severity,
+                    description,
+                    cwe,
+                    url,
+                    repo_name,
+                    pkg_name,
+                    pkg_vers,
+                    univ_hash,
+                    first_patched_vers,
+                ),
+            )
+            return True
+        except psycopg.errors.lookup("23505"):  # UniqueViolation
+            print("Entry in cves already exists", repo_name, pkg_name, pkg_vers, cve_id)
+            return False
 
 
 async def delete(tx: Transaction, cve: CVE) -> None:
     """Delete the given CVE from the db."""
-    # TODO: assert the entry exists in the db before deleting
     async with tx.cursor() as cur:
         await cur.execute(
             "DELETE FROM cves WHERE cve_id = %s OR univ_hash = %s",
@@ -81,6 +89,19 @@ async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[CVE]:
 
     # Parse output into objects, return
     return [CVE(*raw_cve) for raw_cve in raw_cves]
+
+
+async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[str]:
+    """Find by the universal hash string."""
+    # Query the database
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT pkg_vers FROM cves WHERE pkg_name = %s AND repo_name = %s",
+            (pkg_name, repo_name),
+        )
+        versions = await cur.fetchall()
+
+    return [version[0] for version in versions]
 
 
 async def find_by_repo_pkg_vers(

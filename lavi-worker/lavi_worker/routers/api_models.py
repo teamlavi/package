@@ -6,6 +6,10 @@ from pydantic import BaseModel
 from lavi_worker.utils import RepoEnum
 
 
+class InsertTreeData(BaseModel):
+    fill_me_up: str
+
+
 class DeleteVulnRequest(BaseModel):
     repo_name: str
     pkg_name: str
@@ -38,8 +42,40 @@ class FindVulnRequest(BaseModel):
         }
 
 
+class FindVulnVersRequest(BaseModel):
+    repo: RepoEnum
+    package: str
+
+
 class FindVulnResponse(BaseModel):
     vulns: List[str]  # List of CVE id strings
+
+
+class FindVulnVersResponse(BaseModel):
+    vers: List[str]  # List of vulnerable versions
+
+
+class PackageVers(BaseModel):
+    repo_name: str
+    pkg_name: str
+    major_vers: int
+    minor_vers: int
+    patch_vers: int
+    num_downloads: int
+    s3_bucket: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "repo_name": "test",
+                "pkg_name": "test",
+                "major_vers": 1,
+                "minor_vers": 1,
+                "patch_vers": 1,
+                "num_downloads": 0,
+                "s3_bucket": "0",
+            }
+        }
 
 
 class FindVulnsIdListRequest(BaseModel):
@@ -50,6 +86,7 @@ class CveResponse(BaseModel):
     cveId: str
     severity: str | None
     url: str
+    title: str
 
 
 class FindVulnsIdListResponse(BaseModel):
@@ -65,6 +102,7 @@ class InsertVulnRequest(BaseModel):
     severity: str | None = None
     description: str | None = None
     cwe: str | None = None
+    first_patched_vers: str | None = None
 
     class Config:
         schema_extra = {
