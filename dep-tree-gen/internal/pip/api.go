@@ -82,7 +82,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	reader := bufio.NewReader(stdout)
 	line, err := reader.ReadString('\n')
 	for err == nil {
-		fmt.Println(line)
+		fmt.Print(line)
 		line, err = reader.ReadString('\n')
 	}
 	if err != nil && !errors.Is(err, io.EOF) {
