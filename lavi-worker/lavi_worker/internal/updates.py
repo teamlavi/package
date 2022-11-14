@@ -55,7 +55,7 @@ async def initialize_database() -> None:
     # Build the tables
     async with await get_db_tx() as tx:
         async with tx.cursor() as cur:
-            if not is_table_initialized("cves"):
+            if not await is_table_initialized("cves"):
                 await cur.execute(
                     """
                         CREATE TABLE cves (
@@ -74,7 +74,7 @@ async def initialize_database() -> None:
                             ADD CONSTRAINT unique_sha_cve UNIQUE (cve_id, univ_hash);
                             """,
                 )
-            if not is_table_initialized("package"):
+            if not await is_table_initialized("package"):
                 await cur.execute(
                     """
                         CREATE TABLE package (
@@ -89,7 +89,7 @@ async def initialize_database() -> None:
                          );
                      """,
                 )
-            if not is_table_initialized("dependencies"):
+            if not await is_table_initialized("dependencies"):
                 await cur.execute(
                     """
                     CREATE TABLE dependencies (
@@ -370,7 +370,7 @@ async def scrape_vulnerabilities() -> None:
 
             query = (
                 """
-            {"""
+                {"""
                 + query_type
                 + """
                {
