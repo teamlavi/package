@@ -4,7 +4,6 @@ import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"lavi/internal"
 	"lavi/internal/vulnerabilities"
@@ -22,12 +21,6 @@ func getCds(cmd *cobra.Command, gen generator.RepositoryTreeGenerator) models.CD
 	return cds
 }
 
-func display(cds models.CDS, vulns map[string][]vulnerabilities.Vulnerability) {
-	fmt.Printf("package repository: %s\n", cds.Repository)
-	fmt.Printf("total dependencies checked: %d\n", len(cds.Nodes))
-	fmt.Println("this will show more eventually")
-}
-
 // post command function to run AFTER a command has succesfully run
 func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
 	write, _ := cmd.Flags().GetBool("write")
@@ -38,8 +31,9 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 
 	if !noScan {
 		results := vulnerabilities.Scan(cds)
-		clean := vulnerabilities.ConvertToCleanResponse(results)
-		display(cds, clean)
+		clean = vulnerabilities.ConvertToCleanResponse(results)
+
+		display(cds, results)
 	}
 
 	if write {
