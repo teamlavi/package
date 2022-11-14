@@ -29,3 +29,13 @@ workers:
   - name: db-sync-trees
     replicas: 1
     subcommand: db-sync-trees
+
+workerCrons:
+  - name: dud
+    repo: dud
+
+  - name: npm
+    repo: npm
+
+  - name: pip
+    repo: pip

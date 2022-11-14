@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   labels:
     {{- include "repo-worker.baseLabels" $ | nindent 4 }}
-    app.kubernetes.io/component: worker-list-versions
+    app.kubernetes.io/component: {{ $v.name }}
   name: {{ printf "%s-%s" (include "repo-worker.fullname" $) $v.name }}
 spec:
   replicas: {{ $v.replicas }}
