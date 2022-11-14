@@ -86,7 +86,8 @@ class CveResponse(BaseModel):
     cveId: str
     severity: str | None
     url: str
-    title: str
+    title: str | None
+    patched_in: str | None
 
 
 class FindVulnsIdListResponse(BaseModel):
