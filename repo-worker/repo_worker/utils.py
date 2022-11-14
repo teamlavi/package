@@ -11,7 +11,7 @@ class TreeNode(object):
         repo: str,
         package: str,
         version: str,
-        children: List[TreeNode] | None = None,
+        children: List[TreeNode] = [],
     ):
         """Build a tree node given a hash and children."""
         self.repo = repo

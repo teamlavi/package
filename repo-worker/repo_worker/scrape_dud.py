@@ -7,17 +7,19 @@ class DudScraper(object):
     """A scraper for the dud repository."""
 
     @staticmethod
-    def list_packages(repo: str) -> List[str]:
+    def list_packages(repo: str, limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
         return ["mypkg1", "mypkg2", "mypkg3", "mypkg4"]
 
     @staticmethod
-    def list_package_versions(repo: str, package: str) -> List[str]:
+    def list_package_versions(
+        repo: str, package: str, limit: int | None = None
+    ) -> List[str]:
         """Given a repository and package, return a list of available versions."""
         return ["1.2.3", "1.2.4", "1.2.5"]
 
     @staticmethod
-    def generate_dependency_tree(repo, package, version) -> TreeNode:
+    def generate_dependency_tree(repo: str, package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
         # Just make a lil diamond-shaped tree
         root = TreeNode(repo, package, version)

@@ -9,24 +9,29 @@ from repo_worker.utils import TreeNode
 
 class RepoScraper(Protocol):
     @staticmethod
-    def list_packages(repo: str) -> List[str]:
+    def list_packages(repo: str, limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
+        ...
 
     @staticmethod
-    def list_package_versions(repo: str, package: str) -> List[str]:
+    def list_package_versions(
+        repo: str, package: str, limit: int | None = None
+    ) -> List[str]:
         """Given a repository and package, return a list of available versions."""
+        ...
 
     @staticmethod
-    def generate_dependency_tree(repo, package, version) -> TreeNode:
+    def generate_dependency_tree(repo: str, package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
+        ...
 
 
 supported_repos: Dict[str, RepoScraper] = {
-    "dud": DudScraper,
+    "dud": DudScraper(),
 }
 
 
-def parse_cmd_args():
+def parse_cmd_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     # Main parser
     parser = argparse.ArgumentParser(prog="entrypoint")
@@ -39,9 +44,7 @@ def parse_cmd_args():
     list_packages.add_argument("-r", "--repo", action="store", required=True)
 
     # list-package-versions subcommand - List versions a stream of (repo, package)
-    subparsers.add_parser(
-        "list-package-versions", help="list-package-versions help"
-    )
+    subparsers.add_parser("list-package-versions", help="list-package-versions help")
 
     # generate-tree subcommand - Generate a conflict-free dep tree given all data
     subparsers.add_parser("generate-tree", help="generate-tree help")
