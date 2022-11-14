@@ -15,11 +15,11 @@ redis:
 
 workers:
   - name: list-versions
-    replicas: 2
+    replicas: 1
     subcommand: list-package-versions
 
   - name: generate-trees
-    replicas: 2
+    replicas: 1
     subcommand: generate-tree
 
   - name: db-sync-versions
