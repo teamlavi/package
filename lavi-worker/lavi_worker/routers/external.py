@@ -33,7 +33,7 @@ async def find_vulnerable_versions(
         find_vuln_vers_request.repo,
         find_vuln_vers_request.package,
     )
-    print("empty" if not versions else type(versions[0]))
+
     # Format response
     return api_models.FindVulnVersResponse(vers=versions)
 
