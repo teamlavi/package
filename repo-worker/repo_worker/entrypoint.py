@@ -3,7 +3,7 @@
 import argparse
 import logging
 
-from repo_worker import cli_funcs
+from repo_worker import cli_funcs, redis_funcs
 from repo_worker.config import REQUIRED_ENV_FOR_REDIS
 from repo_worker.scrapers import repo_scrapers
 
@@ -100,6 +100,23 @@ def main() -> None:
     elif args.mode == "redis":
         # Runs list-packages once, or the other commands on loop
         logging.info("Running in redis mode")
+
+        # Redis list-packages command
+        if args.command == "list-packages":
+            if args.repo not in repo_scrapers:
+                raise Exception(f"Unrecognized repository: {args.repo}")
+            logging.info("Running redis-mode list-packages")
+            redis_funcs.list_packages(args.repo)
+
+        # Redis list-package-versions command
+        if args.command == "list-package-versions":
+            logging.info("Running redis-mode list-package-versions")
+            redis_funcs.list_package_versions()
+
+        # Redis generate-tree command
+        if args.command == "generate-tree":
+            logging.info("Running redis-mode generate-tree")
+            redis_funcs.generate_tree()
 
     else:
         raise Exception(f"Unrecognized execution mode: {args.mode}")
