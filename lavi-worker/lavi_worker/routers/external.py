@@ -1,4 +1,3 @@
-from matplotlib.pyplot import title
 from fastapi import APIRouter
 
 from lavi_worker.internal import queries
