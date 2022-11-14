@@ -348,6 +348,10 @@ async def scrape_pip_versions(pkg_name:str) -> None :
 
 
 async def scrape_pip_packages() -> None:
+    # hardcode list to scrape
+    for pkg_name in ["arches"]:
+        await scrape_pip_versions(pkg_name)
+    return
     client = httpx.Client(follow_redirects=True)
     page = client.get("https://pypi.org/simple")  # Getting page HTML through request
     # print(page.text)
@@ -363,9 +367,7 @@ async def scrape_pip_packages() -> None:
         except Exception:
             pass
 
-    # hardcode list to scrape
-    for pkg_name in ["numpy"]:
-        await scrape_pip_versions(pkg_name)
+
 
 
 async def scrape_npm_versions(pkg_name: str) -> None:
