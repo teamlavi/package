@@ -254,16 +254,18 @@ async def scrape_pip_packages() -> None:
     stringHelper = page.text.replace(" ", "")
     links = stringHelper.split("\n")
     for pkg_name in links[7:100]:  # -2 for this
-        pkg_name = pkg_name[(pkg_name.find(">") + 1) : pkg_name.rfind("<")]
         try:
-            package = package[package.find('>') + 1:package.rfind('<')]
-            page2 = f'https://pypi.org/pypi/{package}/json'
+            pkg_name = pkg_name[pkg_name.find('>') + 1:pkg_name.rfind('<')]
+            page2 = f'https://pypi.org/pypi/{pkg_name}/json'
 
             versions = json.loads(client.get(page2).text)['releases']
             dependencies = json.loads(client.get(page2).text)['info']['requires_dist']
             version_list = []
 
+            print("!" +  pkg_name)
             try:
+
+                print("!" +  pkg_name)
                 for key in versions:
                     versionHelper = key.split(".")
                     if len(versionHelper) == 2:
@@ -272,16 +274,14 @@ async def scrape_pip_packages() -> None:
 
                     if(len(versionHelper) == 3):
                         await insert_single_package_version(
-                            "pip", str(package.lower()), int(versionHelper[0]), int(versionHelper[1]), int(versionHelper[2])
+                            "pip", str(pkg_name.lower()), int(versionHelper[0]), int(versionHelper[1]), int(versionHelper[2])
                         )
-                        count += 1
-                        countSuccess += 1
                     else:
-                        count += 1
+                        pass
             except:
-                count +=1
+                pass
         except:
-            count += 1
+            pass
 
 
 async def scrape_npm_packages() -> None:
