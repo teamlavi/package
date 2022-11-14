@@ -6,3 +6,7 @@ build:
     - repo-worker-ctr
 valueFiles:
   - values.yaml
+values:
+  image:
+    repository: ${modules.repo-worker-ctr.outputs.deployment-image-name}
+    tag: ${modules.repo-worker-ctr.version}

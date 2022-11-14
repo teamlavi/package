@@ -14,15 +14,14 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{- define "repo-worker.selectorLabels" -}}
+{{- define "repo-worker.baseSelectorLabels" -}}
 app.kubernetes.io/name: {{ include "repo-worker.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: api
 {{- end }}
 
-{{- define "repo-worker.labels" -}}
+{{- define "repo-worker.baseLabels" -}}
 helm.sh/chart: {{ include "repo-worker.chart" . }}
-{{ include "repo-worker.selectorLabels" . }}
+{{ include "repo-worker.baseSelectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}

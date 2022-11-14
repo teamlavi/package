@@ -1,0 +1,43 @@
+{{- range $v := .Values.workers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "repo-worker.baseLabels" $ | nindent 4 }}
+    app.kubernetes.io/component: worker-list-versions
+  name: {{ printf "%s-%s" (include "repo-worker.fullname" $) $v.name }}
+spec:
+  replicas: {{ $v.replicas }}
+  selector:
+    matchLabels:
+      {{- include "repo-worker.baseSelectorLabels" $ | nindent 6}}
+      app.kubernetes.io/component: {{ $v.name }}
+  template:
+    metadata:
+      labels:
+        {{- include "repo-worker.baseSelectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $v.name }}
+    spec:
+      containers:
+        - args:
+            - "repo_worker/entrypoint.py"
+            - "--mode=redis"
+            - {{ $v.subcommand }}
+          command: ["python3"]
+          env:
+            - name: REDIS_HOST
+              value: {{ printf "%s.%s.svc.cluster.local" (include "repo-worker.redisFullname" $) $.Release.Namespace }}
+            - name: REDIS_PORT
+              value: "6379"
+            - name: LAVI_API_URL
+              value: {{ printf "http://lavi-worker.%s.svc.cluster.local" $.Release.Namespace }}
+            - name: GH_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: {{ $.Values.ghAccessToken.secretKey }}
+                  name: {{ $.Values.ghAccessToken.secretName }}
+          image: {{ printf "%s:%s" $.Values.image.repository $.Values.image.tag | quote }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: worker
+---
+{{- end }}
