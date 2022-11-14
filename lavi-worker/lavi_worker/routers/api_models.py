@@ -111,3 +111,33 @@ class InsertVulnRequest(BaseModel):
                 "cwe": None,
             }
         }
+
+#analysis.py Models:
+
+class AffectedCountResponse(BaseModel):
+    pkgsAffected: Dict[str, int]  #CVE id -> Number of packages affected
+
+class CountResponse(BaseModel):
+    count: int #Total number of packages in LAVI database
+
+class CountDepResponse(BaseModel):
+    depList: Dict[str, int] #package id -> Number of dependencies for this package
+
+class CountVulResponse(BaseModel):
+    vulCount: int #Total number of Vulnerabilities found in the packages in our database
+
+class DepthResponse(BaseModel):
+    vulDepth: Dict[str, int] #CVE id -> Vulnerability depth from root package
+
+class NumDownloadsResponse(BaseModel):
+    downloads: Dict[str, int] #Package id -> Number of package downloads
+
+class SeveritiesResponse(BaseModel):
+    sevList: Dict[str, str] #Vulnerable package id -> CVE Serverity type
+
+class TypesResponse(BaseModel):
+    cweList: Dict[str, int] #CWE id -> how many Vulnerabilities for this CWE
+
+class VulPackagesResponse(BaseModel):
+    vulList: List[str] #List of all the package ids that are vulnerable in our database
+
