@@ -28,8 +28,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("write", "w", false, "Write tree to a file")
 	rootCmd.PersistentFlags().Bool("write-with-vulns", false, "When used with write, will include vulnerabilities in written tree")
 	rootCmd.PersistentFlags().BoolP("show", "s", false, "Show ui")
-	rootCmd.PersistentFlags().String("package", "", "Run lavi on a single package. If provided along with version, will default to running in single package mode")
-	rootCmd.PersistentFlags().String("version", "", "Run lavi on a single package. If provided along with package, will default to running in single package mode")
+	rootCmd.PersistentFlags().String("package", "", "Run lavi on a single package. If provided along with version, will default to running in single package mode. This will also disable the ui if flag is provided")
+	rootCmd.PersistentFlags().String("version", "", "Run lavi on a single package. If provided along with package, will default to running in single package mode. This will also disable the ui if flag is provided")
 	rootCmd.PersistentFlags().Bool("no-scan", false, "Ignore scanning the tree for vulnerabilities and only create the dependency tree")
 
 	rootCmd.PersistentFlags().Bool("critical", false, "Only show critical severity vulnerabilities. Can be used alongside [--high, --medium, --low]")

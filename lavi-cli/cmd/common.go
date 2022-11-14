@@ -4,6 +4,7 @@ import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"lavi/internal"
 	internalModels "lavi/internal/models"
@@ -24,6 +25,11 @@ func getCds(cmd *cobra.Command, gen generator.RepositoryTreeGenerator) models.CD
 
 // post command function to run AFTER a command has succesfully run
 func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator) {
+	pkg, version := getPackageAndVersion(cmd)
+	singlePkg := false
+	if pkg != "" && version != "" {
+		singlePkg = true
+	}
 	write, _ := cmd.Flags().GetBool("write")
 	show, _ := cmd.Flags().GetBool("show")
 	noScan, _ := cmd.Flags().GetBool("no-scan")
@@ -40,7 +46,7 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 	}
 
 	if write {
-		fileData := []byte{}
+		var fileData []byte
 		if writeWithVulns {
 			fileData, _ = json.MarshalIndent(addVulnsToCds(cds, results), "", " ")
 		} else {
@@ -50,8 +56,10 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 		_ = ioutil.WriteFile("cds.json", fileData, 0644)
 	}
 
-	if show {
+	if show && !singlePkg {
 		internal.Serve(cmd, cds, gen, clean)
+	} else if show && singlePkg {
+		fmt.Println("WARNING: Running lavi in single package mode will disable the ui")
 	}
 }
 
