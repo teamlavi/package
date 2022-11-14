@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 func BackupFile(filename string) string {
-	newName := "lavi-backup-" + filename
+	newName := "lavi-backup-" + uuid.NewString() + "-" + filename
 	if err := os.Rename(filename, newName); err != nil && !os.IsNotExist(err) {
 		log.Fatal(fmt.Sprintf("failed to backup %s as %s", filename, newName))
 	} else if os.IsNotExist(err) {
