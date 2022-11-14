@@ -185,6 +185,19 @@ async def insert_single_dependency_tree(
         )
 
 
+async def get_single_dependency_tree(
+    repo_name: str, pkg_name: str, pkg_vers: str
+) -> str:
+    """Insert a single vulnerability into the db."""
+    async with await get_db_tx() as tx:
+        return await dependencies.find_tree(
+            tx=tx,
+            repo_name=repo_name,
+            pkg_name=pkg_name,
+            pkg_vers=pkg_vers,
+        )
+
+
 async def insert_single_package_version(
     repo_name: str,
     pkg_name: str,

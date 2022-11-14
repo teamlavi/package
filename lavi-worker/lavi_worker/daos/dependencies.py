@@ -38,6 +38,31 @@ async def create(
         )
 
 
+async def find_tree(
+    tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
+) -> str:
+    univ_hash = generate_universal_hash(
+        repo_name,
+        pkg_name,
+        pkg_vers,
+    )
+    # TODO error catch
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT pkg_dependencies from dependencies
+                WHERE univ_hash=%s
+            """,
+            (univ_hash,),
+        )
+        row = await cur.fetchone()
+        if isinstance(row, tuple):
+            return row[0]
+        else:
+            # TODO: what to return
+            return ""
+
+
 async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM dependencies")
