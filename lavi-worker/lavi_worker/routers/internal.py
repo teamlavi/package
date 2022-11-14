@@ -1,5 +1,9 @@
+from base64 import b64decode
+from typing import Dict, List
+
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
+import orjson
 
 from lavi_worker.internal import updates
 from lavi_worker.routers import api_models
@@ -81,7 +85,24 @@ async def get_database_initialized() -> str:
 
 
 @router.get("/database/size", response_class=PlainTextResponse)
-async def get_database_size(table: str = "cves") -> str:
+async def get_table_size(table: str = "cves") -> str:
     """Get the size of the database."""
-    size = await updates.database_size(table=table)
+    size = await updates.table_size(table=table)
     return str(size)
+
+
+@router.post("/insert_tree")
+async def insert_tree(
+    tree: api_models.InsertTreeData,
+    repo: str,
+    package: str,
+    major_vers: str,
+    minor_vers: str,
+    patch_vers: str,
+) -> Response:
+    """Insert a tree into the database"""
+    unpacked: Dict[str, List[str]] 
+    unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
+    print(f"Got tree with {len(unpacked)} nodes")
+    # TODO put in db
+    return Response(status_code=200)
