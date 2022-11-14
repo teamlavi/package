@@ -1,0 +1,6 @@
+lavi-cli/**/node_modules
+lavi-cli/archives
+
+# ignore everything in the ui except for the go file
+lavi-cli/**/ui/*
+!lavi-cli/**/ui/embed.go

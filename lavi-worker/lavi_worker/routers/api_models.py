@@ -9,6 +9,10 @@ from lavi_worker.utils import LevelEnum
 from lavi_worker.utils import StatusEnum
 from lavi_worker.utils import ResponseEnum
 
+class InsertTreeData(BaseModel):
+    tree: str
+
+
 class DeleteVulnRequest(BaseModel):
     repo_name: str
     pkg_name: str
@@ -85,6 +89,8 @@ class CveResponse(BaseModel):
     cveId: str
     severity: str | None
     url: str
+    title: str | None
+    patched_in: str | None
 
 
 class FindVulnsIdListResponse(BaseModel):
@@ -100,6 +106,7 @@ class InsertVulnRequest(BaseModel):
     severity: str | None = None
     description: str | None = None
     cwe: str | None = None
+    first_patched_vers: str | None = None
 
     class Config:
         schema_extra = {

@@ -8,7 +8,7 @@ from lavi_worker.utils import generate_universal_hash
 class PACKAGE:
     repo_name: str
     pkg_name: str
-    pkg_vers_id: str
+    univ_hash: str
     major_vers: int
     minor_vers: int
     patch_vers: int

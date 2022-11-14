@@ -1,0 +1,41 @@
+ghAccessToken:
+  secretKey: ghAccessToken
+  secretName: gh-access-token
+
+image:
+  pullPolicy: Always
+  repository:
+  tag:
+
+redis:
+  image:
+    pullPolicy: Always
+    repository: docker.io/redis
+    tag: "7.0.5"
+
+workers:
+  - name: list-versions
+    replicas: 1
+    subcommand: list-package-versions
+
+  - name: generate-trees
+    replicas: 1
+    subcommand: generate-tree
+
+  - name: db-sync-versions
+    replicas: 1
+    subcommand: db-sync-versions
+
+  - name: db-sync-trees
+    replicas: 1
+    subcommand: db-sync-trees
+
+workerCrons:
+  - name: dud
+    repo: dud
+
+  - name: npm
+    repo: npm
+
+  - name: pip
+    repo: pip

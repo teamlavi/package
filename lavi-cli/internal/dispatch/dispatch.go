@@ -52,7 +52,10 @@ func RunCommand(cmd *exec.Cmd, function *Function) {
 	if err != nil && !errors.Is(err, io.EOF) {
 		panic(err)
 	}
-	cmd.Wait()
+	if err = cmd.Wait(); err != nil {
+		function.StdoutString += "Failed to install selected changes. Are you sure the package and version name combinations are correct?\r\n"
+		panic(err)
+	}
 }
 
 // dispatches a goroutine thread that can be identified by the id returned
@@ -103,8 +106,9 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		all := []vulnerabilities.BatchVulnerabilityResponse{}
 		c := 0
 		for i := 0; i < len(pkgIds); i += 100 {
-			all = append(all, vulnerabilities.ScanSet(pkgIds[i:i+100]))
-			c += 100
+			slice, count := vulnerabilities.GrabSlice(i, i+100, pkgIds)
+			all = append(all, vulnerabilities.ScanSet(slice))
+			c += count
 			if c > len(pkgIds) {
 				c = len(pkgIds)
 			}
