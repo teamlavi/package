@@ -14,13 +14,13 @@ type LockFile struct {
 type Package struct {
 	Name         string
 	Version      string
-	Dependencies map[string]string
+	Dependencies map[string]interface{}
 }
 
 type Pyproject struct {
 	Tool struct {
 		Poetry struct {
-			Dependencies map[string]string
+			Dependencies map[string]interface{}
 		}
 	}
 }

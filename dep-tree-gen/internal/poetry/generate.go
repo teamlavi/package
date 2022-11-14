@@ -1,6 +1,7 @@
 package poetry
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +21,7 @@ func getPoetryLockFile(path string) LockFile {
 	var lf LockFile
 	_, err := toml.DecodeFile(filepath.Join(path, "poetry.lock"), &lf)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal("failed to parse poetry.lock")
 	}
 
