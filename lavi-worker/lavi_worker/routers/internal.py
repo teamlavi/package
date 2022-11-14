@@ -103,5 +103,6 @@ async def insert_tree(
     """Insert a tree into the database"""
     unpacked: Dict[str, List[str]] 
     unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
-    print(f"LOOK HERE DUMMY {unpacked}")
+    print(f"Got tree with {len(unpacked)} nodes")
+    # TODO put in db
     return Response(status_code=200)
