@@ -54,6 +54,7 @@ class PipScraper(object):
     def generate_dependency_tree(package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
         cmd = f'lavi poetry --package="{package}" --version="{version}" --no-scan -w'
+        # TODO if poetry fails try running with pip
         result = os.popen(cmd).read()
         print(result)
         if "open poetry.lock: no such file or directory" in result:
