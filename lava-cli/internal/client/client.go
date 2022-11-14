@@ -4,6 +4,6 @@ package client
 type Client struct {
 }
 
-func (c *Client) CheckStatus(taskId string) {
+func (c *Client) CheckStatus(jobId string) {
 
 }
