@@ -1,6 +1,7 @@
 from typing import List
 
 from repo_worker.utils import TreeNode
+from repo_worker.utils import generate_dependency_tree
 import os
 import json
 
@@ -50,12 +51,9 @@ class NpmScraper(object):
     @staticmethod
     def generate_dependency_tree(package: str, version: str) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
-        # TODO: install lavi-cli
-        for pkg_name in ["lodash"]:
-            pkg_vers = await get_most_recent_vers("npm", pkg_name)
-            cmd = f'lavi npm --package="{pkg_name}" --version="{pkg_vers}" -w'
-            request = os.popen(cmd).read()
-            print(request)
-            with open("cds.json") as f:
-                print(f.read())
-                await insert_single_dependency_tree("npm", pkg_name, pkg_vers, f.read())
+
+        cmd = f'lavi npm --package="{package}" --version="{version}" --no-scan -w'
+        os.popen(cmd).read()
+        with open("cds.json") as f:
+            cds = json.loads(f.read())
+        return generate_dependency_tree(cds)

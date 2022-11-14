@@ -94,3 +94,23 @@ def get_recent_version(versions: List[str]) -> str:
         raise Exception(f"Highest version {highest} not in set {versions}")
 
     return highest
+
+
+def generate_dependency_tree(cds: dict):
+    def get_node(cds: dict, univ_hash: str) -> TreeNode:
+        """recursive function to generate tree"""
+        cds_nodes = cds["nodes"]
+        node_data = cds_nodes[univ_hash]
+        children_list = node_data["dependencies"]
+        # has children, generate them first
+        children_node_list: List[TreeNode] = []
+        for child_id in children_list:
+            children_node_list.append(get_node(cds, child_id))
+        return TreeNode(
+            cds["repository"],
+            node_data["package"],
+            node_data["version"],
+            children_node_list,
+        )
+
+    return get_node(cds, cds["root"]["dependencies"][0])
