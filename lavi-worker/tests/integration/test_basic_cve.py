@@ -45,7 +45,6 @@ TEST_VULN_CHECK = {
     "repo": TEST_VULN["repo_name"],
     "package": TEST_VULN["pkg_name"],
     "version": TEST_VULN["pkg_vers"],
-    "title": TEST_VULN["description"]
 }
 
 
