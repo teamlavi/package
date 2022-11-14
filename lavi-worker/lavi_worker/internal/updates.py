@@ -244,7 +244,8 @@ async def vers_range_to_list(
         # return results inbetween edges
         return [vers for vers in lower_list if vers in upper_list]
 
-    while not vers_range[vers_range.index(" ")+1:].replace(".", "").isnumeric():
+    vri = vers_range.index(" ") + 1
+    while not vers_range[vri:].replace(".", "").isnumeric():
         # TODO maybe another way to handle?
         # drop version extension
         vers_range = vers_range[:-1]
@@ -259,7 +260,7 @@ async def vers_range_to_list(
 
     if vers_range.count(".") != 2:
         if vers_range[-2:] == ".0":
-            return vers_range_to_list(repo_name, pkg_name, vers_range[:-2])
+            return await vers_range_to_list(repo_name, pkg_name, vers_range[:-2])
         # TODO some releases have 4 version numbers
         print("EDGE CASE TO HANDLE", repo_name, pkg_name, vers_range)
         return []
@@ -320,7 +321,7 @@ async def vers_range_to_list(
         return []
 
 
-async def scrape_pip_versions(pkg_name:str) -> None :
+async def scrape_pip_versions(pkg_name: str) -> None:
     page2 = f"https://pypi.org/pypi/{pkg_name}/json"
 
     versions = json.loads(httpx.get(page2).text)["releases"]
@@ -366,8 +367,6 @@ async def scrape_pip_packages() -> None:
             await scrape_pip_versions(pkg_name)
         except Exception:
             pass
-
-
 
 
 async def scrape_npm_versions(pkg_name: str) -> None:
