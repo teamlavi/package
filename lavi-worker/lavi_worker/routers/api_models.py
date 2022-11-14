@@ -117,7 +117,11 @@ class InsertVulnRequest(BaseModel):
 #LAVA Request
 class LavaRequest(BaseModel):
     repo: RepoEnum
-    
+    packages: List[str] | None  #Query with only a packages in list. Can optionally include a version number. If no version number is included, the most recent release will be used.
+    bound: int | None           #limit bound on how many results the user wants to display (ex: bound=5 would be the top 5 results)
+    minDownloads: int | None    #only include packages with minDownloads package downloads and above (inclusive)
+    level: LevelEnum | None     #include direct, indirect, or all vulnerabilities.Includes ALL by default if None
+    status StatusEnum | None    #include active, patched or all vulnerabilities. Includes only ACTIVE vulnerabilities by default if None
 
 #LAVA Responses
 class AffectedCountResponse(BaseModel):
