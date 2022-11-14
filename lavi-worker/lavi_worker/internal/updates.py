@@ -315,7 +315,7 @@ async def scrape_pip_packages() -> None:
     # print(page.text)
     stringHelper = page.text.replace(" ", "")
     links = stringHelper.split("\n")
-    for pkg_name in links[7:100]:  # -2 for this
+    for pkg_name in links[7:-2]:  # -2 for this
         try:
             # E203: formatter puts whitespace before : but flake8 doesn't want it
             pkg_name = pkg_name[
