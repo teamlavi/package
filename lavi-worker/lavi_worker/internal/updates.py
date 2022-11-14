@@ -251,7 +251,7 @@ async def vers_range_to_list(
 async def scrape_pip_packages() -> None:
     client = httpx.Client(follow_redirects=True)
     page = client.get('https://pypi.org/simple') # Getting page HTML through request
-    print(page.text)
+    #print(page.text)
     stringHelper = page.text.replace(" ", "")
     links = stringHelper.split('\n')
     count = 0
@@ -260,9 +260,7 @@ async def scrape_pip_packages() -> None:
 
         try:
             package = package[package.find('>') + 1:package.rfind('<')]
-            print(package)
             page2 = f'https://pypi.org/pypi/{package}/json'
-
 
             versions = json.loads(client.get(page2).text)['releases']
             dependencies = json.loads(client.get(page2).text)['info']['requires_dist']
@@ -271,14 +269,18 @@ async def scrape_pip_packages() -> None:
             try:
                 for key in versions:
                     versionHelper = key.split(".")
-                    if len(versionHelper) == 3:
-                        version_list.append(versionHelper)
-                    elif len(versionHelper) == 2:
+                    if len(versionHelper) == 2:
                         versionHelper.append('0')
                         version_list.append(versionHelper)
 
-                    count += 1
-                    countSuccess += 1
+                    if(len(versionHelper) == 3):
+                        await insert_single_package_version(
+                            "pip", str(package.lower()), int(versionHelper[0]), int(versionHelper[1]), int(versionHelper[2])
+                        )
+                        count += 1
+                        countSuccess += 1
+                    else:
+                        count += 1
             except:
                 count +=1
         except:
