@@ -15,14 +15,21 @@ def test_generate_universal_hash(repo: str, pkg: str, vers: str, expected: str) 
     assert out == expected
 
 
-def _trees_equal(tree1: Dict[str, List[str]], tree2: Dict[str, List[str]]) -> bool:
+def _assert_trees_equal(
+    tree1: Dict[str, List[str]], tree2: Dict[str, List[str]]
+) -> None:
     """Whether two trees are equivalent."""
-    return True
+    if (tree1_k := set(tree1.keys())) != (tree2_k := set(tree2.keys())):
+        raise Exception(f"Tree keys mismatch: {tree1_k} != {tree2_k}")
+
+    for node in tree1_k:
+        if (tree1_ck := set(tree1[node])) != (tree2_ck := set(tree2[node])):
+            raise Exception(f"Children mismatch for {node}: {tree1_ck} != {tree2_ck}")
 
 
 def test_tree_compression(tree: Dict[str, List[str]]) -> None:
     """Test that compression and decompression are consistent."""
     compressed = utils.compress_tree(tree)
     decompressed = utils.decompress_tree(compressed)
-    if not _trees_equal(tree, decompressed):
-        raise Exception(f"Tree Mismatch: {tree} -> {compressed} -> {decompressed}")
+    print(f"Tree Changes: {tree} -> {compressed} -> {decompressed}")
+    _assert_trees_equal(tree, decompressed)
