@@ -80,7 +80,7 @@ async def find_tree(
         )
         row = await cur.fetchone()
         if isinstance(row, tuple):
-            return row[0]  # type: ignore
+            return str(row[0])
         else:
             return None
 
@@ -96,7 +96,7 @@ async def find_tree_id(tx: Transaction, univ_hash: str) -> str | None:
         )
         row = await cur.fetchone()
         if isinstance(row, tuple):
-            return row[0]  # type: ignore
+            return str(row[0])
         else:
             return None
 
@@ -105,7 +105,7 @@ async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM dependencies")
         row = await cur.fetchone()
-        return row[0]  # type: ignore
+        return int(row[0])
 
 
 async def drop_all_rows(tx: Transaction) -> None:

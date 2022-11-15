@@ -80,11 +80,11 @@ def decompress_tree(compressed: str) -> Dict[str, List[str]]:
 
     tree: Dict[str, list[str]] = {node: [] for node in nodes}
     for dependency_str in lines[1:]:
-        parentStr: str
-        childrenStr: str
-        parentStr, childrenStr = dependency_str.split(">")
-        parent: str = nodes[int(parentStr)]  # get parent node
-        children: list[str] = childrenStr.split(",")
+        parent_index: str
+        children_indices: str
+        parent_index, children_indices = dependency_str.split(">")
+        parent: str = nodes[int(parent_index)]  # get parent node
+        children: list[str] = children_indices.split(",")
         children = [nodes[int(child)] for child in children]  # get children nodes
         tree[parent].extend(children)  # append children to parent dependencies
     return tree

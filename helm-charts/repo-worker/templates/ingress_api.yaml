@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- if .Values.ingress.prefix }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  {{- end }}
+  labels:
+    {{- include "repo-worker.baseLabels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  name: {{ include "repo-worker.fullname" . }}
+spec:
+  ingressClassName: {{ default "nginx" .Values.ingress.className | quote }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ include "repo-worker.fullname" . }}
+                port:
+                  number: 80
+            path: {{ printf "%s(/|$)(.*)" .Values.ingress.prefix }}
+            pathType: Prefix
+  tls:
+    - hosts:
+      - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+{{- end }}
