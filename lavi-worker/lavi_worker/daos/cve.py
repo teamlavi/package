@@ -166,9 +166,9 @@ async def get_cwe_severities(tx: Transaction, cwe: str) -> list[str] | None:
         return [severity[0] for severity in severities] if severities else None
 
 
-async def get_cwe_num_cves(tx: Transaction, cwe: str) -> int | None:
+async def get_cwe_num_cves(tx: Transaction, cwe: str) -> int:
     """Get the vulnerabilities with this cwe."""
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM cves WHERE cwe=%s", (cwe))
         num = await cur.fetchone()
-        return num[0] if num else None
+        return int(num[0]) if num else 0

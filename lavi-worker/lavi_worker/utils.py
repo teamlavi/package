@@ -1,4 +1,3 @@
-import json
 from base64 import b64encode
 from enum import Enum
 from hashlib import sha256
@@ -79,11 +78,13 @@ def decompress_tree(compressed: str) -> Dict[str, List[str]]:
     lines = compressed.split("\n")
     nodes = lines[0].split(",")  # list of nodes
 
-    tree = {node: [] for node in nodes}
+    tree: Dict[str, list[str]] = {node: [] for node in nodes}
     for dependency_str in lines[1:]:
-        parent, children = dependency_str.split(">")
-        parent = nodes[int(parent)]  # get parent node
-        children = children.split(",")
+        parentStr: str
+        childrenStr: str
+        parentStr, childrenStr = dependency_str.split(">")
+        parent: str = nodes[int(parentStr)]  # get parent node
+        children: list[str] = childrenStr.split(",")
         children = [nodes[int(child)] for child in children]  # get children nodes
         tree[parent].extend(children)  # append children to parent dependencies
     return tree

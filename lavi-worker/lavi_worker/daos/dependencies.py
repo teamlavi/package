@@ -80,7 +80,7 @@ async def find_tree(
         )
         row = await cur.fetchone()
         if isinstance(row, tuple):
-            return row[0]
+            return row[0]  # type: ignore
         else:
             return None
 
@@ -96,7 +96,7 @@ async def find_tree_id(tx: Transaction, univ_hash: str) -> str | None:
         )
         row = await cur.fetchone()
         if isinstance(row, tuple):
-            return row[0]
+            return row[0]  # type: ignore
         else:
             return None
 
