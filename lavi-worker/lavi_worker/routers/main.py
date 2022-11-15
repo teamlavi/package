@@ -7,7 +7,7 @@ import orjson
 
 from lavi_worker import config
 from lavi_worker.internal import updates
-from lavi_worker.routers import external, internal
+from lavi_worker.routers import analysis, external, internal
 
 
 # Create the app
@@ -27,6 +27,7 @@ set_json_dumps(json_dumps)
 set_json_loads(orjson.loads)
 
 # Add routers
+app.include_router(analysis.router, prefix="/analysis")
 app.include_router(external.router)
 app.include_router(internal.router, prefix="/internal")
 
