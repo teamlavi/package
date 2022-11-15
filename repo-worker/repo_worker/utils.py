@@ -3,7 +3,8 @@ from __future__ import annotations  # Postponed annotation evaluation, remove on
 from base64 import b64encode
 from hashlib import sha256
 import logging
-from typing import Dict, List, Tuple
+import signal
+from typing import Dict, List, Tuple, Any
 
 import orjson
 
@@ -115,3 +116,44 @@ def get_recent_version(versions: List[str]) -> str:
         raise Exception(f"Highest version {highest} not in set {versions}")
 
     return highest
+
+
+def generate_dependency_tree(
+    cds: Dict[str, Any],
+) -> TreeNode:
+    def get_node(
+        univ_hash: str,
+    ) -> TreeNode:
+        """recursive function to generate tree"""
+        cds_nodes = cds["nodes"]
+        node_data = cds_nodes[univ_hash]
+        children_list = node_data["dependencies"]
+        # has children, generate them first
+        children_node_list: List[TreeNode] = []
+        for child_id in children_list:
+            children_node_list.append(get_node(child_id))
+        return TreeNode(
+            cds["repository"],
+            node_data["package"],
+            node_data["version"],
+            children_node_list,
+        )
+
+    return get_node(cds["root"]["dependencies"][0])
+
+
+class timeout(object):
+    """Credit https://stackoverflow.com/users/205521/thomas-ahle."""
+
+    def __init__(self, seconds: int = 1):
+        self.seconds = seconds
+
+    def handle_timeout(self, signum: Any, frame: Any) -> None:
+        raise TimeoutError("Function timed out")
+
+    def __enter__(self) -> None:
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+        signal.alarm(0)

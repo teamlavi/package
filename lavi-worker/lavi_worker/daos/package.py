@@ -33,22 +33,27 @@ async def create(
         str(major_vers) + "." + str(minor_vers) + "." + str(patch_vers),
     )
     async with tx.cursor() as cur:
-        await cur.execute(
-            """
+        if await vers_exists(
+            tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers
+        ):
+            return
+        else:
+            await cur.execute(
+                """
                 INSERT INTO package
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """,
-            (
-                univ_hash,
-                repo_name,
-                pkg_name,
-                major_vers,
-                minor_vers,
-                patch_vers,
-                num_downloads,
-                s3_bucket,
-            ),
-        )
+                (
+                    univ_hash,
+                    repo_name,
+                    pkg_name,
+                    major_vers,
+                    minor_vers,
+                    patch_vers,
+                    num_downloads,
+                    s3_bucket,
+                ),
+            )
 
 
 async def get_vers_less_than_eql(
@@ -223,9 +228,9 @@ async def vers_exists(
     tx: Transaction,
     repo_name: str,
     pkg_name: str,
-    major_vers: str,
-    minor_vers: str,
-    patch_vers: str,
+    major_vers: str | int,
+    minor_vers: str | int,
+    patch_vers: str | int,
 ) -> bool:
     async with tx.cursor() as cur:
         await cur.execute(
