@@ -5,13 +5,21 @@ from typing import Dict, Tuple
 import httpx
 
 from repo_worker.config import LAVI_API_URL  # Only used if triggered
-from repo_worker.core.redis_wq import get_redis_wq
+from repo_worker.core.redis_wq import get_redis_wq, known_queue_sizes
 from repo_worker.scrapers import repo_scrapers
 from repo_worker.utils import get_recent_version, parse_version
 
 
+def refresh_queues() -> None:
+    """Refresh all the work queues with dropped tasks."""
+    wqs = [get_redis_wq(name) for name in known_queue_sizes]
+    for wq in wqs:
+        wq.refresh()
+
+
 def list_packages(repo: str) -> None:
     """Handle redis runs of list-packages."""
+    # Takes 1-5 seconds, but lease time unnecessary bc we're only using output queues
     scraper = repo_scrapers[repo]
     out_wq = get_redis_wq("to_list_versions")
 
@@ -24,7 +32,7 @@ def list_packages(repo: str) -> None:
     logging.info("Done inserting scraped package names")
 
 
-def list_package_versions(lease_time: int = 120) -> None:
+def list_package_versions(lease_time: int = 30) -> None:
     """Handle redis runs of list-package-versions."""
     in_wq = get_redis_wq("to_list_versions")
     out_versions_wq = get_redis_wq("to_insert_versions")
@@ -45,6 +53,8 @@ def list_package_versions(lease_time: int = 120) -> None:
                 logging.info("No versions to insert")
                 continue
 
+            in_wq.complete(item)
+
             logging.info(f"Inserting {len(versions)} scraped package versions")
             for version in versions:
                 out_versions_wq.insert((repo, package, version))
@@ -59,7 +69,7 @@ def list_package_versions(lease_time: int = 120) -> None:
             traceback.print_exc()
 
 
-def generate_tree(lease_time: int = 120) -> None:
+def generate_tree(lease_time: int = 300) -> None:
     """Handle redis runs of generate-tree."""
     in_wq = get_redis_wq("to_generate_tree")
     out_wq = get_redis_wq("to_insert_tree")
@@ -77,6 +87,8 @@ def generate_tree(lease_time: int = 120) -> None:
             scraper = repo_scrapers[repo]
             tree = scraper.generate_dependency_tree(package=package, version=version)
 
+            in_wq.complete(item)
+
             logging.info("Inserting tree")
             out_wq.insert((repo, package, version, tree.as_json_b64()))
             logging.info("Done inserting tree")
@@ -85,7 +97,7 @@ def generate_tree(lease_time: int = 120) -> None:
             traceback.print_exc()
 
 
-def db_sync_versions(lease_time: int = 120) -> None:
+def db_sync_versions(lease_time: int = 30) -> None:
     """Insert items from versions queue in lavi db."""
     in_wq = get_redis_wq("to_insert_versions")
 
@@ -117,11 +129,13 @@ def db_sync_versions(lease_time: int = 120) -> None:
             resp.raise_for_status()
             logging.info("Succesfully sent version to db")
 
+            in_wq.complete(item)
+
         except Exception:
             traceback.print_exc()
 
 
-def db_sync_trees(lease_time: int = 120) -> None:
+def db_sync_trees(lease_time: int = 30) -> None:
     """Insert items from trees queue in lavi db."""
     in_wq = get_redis_wq("to_insert_tree")
 
@@ -155,6 +169,8 @@ def db_sync_trees(lease_time: int = 120) -> None:
             )
             resp.raise_for_status()
             logging.info("Succesfully sent tree to db")
+
+            in_wq.complete(item)
 
         except Exception:
             traceback.print_exc()
