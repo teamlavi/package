@@ -9,6 +9,7 @@ from lavi_worker.utils import LevelEnum
 from lavi_worker.utils import StatusEnum
 from lavi_worker.utils import ResponseEnum
 
+
 class InsertTreeData(BaseModel):
     tree: str
 
@@ -122,51 +123,64 @@ class InsertVulnRequest(BaseModel):
             }
         }
 
-#analysis.py Models:
 
-#LAVA Request
+# analysis.py Models:
+
+# LAVA Request
 class LavaRequest(BaseModel):
     repo: RepoEnum
-    packages: List[str] | None  #Query with only a packages in list. Can optionally include a version number. If no version number is included, the most recent release will be used.
-    offset: int | None          #offset on how many results the user wants to skip(ex: offset=2 would skip the first 2 results)
-    limit: int | None           #limit on how many results the user wants to display (ex: limit=5 would only show the next 5 results)
-    minDownloads: int | None    #only include packages with minDownloads package downloads and above (inclusive)
-    level: LevelEnum | None     #include direct, indirect, or all vulnerabilities.Includes ALL by default if None
-    status: StatusEnum | None   #include active, patched or all vulnerabilities. Includes only ACTIVE vulnerabilities by default if None
+    packages: List[str] | None
+    offset: int | None
+    limit: int | None
+    minDownloads: int | None
+    level: LevelEnum | None
+    status: StatusEnum | None
 
-#LAVA Responses
 
-#GET Response
+# LAVA Responses
+
+# GET Response
 class LavaResponse(BaseModel):
-    status: ResponseEnum    #Options: complete, failure, or pending
-    error: str | None       #returns error message in case status=failure
-    result: Any             #If status=complete, will return job response. will be one of the responses below  
+    status: ResponseEnum  # Options: complete, failure, or pending
+    error: str | None  # returns error message in case status=failure
+    # If status=complete, will return job response. will be one of the responses below
+    result: Any
 
-#job finished successfully Responses
+
+# job finished successfully Responses
 class AffectedCountResponse(BaseModel):
-    pkgsAffected: Dict[str, int]  #CVE id -> Number of packages affected
+    pkgsAffected: Dict[str, int]  # CVE id -> Number of packages affected
+
 
 class CountResponse(BaseModel):
-    count: int #Total number of packages in LAVI database
+    count: int  # Total number of packages in LAVI database
+
 
 class CountDepResponse(BaseModel):
-    depList: Dict[str, int] #package id -> Number of dependencies for this package
+    depList: Dict[str, int]  # package id -> Number of dependencies for this package
+
 
 class CountVulResponse(BaseModel):
-    vulCount: int #Total number of Vulnerabilities found in the packages in our database
+    vulCount: int  # Total number of Vulns found in the packages in our database
+
 
 class DepthResponse(BaseModel):
-    vulDepth: Dict[str, int] #CVE id -> Vulnerability depth from root package
+    vulDepth: Dict[str, int]  # CVE id -> Vulnerability depth from root package
+
 
 class NumDownloadsResponse(BaseModel):
-    downloads: Dict[str, int] #Package id -> Number of package downloads
+    downloads: Dict[str, int]  # Package id -> Number of package downloads
+
 
 class SeveritiesResponse(BaseModel):
-    sevList: Dict[str, str] #Vulnerable package id -> CVE Serverity type
+    sevList: Dict[str, str]  # Vulnerable package id -> CVE Serverity type
+
 
 class TypesResponse(BaseModel):
-    cweList: Dict[str, int] #CWE id -> how many Vulnerabilities for this CWE
+    cweList: Dict[str, int]  # CWE id -> how many Vulnerabilities for this CWE
+
 
 class VulPackagesResponse(BaseModel):
-    vulList: List[str] #List of all the package ids that are vulnerable in our database
-
+    vulList: List[
+        str
+    ]  # List of all the package ids that are vulnerable in our database

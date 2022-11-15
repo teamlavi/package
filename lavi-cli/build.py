@@ -1,6 +1,6 @@
 # too lazy to figure how to do this in bash
 import subprocess
-import os 
+import os
 import shutil
 
 wd = os.getcwd()
@@ -10,7 +10,7 @@ GOOS = ["darwin", "windows", "linux"]
 GOARCHS = {
     "darwin": ["amd64", "arm64"],
     "windows": ["amd64"],
-    "linux": ["amd64", "arm64"]
+    "linux": ["amd64", "arm64"],
 }
 
 try:
@@ -26,13 +26,11 @@ for goos in GOOS:
 
         name = f"lavi-cli-{goos}-{goarch}"
 
-        print (f"building {name}")
+        print(f"building {name}")
 
         subprocess.run(["go", "build", "-o", "lavi"], env=env)
         os.mkdir(name)
         shutil.copy("INSTALL.txt", name)
         shutil.move("lavi", name)
-        shutil.make_archive(f"archives/{name}", 'zip', name)
+        shutil.make_archive(f"archives/{name}", "zip", name)
         shutil.rmtree(name)
-
-
