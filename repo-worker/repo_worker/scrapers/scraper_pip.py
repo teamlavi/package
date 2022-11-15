@@ -61,7 +61,10 @@ class PipScraper(object):
                 f'lavi poetry --package="{package}" --version="{version}" --no-scan -w'
             )
         else:
-            cmd = f'lavi pip --python={sys.executable} --package="{package}" --version="{version}" --no-scan -w'
+            cmd = (
+                f'lavi pip --python={sys.executable} --package="{package}" '
+                f'--version="{version}" --no-scan -w'
+            )
 
         os.popen(cmd).read()
 
@@ -79,6 +82,3 @@ class PipScraper(object):
         dependency_tree = generate_dependency_tree(cds)
         os.remove("cds.json")
         return dependency_tree
-
-
-print(PipScraper.generate_dependency_tree("numpy", "1.23.0"))
