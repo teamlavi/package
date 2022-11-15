@@ -59,6 +59,3 @@ class NpmScraper(object):
         with open("cds.json") as f:
             cds = json.loads(f.read())
         return generate_dependency_tree(cds)
-
-
-print(len(NpmScraper.list_package_versions("lodash")))
