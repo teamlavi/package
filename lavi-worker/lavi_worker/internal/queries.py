@@ -3,7 +3,7 @@ from typing import List, Dict
 from lavi_worker.daos import cve, package, dependencies
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker.utils import RepoEnum
-from json import loads
+import json
 
 
 async def find_vulnerabilities_simple(
@@ -42,7 +42,14 @@ async def find_full_vulnerabilities_id(
 
 async def get_affected_packages(cve_pkg_univ_hash: str) -> list[str]:
     """Get list of affected packages"""
-    return None
+    pkgs: list[str] = []
+    async with await get_db_tx() as tx:
+        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_table(tx)
+        for dep in dep_table:
+            dep_tree: Dict[str, list[str]] = json.loads(dep.pkg_dependencies)
+            if cve_pkg_univ_hash in dep_tree.keys():
+                pkgs.append(dep.univ_hash)
+    return pkgs
 
 
 async def get_package_count() -> int:
@@ -52,11 +59,15 @@ async def get_package_count() -> int:
     return num
 
 
-async def get_dependencies(univ_hash: str) -> Dict[str, list[str]]:
+async def get_dependencies(univ_hash: str) -> Dict[str, list[str]] | None:
     """Get the list of dependencies for a package"""
     async with await get_db_tx() as tx:
-        dep_string: str = await dependencies.find_tree_id(tx, univ_hash)
-    return loads(dep_string)
+        dep_string: str | None = await dependencies.find_tree_id(tx, univ_hash)
+    if dep_string:
+        dep_tree: Dict[str, list[str]] = json.loads(dep_string)
+        return dep_tree
+    else:
+        return None
 
 
 async def get_vulnerable_package_count() -> int:
@@ -65,26 +76,29 @@ async def get_vulnerable_package_count() -> int:
         return await cve.get_vulnerable_package_count(tx)
 
 
-async def get_vulnerability_depth(univ_hash: str) -> Dict[str, list[int]]:
+async def get_vulnerability_depth(univ_hash: str) -> Dict[str, list[int]] | None:
     """Get the depth(s) of each vulnerability. Vulnerabilities with multiple paths
     have the length of each path in the list."""
     vulnerabilities: Dict[str, list[int]] = {}
-    dep_tree: Dict[str, list[str]] = get_dependencies(univ_hash)
-
-    async def get_vulnerabilities(rec_univ_hash: str, depth: int) -> None:
-        deps = dep_tree[rec_univ_hash]
-        for dep in deps:
-            vulns: list[cve.CVE] = await find_full_vulnerabilities_id(dep)
-            for vuln in vulns:
-                if vuln.cve_id in vulnerabilities:
-                    vulnerabilities[vuln.cve_id].append[depth]
-                else:
-                    vulnerabilities[vuln.cve_id] = [depth]
-            get_vulnerabilities(dep, depth + 1)
+    dep_tree: Dict[str, list[str]] | None = await get_dependencies(univ_hash)
+    if dep_tree is None:
         return None
+    else:
+        dep_tree2: Dict[str, list[str]] = dep_tree
+        async def get_vulnerabilities(rec_univ_hash: str, depth: int) -> None:
+            deps = dep_tree2[rec_univ_hash]
+            for dep in deps:
+                vulns: list[cve.CVE] = await find_full_vulnerabilities_id(dep)
+                for vuln in vulns:
+                    if vuln.cve_id in vulnerabilities.keys():
+                        vulnerabilities[vuln.cve_id].append(depth)
+                    else:
+                        vulnerabilities[vuln.cve_id] = [depth]
+                await get_vulnerabilities(dep, depth + 1)
+            return None
 
-    get_vulnerabilities(univ_hash, 1)
-    return vulnerabilities
+        await get_vulnerabilities(univ_hash, 1)
+        return vulnerabilities
 
 
 async def get_num_downloads(univ_hash: str) -> int:
@@ -92,15 +106,25 @@ async def get_num_downloads(univ_hash: str) -> int:
     return 0
 
 
-async def get_cwe_severity(cwe_id: str) -> str:
+async def get_cwe_severity(cwe_id: str) -> list[str]:
     """Get the severity of the cwe."""
-    return "Unimplemented"
+    async with await get_db_tx() as tx:
+        return await cve.get_cwe_severities(tx, cwe_id)
 
 
 async def get_num_vulns_cwe(cwe_id: str) -> int:
     """Get the number of vulnerabilities with this cwe."""
-    return 0
+    async with await get_db_tx() as tx:
+        return await cve.get_cwe_severities(tx, cwe_id)
 
+async def check_vulnerable(univ_hash: str) -> bool:
+    """Check if there is a vulnerability in a package or its dependencies"""
+    dep_tree: Dict[str, list[str]] | None = await get_dependencies(univ_hash)
+    if dep_tree is None:
+        return False
+    else:
+        for pkg in dep_tree:
+            vulns: list[str] = 
 
 async def get_all_vulnerable_packages() -> list[str]:
     """Get all vulnerable packages in our database."""
