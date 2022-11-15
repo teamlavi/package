@@ -5,33 +5,44 @@ import (
 	"dep-tree-gen/models"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/schollz/progressbar/v3"
 )
 
-func ScanSet(ids []string) BatchVulnerabilityResponse {
+// needed because this function is used in cmdline and api
+// want to show clean exit in cmdline, but panic in api because panics are caught
+func SwitchFailure(logOnFailure bool, message string) {
+	if logOnFailure {
+		log.Fatal(message)
+	} else {
+		panic(message)
+	}
+}
+
+func ScanSet(ids []string, logOnFailure bool) BatchVulnerabilityResponse {
 	values := map[string][]string{"ids": ids}
 	json_data, err := json.Marshal(values)
 
 	if err != nil {
-		panic("failed to scan for vulnerabilities")
+		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
 	}
 
 	resp, err := http.Post("https://lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
 		bytes.NewBuffer(json_data))
 
+	if err != nil {
+		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
+	}
 	defer resp.Body.Close()
 
-	if err != nil {
-		panic("failed to scan for vulnerabilities")
-	}
 	var res BatchVulnerabilityResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
-		panic("failed to scan for vulnerabilities")
+		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
 	}
 	return res
 }
@@ -72,7 +83,7 @@ func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
 	// batch by groups of 100
 	for i := 0; i < len(pkgIds); i += 100 {
 		slice, count := GrabSlice(i, i+100, pkgIds)
-		all = append(all, ScanSet(slice))
+		all = append(all, ScanSet(slice, true))
 		bar.Add(count)
 	}
 	bar.Finish()

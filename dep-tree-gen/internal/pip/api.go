@@ -90,7 +90,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	}
 
 	// need to install the dependencies for the generator to work
-	fmt.Println("installing " + fmt.Sprintf("%s==%s", pkg, version))
+	fmt.Println("Installing " + fmt.Sprintf("%s==%s", pkg, version))
 	cmd := exec.Command(pythonPath, "-m", "pip", "install", fmt.Sprintf("%s==%s", pkg, version))
 	cmd.Stderr = cmd.Stdout
 	stdout, _ := cmd.StdoutPipe()
@@ -107,6 +107,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 		log.Fatal("unknown error occured")
 	}
 	if err = cmd.Wait(); err != nil {
+		common.RestoreFile(backupReq, "requirements.txt")
 		log.Fatal("Failed to install " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
 	}
 
@@ -114,7 +115,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	cds := g.GetCDS()
 
 	// then revert the installation
-	fmt.Println("reverting installation")
+	fmt.Println("Reverting installation")
 	g.Revert(currentCds)
 
 	// restore file if it exists

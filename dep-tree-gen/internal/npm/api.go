@@ -50,6 +50,8 @@ func (g NpmTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	fileBytes := []byte(fileData)
 	err := os.WriteFile("package.json", fileBytes, 0644)
 	if err != nil {
+		common.RestoreFile(backupPkgJson, "package.json")
+		common.RestoreFile(backupPkgLockJson, "package-lock.json")
 		log.Fatal("failed to write new package.json")
 	}
 
