@@ -1,6 +1,6 @@
 from base64 import b64decode, b64encode
 import logging
-from typing import Tuple
+from typing import List, Tuple
 
 import redis
 
@@ -113,6 +113,10 @@ class RedisWQ(object):
             if self.db.lrem(self.processing_queue_name, 0, item):
                 self.db.lpush(self.failed_queue_name, item)
             self.db.delete(self.attempts_prefix + item)
+
+    def get_failures(self) -> List[Tuple[str, ...]]:
+        """Get all failures for the given queue."""
+        return self.db.lrange(self.failed_queue_name, 0, -1)  # type: ignore
 
 
 def get_redis_wq(name: str) -> RedisWQ:

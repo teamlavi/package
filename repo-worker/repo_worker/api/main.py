@@ -27,7 +27,8 @@ def get_failures(queue_name: str) -> List[Tuple[str, ...]]:
     """Get enumerated failures given a queue name."""
     if queue_name not in known_queue_sizes:
         raise Exception(f"Unknown queue: {queue_name}")
-    return []
+    wq = get_redis_wq(queue_name)
+    return wq.get_failures()
 
 
 # Trigger manual tree generation
