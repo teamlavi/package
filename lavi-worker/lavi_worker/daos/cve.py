@@ -148,3 +148,11 @@ async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""
     async with tx.cursor() as cur:
         await cur.execute("TRUNCATE cves RESTART IDENTITY CASCADE")
+
+
+async def get_vulnerable_package_count(tx: Transaction) -> int:
+    """Get a block of rows."""
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT univ_hash FROM cves")
+        univ_hashes = await cur.fetchall()
+        return len({univ_hash[0] for univ_hash in univ_hashes})
