@@ -10,6 +10,7 @@ import (
 	"lavi/internal/vulnerabilities"
 	"os/exec"
 	"reflect"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -38,21 +39,44 @@ func Defer(err interface{}, function *Function) {
 }
 
 func RunCommand(cmd *exec.Cmd, function *Function) {
-	cmd.Stderr = cmd.Stdout
+	var wg sync.WaitGroup
+
 	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
 	cmd.Start()
 
-	reader := bufio.NewReader(stdout)
-	line, err := reader.ReadString('\n')
-	for err == nil {
-		function.StdoutString += line
-		line, err = reader.ReadString('\n')
-	}
-	if err != nil && !errors.Is(err, io.EOF) {
-		panic(err)
-	}
-	if err = cmd.Wait(); err != nil {
+	scannerStdout := bufio.NewReader(stdout)
+	wg.Add(1)
+	go func() {
+		line, err := scannerStdout.ReadString('\n')
+		for err == nil {
+			function.StdoutString += line
+			line, err = scannerStdout.ReadString('\n')
+		}
+		if err != nil && !errors.Is(err, io.EOF) {
+			wg.Done()
+			panic(err)
+		}
+		wg.Done()
+	}()
+	scannerStderr := bufio.NewReader(stderr)
+	wg.Add(1)
+	go func() {
+		line, err := scannerStderr.ReadString('\n')
+		for err == nil {
+			function.StdoutString += line
+			line, err = scannerStderr.ReadString('\n')
+		}
+		if err != nil && !errors.Is(err, io.EOF) {
+			wg.Done()
+			panic(err)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	if err := cmd.Wait(); err != nil {
 		function.StdoutString += "Failed to install selected changes. Are you sure the package and version name combinations are correct?\r\n"
 		panic(err)
 	}
@@ -107,7 +131,7 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		c := 0
 		for i := 0; i < len(pkgIds); i += 100 {
 			slice, count := vulnerabilities.GrabSlice(i, i+100, pkgIds)
-			all = append(all, vulnerabilities.ScanSet(slice))
+			all = append(all, vulnerabilities.ScanSet(slice, false))
 			c += count
 			if c > len(pkgIds) {
 				c = len(pkgIds)
@@ -121,6 +145,39 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 
 		cfg.SetCDS(gen)
 		cfg.SetVulns(cleanVulns)
+		function.Status = "success"
+
+	}()
+	return function.ID
+}
+
+func DispatchRevert(cfg config.ConfigInterface, handler reflect.Value) string {
+	function := &Function{
+		ID:       uuid.NewString(),
+		Complete: false,
+		Handler:  handler,
+		Status:   "installing",
+	}
+	Running[function.ID] = function
+	go func() {
+		defer func() {
+			Defer(recover(), function)
+		}()
+
+		err := cfg.GetGenerator().RestoreFiles()
+		if err != nil {
+			function.StdoutString += "failed to restore files\r\n"
+			function.Status = "error"
+			panic("failed to restore files")
+		}
+
+		out := function.Handler.Call([]reflect.Value{})
+		cmd := out[0].Interface().(*exec.Cmd)
+
+		RunCommand(cmd, function)
+
+		cfg.SetCDS(cfg.GetOriginalCDS())
+		cfg.SetVulns(cfg.GetOriginalVulns())
 		function.Status = "success"
 
 	}()

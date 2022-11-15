@@ -11,6 +11,9 @@ import (
 )
 
 func generateTree(path string) string {
+
+	common.HasExecutableFailOut("go")
+
 	cmd := exec.Command("go", "mod", "graph")
 	cmd.Dir = path
 	var out bytes.Buffer

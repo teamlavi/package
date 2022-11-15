@@ -19,7 +19,22 @@ type PipTreeGenerator struct {
 	PythonPath string
 }
 
+func (g PipTreeGenerator) BackupFiles() error {
+	if err := common.BackupToTemp(g.Path); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g PipTreeGenerator) RestoreFiles() error {
+	if err := common.RestoreFromTemp(g.Path); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g PipTreeGenerator) GetCDS() models.CDS {
+	common.HasExecutableFailOut(g.PythonPath)
 	verifyPipDepTreeInstall(g.PythonPath)
 	pkgs := getPackageNamesFromReq(g.Path)
 
@@ -30,6 +45,7 @@ func (g PipTreeGenerator) GetCDS() models.CDS {
 }
 
 func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	common.HasExecutableFailOut(g.PythonPath)
 	data := []string{}
 	for k, _ := range pkgs {
 		data = append(data, k)
@@ -40,6 +56,7 @@ func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 }
 
 func (g PipTreeGenerator) Revert(cds models.CDS) {
+	common.HasExecutableFailOut(g.PythonPath)
 	pythonPath := g.PythonPath
 	command := []string{"-m", "pip", "install"}
 	if len(cds.Nodes) == 0 {
@@ -87,7 +104,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	}
 
 	// need to install the dependencies for the generator to work
-	fmt.Println("installing " + fmt.Sprintf("%s==%s", pkg, version))
+	fmt.Println("Installing " + fmt.Sprintf("%s==%s", pkg, version))
 	cmd := exec.Command(pythonPath, "-m", "pip", "install", fmt.Sprintf("%s==%s", pkg, version))
 	cmd.Stderr = cmd.Stdout
 	stdout, _ := cmd.StdoutPipe()
@@ -104,6 +121,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 		log.Fatal("unknown error occured")
 	}
 	if err = cmd.Wait(); err != nil {
+		common.RestoreFile(backupReq, "requirements.txt")
 		log.Fatal("Failed to install " + fmt.Sprintf("%s==%s", pkg, version) + ". Are you sure the package and version name combination is correct?")
 	}
 
@@ -111,7 +129,7 @@ func (g PipTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	cds := g.GetCDS()
 
 	// then revert the installation
-	fmt.Println("reverting installation")
+	fmt.Println("Reverting installation")
 	g.Revert(currentCds)
 
 	// restore file if it exists

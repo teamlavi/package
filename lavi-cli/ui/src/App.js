@@ -57,6 +57,7 @@ function App() {
       {resp && <>
         <Header 
           cds={resp}
+          originalCds={original}
           cmd={resp.cmdType} 
           update={update} 
           viewCurrent={viewCurrent} 

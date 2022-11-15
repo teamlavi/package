@@ -13,7 +13,33 @@ type NpmTreeGenerator struct {
 	Path string
 }
 
+func (g NpmTreeGenerator) BackupFiles() error {
+	pkg := filepath.Join(g.Path, "package.json")
+	pkgLock := filepath.Join(g.Path, "package-lock.json")
+	if err := common.BackupToTemp(pkg); err != nil {
+		return err
+	}
+	if err := common.BackupToTemp(pkgLock); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g NpmTreeGenerator) RestoreFiles() error {
+	pkg := filepath.Join(g.Path, "package.json")
+	pkgLock := filepath.Join(g.Path, "package-lock.json")
+	if err := common.RestoreFromTemp(pkg); err != nil {
+		return err
+	}
+	if err := common.RestoreFromTemp(pkgLock); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g NpmTreeGenerator) GetCDS() models.CDS {
+	common.HasExecutableFailOut("go")
+
 	if _, err := os.Stat(filepath.Join(g.Path, "package.json")); err != nil {
 		log.Fatal("project must contain a package.json file")
 	}
@@ -48,6 +74,8 @@ func (g NpmTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.C
 	fileBytes := []byte(fileData)
 	err := os.WriteFile("package.json", fileBytes, 0644)
 	if err != nil {
+		common.RestoreFile(backupPkgJson, "package.json")
+		common.RestoreFile(backupPkgLockJson, "package-lock.json")
 		log.Fatal("failed to write new package.json")
 	}
 

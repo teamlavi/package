@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"dep-tree-gen/common"
 	"dep-tree-gen/models"
 	"io/ioutil"
 	"log"
@@ -11,6 +12,30 @@ import (
 
 type GolangTreeGenerator struct {
 	Path string
+}
+
+func (g GolangTreeGenerator) BackupFiles() error {
+	mod := filepath.Join(g.Path, "go.mod")
+	sum := filepath.Join(g.Path, "go.sum")
+	if err := common.BackupToTemp(mod); err != nil {
+		return err
+	}
+	if err := common.BackupToTemp(sum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g GolangTreeGenerator) RestoreFiles() error {
+	mod := filepath.Join(g.Path, "go.mod")
+	sum := filepath.Join(g.Path, "go.sum")
+	if err := common.RestoreFromTemp(mod); err != nil {
+		return err
+	}
+	if err := common.RestoreFromTemp(sum); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g GolangTreeGenerator) GetCDS() models.CDS {
