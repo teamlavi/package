@@ -24,7 +24,7 @@ class NpmScraper(object):
         """Given a repository and package, return a list of available versions."""
         try:
             request = httpx.get(
-                "https://registry.npmjs.org/react",
+                f"https://registry.npmjs.org/{package}",
             )
             version_list = list(json.loads(request.text)["versions"])
             if isinstance(version_list, str) and "-" in version_list:
@@ -61,4 +61,4 @@ class NpmScraper(object):
         return generate_dependency_tree(cds)
 
 
-print(NpmScraper.list_package_versions("lodash"))
+print(len(NpmScraper.list_package_versions("lodash")))
