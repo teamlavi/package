@@ -44,6 +44,8 @@ spec:
                 secretKeyRef:
                   key: {{ .Values.ghAccessToken.secretKey }}
                   name: {{ .Values.ghAccessToken.secretName }}
+            - name: REPO_API_URL
+              value: {{ printf "http://repo-worker.%s.svc.cluster.local" .Release.Namespace }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: uvicorn
