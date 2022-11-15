@@ -23,10 +23,11 @@ class NpmScraper(object):
     def list_package_versions(package: str, limit: int | None = None) -> List[str]:
         """Given a repository and package, return a list of available versions."""
         try:
-            request = httpx.get(
+            resp = httpx.get(
                 f"https://registry.npmjs.org/{package}",
             )
-            version_list = list(json.loads(request.text)["versions"])
+            resp.raise_for_status()
+            version_list = list(json.loads(resp.text)["versions"])
             if isinstance(version_list, str) and "-" in version_list:
                 return []
             elif isinstance(version_list, str):
