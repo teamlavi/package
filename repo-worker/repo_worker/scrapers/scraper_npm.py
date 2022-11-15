@@ -4,6 +4,7 @@ from repo_worker.utils import TreeNode
 from repo_worker.utils import generate_dependency_tree
 import os
 import json
+import httpx
 
 
 class NpmScraper(object):
@@ -22,9 +23,10 @@ class NpmScraper(object):
     def list_package_versions(package: str, limit: int | None = None) -> List[str]:
         """Given a repository and package, return a list of available versions."""
         try:
-            cmd = "npm view " + package + "@* version --json"
-            request = os.popen(cmd).read()
-            version_list = json.loads(request)
+            request = httpx.get(
+                "https://registry.npmjs.org/react",
+            )
+            version_list = list(json.loads(request.text)["versions"])
             if isinstance(version_list, str) and "-" in version_list:
                 return []
             elif isinstance(version_list, str):
@@ -57,3 +59,6 @@ class NpmScraper(object):
         with open("cds.json") as f:
             cds = json.loads(f.read())
         return generate_dependency_tree(cds)
+
+
+print(NpmScraper.list_package_versions("lodash"))
