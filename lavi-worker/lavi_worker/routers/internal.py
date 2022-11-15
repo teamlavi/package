@@ -30,7 +30,7 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool
 async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
     await updates.insert_single_package_version(**package_ver_request.dict())
     return Response(status_code=200)
-
+      
 
 @router.get("/query_vers")
 async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:

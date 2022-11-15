@@ -81,7 +81,6 @@ class PackageVers(BaseModel):
             }
         }
 
-
 class FindVulnsIdListRequest(BaseModel):
     ids: List[str]
 
