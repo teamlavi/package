@@ -79,7 +79,7 @@ async def initialize_database() -> None:
                             cwe TEXT,
                             url TEXT NOT NULL,
                             repo_name VARCHAR(50) NOT NULL,
-                            pkg_name VARCHAR(50) NOT NULL,
+                            pkg_name VARCHAR(100) NOT NULL,
                             pkg_vers VARCHAR(50) NOT NULL,
                             univ_hash VARCHAR(100) NOT NULL,
                             first_patched_vers VARCHAR(50)
@@ -94,7 +94,7 @@ async def initialize_database() -> None:
                         CREATE TABLE package (
                          univ_hash VARCHAR(100) PRIMARY KEY,
                          repo_name VARCHAR(50) NOT NULL,
-                         pkg_name VARCHAR(50) NOT NULL,
+                         pkg_name VARCHAR(100) NOT NULL,
                          major_vers INTEGER NOT NULL,
                          minor_vers INTEGER NOT NULL,
                          patch_vers INTEGER NOT NULL,
@@ -109,7 +109,7 @@ async def initialize_database() -> None:
                     CREATE TABLE dependencies (
                       univ_hash VARCHAR(100) PRIMARY KEY,
                       repo_name VARCHAR(50) NOT NULL,
-                      pkg_name VARCHAR(50) NOT NULL,
+                      pkg_name VARCHAR(100) NOT NULL,
                       pkg_vers VARCHAR(50),
                       pkg_dependencies TEXT NOT NULL
                     );
