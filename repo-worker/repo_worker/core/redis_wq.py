@@ -96,7 +96,7 @@ class RedisWQ(object):
         failed_items = []  # Items that passed the retry limit
         for packed_item in in_progress:
             packed_item_str = packed_item.decode("UTF-8")
-            attempts = int(self.db.get(self.attempts_prefix + packed_item_str) or 0)
+            attempts = self._get_attempts_packed(packed_item_str)
             if not self.db.get(self.lease_queue_prefix + packed_item_str):
                 if attempts < self.attempt_limit:
                     dead_items.append(packed_item_str)
@@ -114,9 +114,36 @@ class RedisWQ(object):
                 self.db.lpush(self.failed_queue_name, item)
             self.db.delete(self.attempts_prefix + item)
 
+    def _get_queue(self, queue: str) -> List[Tuple[str, ...]]:
+        """Get the deserialized contents of a queue."""
+        items: List[bytes] = self.db.lrange(queue, 0, -1)
+        return [_deserialize(item.decode()) for item in items]
+
+    def _get_attempts_packed(self, packed_item: str) -> int:
+        """Get how many attempts have been begun against the given packed item."""
+        return int(self.db.get(self.attempts_prefix + packed_item) or 0)
+
+    def get_attempts(self, item: Tuple[str, ...]) -> int:
+        """Get how many attempts have been begun against the given packed item."""
+        return self._get_attempts_packed(_serialize(item))
+
     def get_failures(self) -> List[Tuple[str, ...]]:
-        """Get all failures for the given queue."""
-        return self.db.lrange(self.failed_queue_name, 0, -1)  # type: ignore
+        """Get failed items."""
+        return self._get_queue(self.failed_queue_name)
+
+    def get_status(self, item: Tuple[str, ...]) -> str:
+        """Get the human-readable status string for a given item."""
+        if item in self._get_queue(self.failed_queue_name):
+            return "failed"
+
+        elif item in self._get_queue(self.processing_queue_name):
+            attempts = self.get_attempts(item)
+            return f"processing - attempt {attempts}"
+
+        elif item in self._get_queue(self.queue_name):
+            return "queued"
+
+        return "unknown/complete"
 
 
 def get_redis_wq(name: str) -> RedisWQ:
