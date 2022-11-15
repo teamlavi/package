@@ -41,15 +41,30 @@ func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 
 func (g PipTreeGenerator) Revert(cds models.CDS) {
 	pythonPath := g.PythonPath
-	cmd := []string{"-m", "pip", "install"}
-	for _, node := range cds.Nodes {
-		cmd = append(cmd, fmt.Sprintf("%s==%s", node.Package, node.Version))
+	command := []string{"-m", "pip", "install"}
+	if len(cds.Nodes) == 0 {
+		return
 	}
+	for _, node := range cds.Nodes {
+		command = append(command, fmt.Sprintf("%s==%s", node.Package, node.Version))
+	}
+	cmd := exec.Command(pythonPath, command...)
+	cmd.Stderr = cmd.Stdout
+	stdout, _ := cmd.StdoutPipe()
 
-	out := exec.Command(pythonPath, cmd...)
-	err := out.Run()
-	if err != nil {
-		log.Fatal(err)
+	cmd.Start()
+
+	reader := bufio.NewReader(stdout)
+	line, err := reader.ReadString('\n')
+	for err == nil {
+		fmt.Print(line)
+		line, err = reader.ReadString('\n')
+	}
+	if err != nil && !errors.Is(err, io.EOF) {
+		log.Fatal("unknown error occured")
+	}
+	if err = cmd.Wait(); err != nil {
+		log.Fatal("Failed to revert installation")
 	}
 }
 
