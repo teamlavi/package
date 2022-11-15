@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.responses import PlainTextResponse
 
 from repo_worker import config
+from repo_worker.core.redis_wq import get_redis_wq
 
 
 # Create the app
@@ -17,3 +18,12 @@ app = FastAPI(
 def ping() -> str:
     """Ping pong."""
     return "pong"
+
+
+# Trigger manual tree generation
+@app.post("/generate_tree", tags=["triggers"])
+def trigger_generate_tree(repo: str, package: str, version: str) -> Response:
+    """Trigger tree generation."""
+    out_wq = get_redis_wq("to_generate_tree")
+    out_wq.insert((repo, package, version))
+    return Response(status_code=200)
