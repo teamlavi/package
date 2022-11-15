@@ -7,7 +7,7 @@ from lavi_worker.utils import RepoEnum
 
 
 class InsertTreeData(BaseModel):
-    fill_me_up: str
+    tree: str
 
 
 class DeleteVulnRequest(BaseModel):

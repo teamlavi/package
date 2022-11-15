@@ -147,10 +147,11 @@ def db_sync_trees(lease_time: int = 120) -> None:
                 "minor_vers": str(minor),
                 "patch_vers": str(patch),
             }
+            logging.critical(tree)
             resp = httpx.post(
                 f"{LAVI_API_URL}/internal/insert_tree",
                 params=query_params,
-                content=tree.encode(),
+                json={"tree": tree},
             )
             resp.raise_for_status()
             logging.info("Succesfully sent tree to db")
