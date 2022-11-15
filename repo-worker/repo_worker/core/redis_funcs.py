@@ -1,5 +1,6 @@
 import logging
 import traceback
+import time
 from typing import Dict, Tuple
 
 import httpx
@@ -45,6 +46,7 @@ def list_package_versions(lease_time: int = 30) -> None:
                 logging.info("No work received, waiting")
                 continue
             repo, package = item
+            start_t = time.time()
 
             logging.info(f"Scraping package versions for {repo} - {package}")
             scraper = repo_scrapers[repo]
@@ -54,6 +56,8 @@ def list_package_versions(lease_time: int = 30) -> None:
                 continue
 
             in_wq.complete(item)
+            elapsed_t = int(1000 * (time.time() - start_t))
+            in_wq.save_metrics(elapsed_t, len(versions))
 
             logging.info(f"Inserting {len(versions)} scraped package versions")
             for version in versions:
@@ -82,12 +86,15 @@ def generate_tree(lease_time: int = 300) -> None:
                 logging.info("No work received, waiting")
                 continue
             repo, package, version = item
+            start_t = time.time()
 
             logging.info(f"Generating tree for {repo} - {package} - {version}")
             scraper = repo_scrapers[repo]
             tree = scraper.generate_dependency_tree(package=package, version=version)
 
             in_wq.complete(item)
+            elapsed_t = int(1000 * (time.time() - start_t))
+            in_wq.save_metrics(elapsed_t, 1)
 
             logging.info("Inserting tree")
             out_wq.insert((repo, package, version, tree.as_json_b64()))
@@ -114,6 +121,7 @@ def db_sync_versions(lease_time: int = 30) -> None:
                 logging.info("Failed to parse version, skipping")
                 continue
             major, minor, patch = parsed_version
+            start_t = time.time()
 
             logging.info(f"Sending version to lavi db: {repo} - {package} - {version}")
             body = {
@@ -130,6 +138,8 @@ def db_sync_versions(lease_time: int = 30) -> None:
             logging.info("Succesfully sent version to db")
 
             in_wq.complete(item)
+            elapsed_t = int(1000 * (time.time() - start_t))
+            in_wq.save_metrics(elapsed_t, 1)
 
         except Exception:
             traceback.print_exc()
@@ -152,6 +162,7 @@ def db_sync_trees(lease_time: int = 30) -> None:
                 logging.info("Failed to parse version, skipping")
                 continue
             major, minor, patch = parsed_version
+            start_t = time.time()
 
             logging.info(f"Sending tree to lavi db: {repo} - {package} - {version}")
             query_params: Dict[str, str] = {
@@ -171,6 +182,8 @@ def db_sync_trees(lease_time: int = 30) -> None:
             logging.info("Succesfully sent tree to db")
 
             in_wq.complete(item)
+            elapsed_t = int(1000 * (time.time() - start_t))
+            in_wq.save_metrics(elapsed_t, 1)
 
         except Exception:
             traceback.print_exc()
