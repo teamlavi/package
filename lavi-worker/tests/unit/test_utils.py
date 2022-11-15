@@ -31,6 +31,14 @@ def _assert_trees_equal(
     "tree",
     [
         {
+            "root": ["c1", "c2"],
+            "c1": ["gc1", "gc2"],
+            "c2": ["gc3"],
+            "gc1": [],
+            "gc2": [],
+            "gc3": [],
+        },
+        {
             "f3IcSz56TBzuKXC7EdH3zQ9BM4OQAD2SdomsTMBj1rw=": [
                 "tPuzLW5Plk3UdCa4q/+CTGCBtGWBYGq4Uqy+4RUbfY4=",
                 "lOZqpDD3kvzgFYWXdVOCXZwMCZJCj4/MKCdyjSnD73I=",
@@ -42,6 +50,17 @@ def _assert_trees_equal(
             "lOZqpDD3kvzgFYWXdVOCXZwMCZJCj4/MKCdyjSnD73I=": [
                 "jBTB2a6sTkvmDdcpOKCHNjpqJ7AiBW7x/SVrTiDHiVk="
             ],
+        },
+        {
+            "c1": ["gc1", "gc2"],
+            "c2": ["gc3", "gc2"],
+            "c3": ["gc3"],
+            "c4": ["gc3"],
+            "gc1": [],
+            "ggc1": [],
+            "gc2": [],
+            "root": ["c1", "c2", "c3", "c4"],
+            "gc3": ["ggc1"],
         },
     ],
 )
