@@ -20,6 +20,7 @@ type PipTreeGenerator struct {
 }
 
 func (g PipTreeGenerator) GetCDS() models.CDS {
+	common.HasExecutableFailOut(g.PythonPath)
 	verifyPipDepTreeInstall(g.PythonPath)
 	pkgs := getPackageNamesFromReq(g.Path)
 
@@ -30,6 +31,7 @@ func (g PipTreeGenerator) GetCDS() models.CDS {
 }
 
 func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
+	common.HasExecutableFailOut(g.PythonPath)
 	data := []string{}
 	for k, _ := range pkgs {
 		data = append(data, k)
@@ -40,6 +42,7 @@ func (g PipTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
 }
 
 func (g PipTreeGenerator) Revert(cds models.CDS) {
+	common.HasExecutableFailOut(g.PythonPath)
 	pythonPath := g.PythonPath
 	command := []string{"-m", "pip", "install"}
 	if len(cds.Nodes) == 0 {

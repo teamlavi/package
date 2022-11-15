@@ -14,6 +14,8 @@ type NpmTreeGenerator struct {
 }
 
 func (g NpmTreeGenerator) GetCDS() models.CDS {
+	common.HasExecutableFailOut("go")
+
 	if _, err := os.Stat(filepath.Join(g.Path, "package.json")); err != nil {
 		log.Fatal("project must contain a package.json file")
 	}
