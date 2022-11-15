@@ -41,6 +41,15 @@ def flush_all() -> Response:
     return Response(status_code=200)
 
 
+@app.get("/metrics", tags=["maintenance"])
+def get_metrics(queue_name: str) -> List[Tuple[int, int]]:
+    """Get all metrics from the given queue."""
+    if queue_name not in known_queue_sizes:
+        raise Exception(f"Unknown queue: {queue_name}")
+    wq = get_redis_wq(queue_name)
+    return wq.get_metrics()
+
+
 # Trigger manual tree generation
 @app.post("/generate_tree", tags=["triggers"])
 def trigger_generate_tree(repo: str, package: str, version: str) -> Response:

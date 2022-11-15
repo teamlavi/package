@@ -38,6 +38,7 @@ class RedisWQ(object):
         self.queue_name = queue_name
         self.processing_queue_name = queue_name + ":processing"
         self.failed_queue_name = queue_name + ":failed"
+        self.metrics_store_name = queue_name + ":metrics"
         self.lease_queue_prefix = queue_name + ":leased:"
         self.attempts_prefix = queue_name + ":attempts:"
         self.expected_tuple_size = expected_tuple_size
@@ -144,6 +145,19 @@ class RedisWQ(object):
             return "queued"
 
         return "unknown/complete"
+
+    def save_metrics(self, elapsed_time_ms: int, ouputs_per_input: int) -> None:
+        """Save metrics to the store."""
+        self.db.lpush(self.metrics_store_name, f"{elapsed_time_ms}:{ouputs_per_input}")
+
+    def get_metrics(self) -> List[Tuple[int, int]]:
+        """Get all metrics from the server."""
+        raw_metrics = self.db.lrange(self.metrics_store_name, 0, -1)
+        output = []
+        for metric in raw_metrics:
+            nums = metric.decode().split(":")
+            output.append((nums[0], nums[1]))
+        return output
 
 
 def get_redis_wq(name: str) -> RedisWQ:

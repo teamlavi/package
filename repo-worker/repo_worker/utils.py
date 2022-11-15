@@ -3,6 +3,7 @@ from __future__ import annotations  # Postponed annotation evaluation, remove on
 from base64 import b64encode
 from hashlib import sha256
 import logging
+import signal
 from typing import Dict, List, Tuple, Any
 
 import orjson
@@ -139,3 +140,20 @@ def generate_dependency_tree(
         )
 
     return get_node(cds["root"]["dependencies"][0])
+
+
+class timeout(object):
+    """Credit https://stackoverflow.com/users/205521/thomas-ahle."""
+
+    def __init__(self, seconds: int = 1):
+        self.seconds = seconds
+
+    def handle_timeout(self, signum: Any, frame: Any) -> None:
+        raise TimeoutError("Function timed out")
+
+    def __enter__(self) -> None:
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+        signal.alarm(0)
