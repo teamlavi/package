@@ -31,19 +31,35 @@ def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
 
 def compress_tree(tree: Dict[str, List[str]]) -> str:
     """Compress a tree into a smaller data structure for storage."""
-    # TODO compress the tree
-    res = ""
+    nodes_str = ""  # comma seperated ordered list of nodes
+    dependencies_str = ""
+    nodes = list(tree.keys())  # ordered list of nodes
     for node in tree:
         dependencies = tree[node]
-        res += node + " > "
-        for depend in dependencies:
-            res += depend + ", "
-        res += "\n"
-    return res
+        nodes_str += node + ","
+        # if node has no dependencies then there is no need to show that
+        if len(dependencies) > 0:
+            dependencies_str += str(nodes.index(node)) + ">"
+            for depend in dependencies:
+                dependencies_str += str(nodes.index(depend)) + ","
+            dependencies_str = dependencies_str[:-1]  # remove last comma
+            dependencies_str += "\n"
+    if dependencies_str[-1:] == "\n":
+        dependencies_str = dependencies_str[:-1]
+    nodes_str = nodes_str[:-1]  # remove last comma
+    return nodes_str + "\n" + dependencies_str
 
 
 def decompress_tree(compressed: str) -> Dict[str, List[str]]:
     """Take a compressed tree and convert back to a python object."""
-    # TODO decompress tree
-    decompressed: Dict[str, List[str]] = json.loads(compressed.replace("'", '"'))
-    return decompressed
+    lines = compressed.split("\n")
+    nodes = lines[0].split(",")  # list of nodes
+
+    tree = {node: [] for node in nodes}
+    for dependency_str in lines[1:]:
+        parent, children = dependency_str.split(">")
+        parent = nodes[int(parent)]  # get parent node
+        children = children.split(",")
+        children = [nodes[int(child)] for child in children]  # get children nodes
+        tree[parent].extend(children)  # append children to parent dependencies
+    return tree
