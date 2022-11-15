@@ -38,4 +38,5 @@ def compress_tree(tree: Dict[str, List[str]]) -> str:
 def decompress_tree(compressed: str) -> Dict[str, List[str]]:
     """Take a compressed tree and convert back to a python object."""
     # TODO decompress tree
-    return json.loads(compressed)
+    decompressed: Dict[str, List[str]] = json.loads(compressed.replace("'", '"'))
+    return decompressed
