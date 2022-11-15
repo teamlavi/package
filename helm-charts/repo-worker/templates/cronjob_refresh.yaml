@@ -3,8 +3,8 @@ kind: CronJob
 metadata:
   labels:
     {{- include "repo-worker.baseLabels" . | nindent 4 }}
-    app.kubernetes.io/component: {{ printf "scraper-%s" refresh }}
-  name: {{ printf "%s-%s" (include "repo-worker.fullname" .) refresh }}
+    app.kubernetes.io/component: refresh-queues
+  name: {{ printf "%s-refresh" (include "repo-worker.fullname" .) }}
 spec:
   jobTemplate:
     spec:
@@ -18,7 +18,7 @@ spec:
               command: ["python3"]
               env:
                 - name: REDIS_HOST
-                  value: {{ printf "%s.%s.svc.cluster.local" (include "repo-worker.redisFullname" ) .Release.Namespace }}
+                  value: {{ printf "%s.%s.svc.cluster.local" (include "repo-worker.redisFullname" .) .Release.Namespace }}
                 - name: REDIS_PORT
                   value: "6379"
                 - name: LAVI_API_URL
