@@ -13,6 +13,30 @@ type NpmTreeGenerator struct {
 	Path string
 }
 
+func (g NpmTreeGenerator) BackupFiles() error {
+	pkg := filepath.Join(g.Path, "package.json")
+	pkgLock := filepath.Join(g.Path, "package-lock.json")
+	if err := common.BackupToTemp(pkg); err != nil {
+		return err
+	}
+	if err := common.BackupToTemp(pkgLock); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g NpmTreeGenerator) RestoreFiles() error {
+	pkg := filepath.Join(g.Path, "package.json")
+	pkgLock := filepath.Join(g.Path, "package-lock.json")
+	if err := common.RestoreFromTemp(pkg); err != nil {
+		return err
+	}
+	if err := common.RestoreFromTemp(pkgLock); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g NpmTreeGenerator) GetCDS() models.CDS {
 	common.HasExecutableFailOut("go")
 

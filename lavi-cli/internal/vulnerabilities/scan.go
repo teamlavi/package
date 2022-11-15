@@ -86,7 +86,7 @@ func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
 		all = append(all, ScanSet(slice, true))
 		bar.Add(count)
 	}
-	bar.Finish()
+	bar.Set(len(pkgIds))
 
 	return CleanupScanResults(all)
 }

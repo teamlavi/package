@@ -10,10 +10,31 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 type PoetryTreeGenerator struct {
 	Path string
+}
+
+func (g PoetryTreeGenerator) BackupFiles() error {
+	if err := common.BackupToTemp(filepath.Join(g.Path, "pyproject.toml")); err != nil {
+		return err
+	}
+	if err := common.BackupToTemp(filepath.Join(g.Path, "poetry.lock")); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g PoetryTreeGenerator) RestoreFiles() error {
+	if err := common.RestoreFromTemp(filepath.Join(g.Path, "pyproject.toml")); err != nil {
+		return err
+	}
+	if err := common.RestoreFromTemp(filepath.Join(g.Path, "poetry.lock")); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g PoetryTreeGenerator) GetCDS() models.CDS {

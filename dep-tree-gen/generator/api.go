@@ -10,4 +10,7 @@ type RepositoryTreeGenerator interface {
 
 	// run single package generation mode
 	GenerateSinglePackageCds(pkg, version string) models.CDS
+
+	BackupFiles() error
+	RestoreFiles() error
 }

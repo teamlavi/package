@@ -6,6 +6,7 @@ import (
 	"lavi/internal/config"
 	"lavi/internal/dispatch"
 	"net/http"
+	"os"
 	"os/exec"
 	"reflect"
 )
@@ -48,21 +49,37 @@ func GetPipVersions(packageName string) []string {
 	return out
 }
 
-func PipRevert(cfg config.ConfigInterface, pythonPath string) string {
-	return PipInstall(cfg, pythonPath, CDSToPkgMap(cfg.GetOriginalCDS()))
+func PipRevert(cfg config.ConfigInterface, pythonPath string, reqPath string) string {
+	return dispatch.DispatchRevert(cfg, reflect.ValueOf(func() *exec.Cmd {
+		return exec.Command(pythonPath, "-m", "pip", "install", "-r", reqPath)
+	}))
 }
 
-func runPipInstall(pythonPath string, packages map[string]string) *exec.Cmd {
-
-	commands := []string{"-m", "pip", "install"}
+func runPipInstall(pythonPath string, requirementsPath string, packages map[string]string) *exec.Cmd {
+	pkgs := ""
+	commands := []string{"-m", "pip", "install", "-r", requirementsPath}
 	for k, v := range packages {
-		commands = append(commands, k+"=="+v)
+		pkgs = pkgs + k + "==" + v + "\n"
+	}
+	// need to write to requirements.txt
+	if err := os.WriteFile(requirementsPath, []byte(pkgs), 0666); err != nil {
+		panic(err)
 	}
 
 	cmd := exec.Command(pythonPath, commands...)
 	return cmd
 }
 
-func PipInstall(cfg config.ConfigInterface, pythonPath string, packages map[string]string) string {
-	return dispatch.DispatchInstall(cfg, packages, reflect.ValueOf(runPipInstall), reflect.ValueOf(pythonPath), reflect.ValueOf(packages))
+func PipInstall(cfg config.ConfigInterface, pythonPath, requirementsPath string, packages map[string]string) string {
+	allPkgs := map[string]string{}
+	cds := cfg.GetCDS()
+	for _, id := range cds.Root.Dependencies {
+		node := cds.Nodes[id]
+		if _, exists := packages[node.Package]; exists {
+			allPkgs[node.Package] = packages[node.Package]
+		} else {
+			allPkgs[node.Package] = node.Version
+		}
+	}
+	return dispatch.DispatchInstall(cfg, allPkgs, reflect.ValueOf(runPipInstall), reflect.ValueOf(pythonPath), reflect.ValueOf(requirementsPath), reflect.ValueOf(allPkgs))
 }

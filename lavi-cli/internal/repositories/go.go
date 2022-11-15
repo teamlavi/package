@@ -25,7 +25,9 @@ func GetGoVersions(packageName string) []string {
 }
 
 func GoRevert(cfg config.ConfigInterface) string {
-	return GoInstall(cfg, CDSToPkgMap(cfg.GetOriginalCDS()))
+	return dispatch.DispatchRevert(cfg, reflect.ValueOf(func() *exec.Cmd {
+		return exec.Command("go", "install")
+	}))
 }
 
 func runGoInstall(packages map[string]string) *exec.Cmd {

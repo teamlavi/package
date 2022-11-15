@@ -19,6 +19,20 @@ type PipTreeGenerator struct {
 	PythonPath string
 }
 
+func (g PipTreeGenerator) BackupFiles() error {
+	if err := common.BackupToTemp(g.Path); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g PipTreeGenerator) RestoreFiles() error {
+	if err := common.RestoreFromTemp(g.Path); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g PipTreeGenerator) GetCDS() models.CDS {
 	common.HasExecutableFailOut(g.PythonPath)
 	verifyPipDepTreeInstall(g.PythonPath)

@@ -28,12 +28,14 @@ func GetNpmVersions(packageName string) []string {
 }
 
 func NpmRevert(cfg config.ConfigInterface) string {
-	return NpmInstall(cfg, CDSToPkgMap(cfg.GetOriginalCDS()))
+	return dispatch.DispatchRevert(cfg, reflect.ValueOf(func() *exec.Cmd {
+		commands := []string{"ci", "--progress=false", "--no-audit", "--loglevel verbose"}
+		return exec.Command("npm", commands...)
+	}))
 }
 
 func runNpmInstall(packages map[string]string) *exec.Cmd {
-
-	commands := []string{"install", "--progress=false"}
+	commands := []string{"install", "--progress=false", "--no-audit", "--loglevel verbose"}
 	for k, v := range packages {
 		commands = append(commands, k+"@"+v)
 	}

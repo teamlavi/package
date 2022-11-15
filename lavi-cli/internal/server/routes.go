@@ -122,7 +122,8 @@ func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 
 	if cmdType == common.PIP_CMD_NAME {
 		pythonPath, _ := s.GetCmd().Flags().GetString("python")
-		JsonResponse(w, r, map[string]string{"id": repositories.PipInstall(s, pythonPath, t.Packages)})
+		requirementsPath, _ := s.GetCmd().Flags().GetString("path")
+		JsonResponse(w, r, map[string]string{"id": repositories.PipInstall(s, pythonPath, requirementsPath, t.Packages)})
 		return
 	}
 	if cmdType == common.GO_CMD_NAME {
@@ -148,35 +149,12 @@ func Revert(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 		panic("no repo provided")
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	var t struct {
-		Packages map[string]string `json:"packages"`
+	id := RevertCommon(s, cmdType)
+	if id == "" {
+		panic("failed")
+	} else {
+		JsonResponse(w, r, map[string]string{"id": id})
 	}
-	err := decoder.Decode(&t)
-
-	if err != nil {
-		panic(err)
-	}
-
-	if cmdType == common.PIP_CMD_NAME {
-		pythonPath, _ := s.GetCmd().Flags().GetString("python")
-		JsonResponse(w, r, map[string]string{"id": repositories.PipRevert(s, pythonPath)})
-		return
-	}
-	if cmdType == common.GO_CMD_NAME {
-		JsonResponse(w, r, map[string]string{"id": repositories.GoRevert(s)})
-		return
-	}
-	if cmdType == common.NPM_CMD_NAME {
-		JsonResponse(w, r, map[string]string{"id": repositories.NpmRevert(s)})
-		return
-	}
-	if cmdType == common.POETRY_CMD_NAME {
-		JsonResponse(w, r, map[string]string{"id": repositories.GoRevert(s)})
-		return
-	}
-
-	panic("failed")
 }
 
 func DispatchStatus(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
