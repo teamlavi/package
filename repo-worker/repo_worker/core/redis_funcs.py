@@ -53,6 +53,8 @@ def list_package_versions(lease_time: int = 30) -> None:
                 logging.info("No versions to insert")
                 continue
 
+            in_wq.complete(item)
+
             logging.info(f"Inserting {len(versions)} scraped package versions")
             for version in versions:
                 out_versions_wq.insert((repo, package, version))
@@ -84,6 +86,8 @@ def generate_tree(lease_time: int = 300) -> None:
             logging.info(f"Generating tree for {repo} - {package} - {version}")
             scraper = repo_scrapers[repo]
             tree = scraper.generate_dependency_tree(package=package, version=version)
+
+            in_wq.complete(item)
 
             logging.info("Inserting tree")
             out_wq.insert((repo, package, version, tree.as_json_b64()))
@@ -125,6 +129,8 @@ def db_sync_versions(lease_time: int = 30) -> None:
             resp.raise_for_status()
             logging.info("Succesfully sent version to db")
 
+            in_wq.complete(item)
+
         except Exception:
             traceback.print_exc()
 
@@ -163,6 +169,8 @@ def db_sync_trees(lease_time: int = 30) -> None:
             )
             resp.raise_for_status()
             logging.info("Succesfully sent tree to db")
+
+            in_wq.complete(item)
 
         except Exception:
             traceback.print_exc()
