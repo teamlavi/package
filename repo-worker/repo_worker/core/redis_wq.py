@@ -37,6 +37,7 @@ class RedisWQ(object):
         self.db = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)  # type: ignore
         self.queue_name = queue_name
         self.processing_queue_name = queue_name + ":processing"
+        self.failed_queue_name = queue_name + ":failed"
         self.lease_queue_prefix = queue_name + ":leased:"
         self.attempts_prefix = queue_name + ":attempts:"
         self.expected_tuple_size = expected_tuple_size
@@ -91,21 +92,27 @@ class RedisWQ(object):
     def refresh(self) -> None:
         """Refresh the work queue with dead items."""
         in_progress = self.db.lrange(self.processing_queue_name, 0, -1)
-        dead_items = []
+        dead_items = []  # Items to retry
+        failed_items = []  # Items that passed the retry limit
         for packed_item in in_progress:
             packed_item_str = packed_item.decode("UTF-8")
             attempts = int(self.db.get(self.attempts_prefix + packed_item_str) or 0)
-            print(f"{attempts} attempts")
-            if (
-                not self.db.get(self.lease_queue_prefix + packed_item_str)
-                and attempts < self.attempt_limit
-            ):
-                dead_items.append(packed_item_str)
+            if not self.db.get(self.lease_queue_prefix + packed_item_str):
+                if attempts < self.attempt_limit:
+                    dead_items.append(packed_item_str)
+                else:
+                    failed_items.append(packed_item_str)
         for item in dead_items:
             # Only re-add to queue if it's still in processing
             # This will also prevent duplicate lost jobs being added to work queue
             if self.db.lrem(self.processing_queue_name, 0, item):
                 self.db.lpush(self.queue_name, item)
+        for item in failed_items:
+            # Only re-add to queue if it's still in processing
+            # This will also prevent duplicate lost jobs being added to failed queue
+            if self.db.lrem(self.processing_queue_name, 0, item):
+                self.db.lpush(self.failed_queue_name, item)
+            self.db.delete(self.attempts_prefix + item)
 
 
 def get_redis_wq(name: str) -> RedisWQ:
