@@ -85,6 +85,22 @@ async def find_tree(
             return None
 
 
+async def find_tree_id(tx: Transaction, univ_hash: str) -> str | None:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT pkg_dependencies from dependencies
+                WHERE univ_hash=%s
+            """,
+            (univ_hash,),
+        )
+        row = await cur.fetchone()
+        if isinstance(row, tuple):
+            return row[0]
+        else:
+            return None
+
+
 async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM dependencies")
@@ -96,28 +112,3 @@ async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""
     async with tx.cursor() as cur:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
-
-
-async def get_dependencies(
-    tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
-) -> list[str]:
-    """Get the dependencies given a universal hash."""
-    async with tx.cursor() as cur:
-        await cur.execute(
-            """SELECT pkg_dependencies FROM dependencies 
-            WHERE repo_name = %s AND pkg_name = %s AND pkg_vers = %s""",
-            (repo_name, pkg_name, pkg_vers),
-        )
-        dependencies = await cur.fetchone()
-        return [dependencies[0]]
-
-
-async def get_dependencies_id(tx: Transaction, univ_hash: str) -> list[str]:
-    """Get the dependencies given a universal hash."""
-    async with tx.cursor() as cur:
-        await cur.execute(
-            "SELECT pkg_dependencies FROM dependencies WHERE univ_hash = %s",
-            (univ_hash),
-        )
-        dependencies = await cur.fetchone()
-        return [dependencies[0]]
