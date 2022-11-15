@@ -192,7 +192,7 @@ def db_sync_trees(lease_time: int = 30) -> None:
 
                 in_wq.complete(item)
                 elapsed_t = int(1000 * (time.time() - start_t))
-                in_wq.save_metrics(elapsed_t, 1)
+                in_wq.save_metrics(elapsed_t, len(tree))
 
         except Exception:
             traceback.print_exc()

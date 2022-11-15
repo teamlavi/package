@@ -32,6 +32,10 @@ def averages(metrics: List[Tuple[int, int]]) -> Tuple[int, int]:
 def main() -> None:
     for queue_name in queue_names:
         metrics = collect_metrics(queue_name)
+        if not metrics:
+            print("No metrics found")
+            return
+
         avg_time, avg_out = averages(metrics)
         print(
             f"{queue_name}  \tt={round(avg_time, 3)}ms"
