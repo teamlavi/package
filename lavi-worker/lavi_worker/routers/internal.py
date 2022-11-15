@@ -114,6 +114,9 @@ async def insert_tree(
 
 
 @router.get("/get_tree")
-async def get_tree(repo: str, package: str, version: str) -> str:
+async def get_tree(repo: str, package: str, version: str) -> str | None:
     compressed_tree = await updates.get_single_dependency_tree(repo, package, version)
-    return str(decompress_tree(compressed_tree))
+    if compressed_tree is None:
+        return None
+    else:
+        return str(decompress_tree(compressed_tree))

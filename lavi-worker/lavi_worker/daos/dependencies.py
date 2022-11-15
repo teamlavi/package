@@ -40,7 +40,7 @@ async def create(
 
 async def find_tree(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
-) -> str:
+) -> str | None:
     univ_hash = generate_universal_hash(
         repo_name,
         pkg_name,
@@ -59,8 +59,7 @@ async def find_tree(
         if isinstance(row, tuple):
             return row[0]
         else:
-            # TODO: what to return
-            return ""
+            return None
 
 
 async def get_row_count(tx: Transaction) -> int:
