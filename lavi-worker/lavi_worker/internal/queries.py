@@ -1,8 +1,6 @@
 from typing import List
 
 from lavi_worker.daos import cve
-from lavi_worker.daos import dependencies
-from lavi_worker.daos import package
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker.utils import RepoEnum
 
@@ -39,17 +37,3 @@ async def find_full_vulnerabilities_id(
     async with await get_db_tx() as tx:
         cves = await cve.find_by_univ_hash(tx, univ_id)
     return cves
-
-
-async def get_table_storage_size(table_name: str = "dependencies") -> str:
-    if table_name == "dependencies":
-        async with await get_db_tx() as tx:
-            return await dependencies.get_table_storage_size(tx)
-    elif table_name == "cves":
-        async with await get_db_tx() as tx:
-            return await cve.get_table_storage_size(tx)
-    elif table_name == "package":
-        async with await get_db_tx() as tx:
-            return await package.get_table_storage_size(tx)
-    else:
-        return f"unknown table '{table_name}'"

@@ -6,7 +6,6 @@ from fastapi.responses import PlainTextResponse
 import orjson
 
 from lavi_worker.internal import updates
-from lavi_worker.internal import queries
 from lavi_worker.routers import api_models
 from lavi_worker.utils import compress_tree, decompress_tree
 
@@ -124,5 +123,5 @@ async def get_tree(repo: str, package: str, version: str) -> str | None:
 
 
 @router.get("/get_table_storage_size")
-async def get_table_storage_size(table_name: str = "dependencies") -> int:
-    return await queries.get_table_storage_size(table_name)
+async def get_table_storage_size(table_name: str = "dependencies") -> str:
+    return await updates.get_table_storage_size(table_name)
