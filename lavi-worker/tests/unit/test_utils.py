@@ -27,6 +27,24 @@ def _assert_trees_equal(
             raise Exception(f"Children mismatch for {node}: {tree1_ck} != {tree2_ck}")
 
 
+@pytest.mark.parametrize(
+    "tree",
+    [
+        {
+            "f3IcSz56TBzuKXC7EdH3zQ9BM4OQAD2SdomsTMBj1rw=": [
+                "tPuzLW5Plk3UdCa4q/+CTGCBtGWBYGq4Uqy+4RUbfY4=",
+                "lOZqpDD3kvzgFYWXdVOCXZwMCZJCj4/MKCdyjSnD73I=",
+            ],
+            "tPuzLW5Plk3UdCa4q/+CTGCBtGWBYGq4Uqy+4RUbfY4=": [
+                "jBTB2a6sTkvmDdcpOKCHNjpqJ7AiBW7x/SVrTiDHiVk="
+            ],
+            "jBTB2a6sTkvmDdcpOKCHNjpqJ7AiBW7x/SVrTiDHiVk=": [],
+            "lOZqpDD3kvzgFYWXdVOCXZwMCZJCj4/MKCdyjSnD73I=": [
+                "jBTB2a6sTkvmDdcpOKCHNjpqJ7AiBW7x/SVrTiDHiVk="
+            ],
+        },
+    ],
+)
 def test_tree_compression(tree: Dict[str, List[str]]) -> None:
     """Test that compression and decompression are consistent."""
     compressed = utils.compress_tree(tree)
