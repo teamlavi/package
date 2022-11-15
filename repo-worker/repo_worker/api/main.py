@@ -1,8 +1,10 @@
+from typing import List, Tuple
+
 from fastapi import FastAPI, Response
 from fastapi.responses import PlainTextResponse
 
 from repo_worker import config
-from repo_worker.core.redis_wq import get_redis_wq
+from repo_worker.core.redis_wq import get_redis_wq, known_queue_sizes
 
 
 # Create the app
@@ -18,6 +20,14 @@ app = FastAPI(
 def ping() -> str:
     """Ping pong."""
     return "pong"
+
+
+@app.get("/failures", tags=["maintenance"])
+def get_failures(queue_name: str) -> List[Tuple[str, ...]]:
+    """Get enumerated failures given a queue name."""
+    if queue_name not in known_queue_sizes:
+        raise Exception(f"Unknown queue: {queue_name}")
+    return []
 
 
 # Trigger manual tree generation
