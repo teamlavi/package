@@ -80,7 +80,7 @@ async def find_tree(
         )
         row = await cur.fetchone()
         if isinstance(row, tuple):
-            return row[0]
+            return str(row[0])
         else:
             return None
 
