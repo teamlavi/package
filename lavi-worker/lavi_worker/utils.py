@@ -11,6 +11,30 @@ class RepoEnum(str, Enum):
     golang = "golang"
 
 
+class ResponseEnum(str, Enum):
+    """Enumartor for LAVA GET responses"""
+
+    complete = "complete"
+    failure = "failure"
+    pending = "pending"
+
+
+class LevelEnum(str, Enum):
+    """Enumerator for vulnerability levels for use in LavaRequest"""
+
+    direct = "direct"
+    indirect = "indirect"
+    both = "both"  # default if None
+
+
+class StatusEnum(str, Enum):
+    """Enumerator for vulnerability status for use in LavaRequest"""
+
+    patched = "patched"
+    active = "active"  # default if None
+    allVul = "allVul"
+
+
 def _sha256(content: str | bytes) -> bytes:
     """Wrapper for hashlib sha256."""
     if isinstance(content, str):
