@@ -7,6 +7,10 @@ import (
 	"reflect"
 )
 
+func PoetryRevert(cfg config.ConfigInterface) string {
+	return PoetryInstall(cfg, CDSToPkgMap(cfg.GetOriginalCDS()))
+}
+
 func runPoetryInstall(packages map[string]string) *exec.Cmd {
 
 	commands := []string{"add"}

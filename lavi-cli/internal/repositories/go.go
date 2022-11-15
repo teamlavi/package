@@ -24,6 +24,10 @@ func GetGoVersions(packageName string) []string {
 	return strings.Split(txt, " ")
 }
 
+func GoRevert(cfg config.ConfigInterface) string {
+	return GoInstall(cfg, CDSToPkgMap(cfg.GetOriginalCDS()))
+}
+
 func runGoInstall(packages map[string]string) *exec.Cmd {
 
 	commands := []string{"get", "-v"}

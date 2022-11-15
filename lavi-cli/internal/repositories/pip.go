@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"dep-tree-gen/models"
 	"encoding/json"
 	"io/ioutil"
 	"lavi/internal/config"
@@ -49,16 +48,8 @@ func GetPipVersions(packageName string) []string {
 	return out
 }
 
-func PipRevert(pythonPath string, cds models.CDS) {
-	commands := []string{"-m", "pip", "install"}
-	for _, v := range cds.Nodes {
-		commands = append(commands, v.Package+"=="+v.Version)
-	}
-	cmd := exec.Command(pythonPath, commands...)
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+func PipRevert(cfg config.ConfigInterface, pythonPath string) string {
+	return PipInstall(cfg, pythonPath, CDSToPkgMap(cfg.GetOriginalCDS()))
 }
 
 func runPipInstall(pythonPath string, packages map[string]string) *exec.Cmd {

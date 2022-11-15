@@ -23,6 +23,7 @@ func RegisterRoutes(server *Server) {
 	server.Register("/api/v1/cds/original/vulnerabilities", GetOriginalCdsVulns, "GET")
 	server.Register("/api/v1/repositories/{repoName}/versions", GetVersions, "GET")
 	server.Register("/api/v1/install/{cmdType}", Install, "POST")
+	server.Register("/api/v1/revert/{cmdType}", Revert, "POST")
 	server.Register("/api/v1/dispatch/status", DispatchStatus, "GET")
 	server.Register("/api/v1/dispatch/stdout", DispatchStdout, "GET")
 	server.router.PathPrefix("/").Handler(http.FileServer(getFileSystem()))
@@ -134,6 +135,44 @@ func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 	}
 	if cmdType == common.POETRY_CMD_NAME {
 		JsonResponse(w, r, map[string]string{"id": repositories.PoetryInstall(s, t.Packages)})
+		return
+	}
+
+	panic("failed")
+}
+
+func Revert(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cmdType, ok := vars["cmdType"]
+	if !ok {
+		panic("no repo provided")
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var t struct {
+		Packages map[string]string `json:"packages"`
+	}
+	err := decoder.Decode(&t)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if cmdType == common.PIP_CMD_NAME {
+		pythonPath, _ := s.GetCmd().Flags().GetString("python")
+		JsonResponse(w, r, map[string]string{"id": repositories.PipRevert(s, pythonPath)})
+		return
+	}
+	if cmdType == common.GO_CMD_NAME {
+		JsonResponse(w, r, map[string]string{"id": repositories.GoRevert(s)})
+		return
+	}
+	if cmdType == common.NPM_CMD_NAME {
+		JsonResponse(w, r, map[string]string{"id": repositories.NpmRevert(s)})
+		return
+	}
+	if cmdType == common.POETRY_CMD_NAME {
+		JsonResponse(w, r, map[string]string{"id": repositories.GoRevert(s)})
 		return
 	}
 

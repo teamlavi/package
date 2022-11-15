@@ -27,6 +27,10 @@ func GetNpmVersions(packageName string) []string {
 	return versions
 }
 
+func NpmRevert(cfg config.ConfigInterface) string {
+	return NpmInstall(cfg, CDSToPkgMap(cfg.GetOriginalCDS()))
+}
+
 func runNpmInstall(packages map[string]string) *exec.Cmd {
 
 	commands := []string{"install", "--progress=false"}
