@@ -33,7 +33,9 @@ async def create(
         str(major_vers) + "." + str(minor_vers) + "." + str(patch_vers),
     )
     async with tx.cursor() as cur:
-        if vers_exists(tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers):
+        if await vers_exists(
+            tx, repo_name, pkg_name, major_vers, minor_vers, patch_vers
+        ):
             return
         else:
             await cur.execute(
