@@ -105,12 +105,12 @@ export default function Header({ cds, originalCds, viewCurrent, setViewCurrent, 
                 <IconButton onClick={() => setHelpModalOpen(true)} style={{ color: "white" }}>
                     <InfoIcon />
                 </IconButton>
-                <IconButton style={{ marginLeft: "0.25em" }} onClick={downloadCds} style={{ color: "white" }}>
+                {/* <IconButton style={{ marginLeft: "0.25em" }} onClick={downloadCds} style={{ color: "white" }}>
                     <DownloadIcon />
                 </IconButton>
                 <IconButton style={{ marginLeft: "0.25em" }} onClick={() => fileInputRef.current.click()} style={{ color: "white" }}>
                     <UploadIcon />
-                </IconButton>
+                </IconButton> */}
                 <InstallConfirmation open={confirmModalOpen} onClose={(v) => {
                     setConfirmModalOpen(false)
                     if (v) {

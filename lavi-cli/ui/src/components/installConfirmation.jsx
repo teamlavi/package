@@ -16,7 +16,7 @@ function InstallConfirmation({ open, onClose }) {
             </DialogTitle>
             <DialogContent style={{ padding: "20px 24px" }}>
                 <Typography>
-                    This operation <b>will</b> install the new dependencies onto your system. However, LAVI will keep track of previous dependencies which will allow for you to revert back to your original installation. There is also a button that allows for downloading your original dependency tree, just as another backup.
+                    This operation <b>will</b> install the new dependencies onto your system. However, LAVI will keep track of previous dependencies which will allow for you to revert back to your original installation.
                 </Typography>
                 <FormGroup>
                     <FormControlLabel control={<Checkbox value={confirm} onChange={(e) => setConfirm(e.target.checked)} />} label="I confirm I have read and understand the above statement" />
