@@ -9,6 +9,12 @@ image:
   repository:
   tag:
 
+ingress:
+  enabled: true
+  host:
+  prefix: /repo
+  tlsSecretName: ingress-cert
+
 redis:
   image:
     pullPolicy: Always
