@@ -4,6 +4,7 @@ from lavi_worker.routers import api_models
 
 router = APIRouter(tags=["analysis"])
 
+
 # 1.) affectedCount - For vulnerabilities found in queried packages
 # return a list with the number of packages affected by each vulnerability.
 @router.post("/affected_count")
