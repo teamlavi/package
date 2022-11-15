@@ -30,6 +30,7 @@ class RedisWQ(object):
         self,
         queue_name: str,
         expected_tuple_size: int | None = None,
+        attempt_limit: int = 3,
     ):
         """Initialize a work queue, use config from env vars."""
         assert REDIS_HOST is not None and REDIS_PORT is not None
@@ -37,7 +38,9 @@ class RedisWQ(object):
         self.queue_name = queue_name
         self.processing_queue_name = queue_name + ":processing"
         self.lease_queue_prefix = queue_name + ":leased:"
+        self.attempts_prefix = queue_name + ":attempts:"
         self.expected_tuple_size = expected_tuple_size
+        self.attempt_limit = attempt_limit
 
     def insert(self, item: Tuple[str, ...]) -> None:
         """Insert an item into the queue."""
@@ -65,6 +68,7 @@ class RedisWQ(object):
         if packed_item:
             packed_item_str = packed_item.decode("UTF-8")
             self.db.setex(self.lease_queue_prefix + packed_item_str, lease_duration, 1)
+            self.db.incr(self.attempts_prefix + packed_item_str)
             item = _deserialize(packed_item_str)
             if len(item) != self.expected_tuple_size:
                 raise Exception(
@@ -82,6 +86,7 @@ class RedisWQ(object):
         packed_item = _serialize(item)
         self.db.lrem(self.processing_queue_name, 0, packed_item)
         self.db.delete(self.lease_queue_prefix + packed_item)
+        self.db.delete(self.attempts_prefix + packed_item)
 
     def refresh(self) -> None:
         """Refresh the work queue with dead items."""
@@ -89,7 +94,12 @@ class RedisWQ(object):
         dead_items = []
         for packed_item in in_progress:
             packed_item_str = packed_item.decode("UTF-8")
-            if not self.db.get(self.lease_queue_prefix + packed_item_str):
+            attempts = int(self.db.get(self.attempts_prefix + packed_item_str) or 0)
+            print(f"{attempts} attempts")
+            if (
+                not self.db.get(self.lease_queue_prefix + packed_item_str)
+                and attempts < self.attempt_limit
+            ):
                 dead_items.append(packed_item_str)
         for item in dead_items:
             # Only re-add to queue if it's still in processing
