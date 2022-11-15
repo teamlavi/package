@@ -32,7 +32,14 @@ def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
 def compress_tree(tree: Dict[str, List[str]]) -> str:
     """Compress a tree into a smaller data structure for storage."""
     # TODO compress the tree
-    return str(tree)
+    res = ""
+    for node in tree:
+        dependencies = tree[node]
+        res += node + " > "
+        for depend in dependencies:
+            res += depend + ", "
+        res += "\n"
+    return res
 
 
 def decompress_tree(compressed: str) -> Dict[str, List[str]]:
