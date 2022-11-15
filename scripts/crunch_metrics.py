@@ -33,7 +33,10 @@ def main() -> None:
     for queue_name in queue_names:
         metrics = collect_metrics(queue_name)
         avg_time, avg_out = averages(metrics)
-        print(f"{queue_name}  \tt={round(avg_time, 3)}ms\to={round(avg_out, 3)}\tn={len(metrics)}")
+        print(
+            f"{queue_name}  \tt={round(avg_time, 3)}ms"
+            f"\to={round(avg_out, 3)}\tn={len(metrics)}"
+        )
 
 
 if __name__ == "__main__":
