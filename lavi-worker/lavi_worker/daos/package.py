@@ -16,7 +16,7 @@ class SemVer:
         self.minor_vers = int(minor_vers)
         self.patch_vers = int(patch_vers)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.major_vers}.{self.minor_vers}.{self.patch_vers}"
 
 
@@ -74,7 +74,7 @@ async def list_package_versions_pip(
     page2 = f"https://pypi.org/pypi/{package}/json"
 
     all_versions = json.loads(httpx.get(page2).text)["releases"].keys()
-    res_versions: List[str] = []
+    res_versions: List[SemVer] = []
     for vers in all_versions:
         if limit is not None and len(res_versions) >= limit:
             break
@@ -83,7 +83,7 @@ async def list_package_versions_pip(
             while vers.count(".") < 2:
                 # if no minor or patch version included
                 vers += ".0"
-            res_versions.append(vers)
+            res_versions.append(SemVer(*vers.split(".")))
     return res_versions
 
 
