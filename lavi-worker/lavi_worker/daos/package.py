@@ -60,7 +60,7 @@ async def list_package_versions_npm(
                 while vers.count(".") < 2:
                     # if no minor or patch version included
                     vers += ".0"
-                res_versions.append(*vers.split("."))
+                res_versions.append(SemVer(*vers.split(".")))
         return res_versions
     except Exception as e:
         print(f"Unable to interpret versions for {package}", e)
@@ -110,71 +110,130 @@ async def get_vers_less_than_eql(
         elif (
             vers.major_vers == int(major_vers)
             and vers.minor_vers == int(minor_vers)
-            and vers.patch_vers < int(patch_vers)
+            and vers.patch_vers <= int(patch_vers)
         ):
             res.append(str(vers))
     return res
 
 
 async def get_vers_less_than(
-    tx: Transaction,
+    tx: Transaction | None,
     repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
     patch_vers: str,
 ) -> list[str]:
-    return []
+    if repo_name == "npm":
+        all_vers = await list_package_versions_npm(pkg_name)
+    elif repo_name == "pip":
+        all_vers = await list_package_versions_npm(pkg_name)
+    else:
+        all_vers = []
+    res: List[str] = []
+    for vers in all_vers:
+        if vers.major_vers < int(major_vers):
+            res.append(str(vers))
+        elif vers.major_vers == int(major_vers) and vers.minor_vers < int(minor_vers):
+            res.append(str(vers))
+        elif (
+            vers.major_vers == int(major_vers)
+            and vers.minor_vers == int(minor_vers)
+            and vers.patch_vers < int(patch_vers)
+        ):
+            res.append(str(vers))
+    return res
 
 
 async def get_vers_greater_than_eql(
-    tx: Transaction,
+    tx: Transaction | None,
     repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
     patch_vers: str,
 ) -> list[str]:
-    return []
+    if repo_name == "npm":
+        all_vers = await list_package_versions_npm(pkg_name)
+    elif repo_name == "pip":
+        all_vers = await list_package_versions_npm(pkg_name)
+    else:
+        all_vers = []
+    res: List[str] = []
+    for vers in all_vers:
+        if vers.major_vers > int(major_vers):
+            res.append(str(vers))
+        elif vers.major_vers == int(major_vers) and vers.minor_vers > int(minor_vers):
+            res.append(str(vers))
+        elif (
+            vers.major_vers == int(major_vers)
+            and vers.minor_vers == int(minor_vers)
+            and vers.patch_vers >= int(patch_vers)
+        ):
+            res.append(str(vers))
+    return res
 
 
 async def get_vers_greater_than(
-    tx: Transaction,
+    tx: Transaction | None,
     repo_name: str,
     pkg_name: str,
     major_vers: str,
     minor_vers: str,
     patch_vers: str,
 ) -> list[str]:
-    return []
+    if repo_name == "npm":
+        all_vers = await list_package_versions_npm(pkg_name)
+    elif repo_name == "pip":
+        all_vers = await list_package_versions_npm(pkg_name)
+    else:
+        all_vers = []
+    res: List[str] = []
+    for vers in all_vers:
+        if vers.major_vers > int(major_vers):
+            res.append(str(vers))
+        elif vers.major_vers == int(major_vers) and vers.minor_vers > int(minor_vers):
+            res.append(str(vers))
+        elif (
+            vers.major_vers == int(major_vers)
+            and vers.minor_vers == int(minor_vers)
+            and vers.patch_vers > int(patch_vers)
+        ):
+            res.append(str(vers))
+    return res
 
 
 async def vers_exists(
-    tx: Transaction,
+    tx: Transaction | None,
     repo_name: str,
     pkg_name: str,
     major_vers: str | int,
     minor_vers: str | int,
     patch_vers: str | int,
 ) -> bool:
-    return []
+    if repo_name == "npm":
+        all_vers = await list_package_versions_npm(pkg_name)
+    elif repo_name == "pip":
+        all_vers = await list_package_versions_npm(pkg_name)
+    else:
+        all_vers = []
+    for vers in all_vers:
+        if (
+            vers.major_vers == int(major_vers)
+            and vers.minor_vers == int(minor_vers)
+            and vers.patch_vers == int(patch_vers)
+        ):
+            return True
+    return False
 
 
 async def get_row_count(tx: Transaction) -> int:
-    async with tx.cursor() as cur:
-        await cur.execute("SELECT COUNT(*) FROM package")
-        row = await cur.fetchone()
-        return row[0]  # type: ignore
+    return -1
 
 
 async def drop_all_rows(tx: Transaction) -> None:
-    """Drop all table rows."""
-    async with tx.cursor() as cur:
-        await cur.execute("TRUNCATE package RESTART IDENTITY CASCADE")
+    return
 
 
 async def get_table_storage_size(tx: Transaction) -> str:
-    async with tx.cursor() as cur:
-        await cur.execute("SELECT pg_size_pretty(pg_total_relation_size('package'))")
-        row = await cur.fetchone()
-        return row[0]  # type: ignore
+    return "null"
