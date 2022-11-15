@@ -113,6 +113,7 @@ async def drop_all_rows(tx: Transaction) -> None:
     async with tx.cursor() as cur:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
 
+
 async def get_table(tx: Transaction) -> list[DEPENDENCY]:
     async with tx.cursor() as cur:
         await cur.execute("SELECT * FROM dependencies")

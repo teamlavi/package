@@ -85,6 +85,7 @@ async def get_vulnerability_depth(univ_hash: str) -> Dict[str, list[int]] | None
         return None
     else:
         dep_tree2: Dict[str, list[str]] = dep_tree
+
         async def get_vulnerabilities(rec_univ_hash: str, depth: int) -> None:
             deps = dep_tree2[rec_univ_hash]
             for dep in deps:
@@ -117,15 +118,24 @@ async def get_num_vulns_cwe(cwe_id: str) -> int:
     async with await get_db_tx() as tx:
         return await cve.get_cwe_severities(tx, cwe_id)
 
+
 async def check_vulnerable(univ_hash: str) -> bool:
     """Check if there is a vulnerability in a package or its dependencies"""
     dep_tree: Dict[str, list[str]] | None = await get_dependencies(univ_hash)
     if dep_tree is None:
         return False
     else:
-        for pkg in dep_tree:
-            vulns: list[str] = 
+        for pkg in dep_tree.keys():
+            if await find_full_vulnerabilities_id(pkg):
+                return True
+
 
 async def get_all_vulnerable_packages() -> list[str]:
     """Get all vulnerable packages in our database."""
-    return ["Unimplemented"]
+    pkgs: list[str] = []
+    async with await get_db_tx() as tx:
+        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_table(tx)
+        for dep in dep_table:
+            if check_vulnerable(dep.univ_hash):
+                pkgs.append(dep.univ_hash)
+    return pkgs
