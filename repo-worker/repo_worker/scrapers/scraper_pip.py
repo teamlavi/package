@@ -51,15 +51,25 @@ class PipScraper(object):
         return res_versions
 
     @staticmethod
-    def generate_dependency_tree(package: str, version: str) -> TreeNode:
+    def generate_dependency_tree(
+        package: str, version: str, subcommand="poetry"
+    ) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
-        cmd = f'lavi poetry --package="{package}" --version="{version}" --no-scan -w'
-        # TODO if poetry fails try running with pip
+        cmd = f'lavi {subcommand} --package="{package}" --version="{version}" --no-scan -w'
         result = os.popen(cmd).read()
         print(result)
-        if "open poetry.lock: no such file or directory" in result:
-            # TODO: what to return?
-            return TreeNode(package="", repo="", version="")
-        with open("cds.json") as f:
-            cds = json.loads(f.read())
-        return generate_dependency_tree(cds)
+        try:
+            with open("cds.json") as f:
+                cds = json.loads(f.read())
+        except FileNotFoundError:
+            if subcommand == "pip":
+                return TreeNode(package="", repo="", version="")
+            else:
+                return PipScraper.generate_dependency_tree(package, version, "pip")
+
+        dependency_tree = generate_dependency_tree(cds)
+        os.remove("cds.json")
+        return dependency_tree
+
+
+print(PipScraper.generate_dependency_tree("numpy", "1.23.0"))
