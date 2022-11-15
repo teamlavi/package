@@ -120,3 +120,8 @@ async def get_tree(repo: str, package: str, version: str) -> str | None:
         return None
     else:
         return str(decompress_tree(compressed_tree))
+
+
+@router.get("/get_table_storage_size")
+async def get_table_storage_size(table_name: str = "dependencies") -> str:
+    return await updates.get_table_storage_size(table_name)

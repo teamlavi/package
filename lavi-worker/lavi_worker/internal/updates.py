@@ -21,6 +21,20 @@ async def is_db_initialized() -> bool:
     )
 
 
+async def get_table_storage_size(table_name: str = "dependencies") -> str:
+    if table_name == "dependencies":
+        async with await get_db_tx() as tx:
+            return await dependencies.get_table_storage_size(tx)
+    elif table_name == "cves":
+        async with await get_db_tx() as tx:
+            return await cve.get_table_storage_size(tx)
+    elif table_name == "package":
+        async with await get_db_tx() as tx:
+            return await package.get_table_storage_size(tx)
+    else:
+        return f"unknown table '{table_name}'"
+
+
 async def is_table_initialized(table: str = "cves") -> bool:
     """Return whether the database has been initialized yet."""
     if table == "cves":

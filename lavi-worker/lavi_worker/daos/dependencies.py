@@ -96,3 +96,12 @@ async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""
     async with tx.cursor() as cur:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
+
+
+async def get_table_storage_size(tx: Transaction) -> str:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT pg_size_pretty(pg_total_relation_size('dependencies'))"
+        )
+        row = await cur.fetchone()
+        return row[0]  # type: ignore
