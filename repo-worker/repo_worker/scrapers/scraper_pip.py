@@ -5,6 +5,7 @@ from repo_worker.utils import generate_dependency_tree
 import json
 import httpx
 import os
+import sys
 
 
 class PipScraper(object):
@@ -52,20 +53,28 @@ class PipScraper(object):
 
     @staticmethod
     def generate_dependency_tree(
-        package: str, version: str, subcommand="poetry"
+        package: str, version: str, use_poetry: bool = True
     ) -> TreeNode:
         """Given a repository, package, and version, return a conflict-free dep tree."""
-        cmd = f'lavi {subcommand} --package="{package}" --version="{version}" --no-scan -w'
-        result = os.popen(cmd).read()
-        print(result)
+        if use_poetry:
+            cmd = (
+                f'lavi poetry --package="{package}" --version="{version}" --no-scan -w'
+            )
+        else:
+            cmd = f'lavi pip --python={sys.executable} --package="{package}" --version="{version}" --no-scan -w'
+
+        os.popen(cmd).read()
+
         try:
             with open("cds.json") as f:
                 cds = json.loads(f.read())
         except FileNotFoundError:
-            if subcommand == "pip":
-                return TreeNode(package="", repo="", version="")
+            if use_poetry:
+                return PipScraper.generate_dependency_tree(
+                    package, version, use_poetry=False
+                )
             else:
-                return PipScraper.generate_dependency_tree(package, version, "pip")
+                return TreeNode(package="", repo="", version="")
 
         dependency_tree = generate_dependency_tree(cds)
         os.remove("cds.json")
