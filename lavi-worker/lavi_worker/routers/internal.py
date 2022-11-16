@@ -14,9 +14,9 @@ router = APIRouter(tags=["internal"])
 
 
 @router.post("/trigger_vuln_scraper")
-async def trigger_vuln_scraper() -> Response:
+async def trigger_vuln_scraper(repository: str) -> Response:
     """Trigger the scraper to refresh the database."""
-    await updates.scrape_vulnerabilities()
+    await updates.scrape_vulnerabilities(repository)
     return Response(status_code=200)
 
 

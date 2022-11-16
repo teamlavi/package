@@ -491,152 +491,150 @@ async def vers_range_to_list(
         return []
 
 
-async def scrape_vulnerabilities() -> None:
+async def scrape_vulnerabilities(repository: str) -> None:
     """Scrape vulnerabilities from github, save to database."""
     global CACHE_CURSOR
+    if repository not in ["npm", "pip"]:
+        raise Exception(f"Unrecognized repo: {repository}")
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
-    for repository in ["npm", "pip"]:
-        auth_headers = {"Authorization": f"Bearer {config.GH_ACCESS_TOKEN}"}
+    auth_headers = {"Authorization": f"Bearer {config.GH_ACCESS_TOKEN}"}
 
-        # Get vulnerabilities after:
-        last_cursor = None  # = CACHE_CURSOR
+    # Get vulnerabilities after:
+    last_cursor = None  # = CACHE_CURSOR
 
-        # Repeats until there are no new vulnerabilities
-        # TODO: first:x how many to query at once?
-        while True:
-            query_type = (
-                "securityVulnerabilities(first:100, ecosystem: "
-                + repository.upper()
-                + (
-                    ""
-                    if last_cursor is None or last_cursor == ""
-                    else ', after: "' + last_cursor + '"'  # type: ignore
-                )
-                + ", orderBy: {field: UPDATED_AT, direction: ASC})"
+    # Repeats until there are no new vulnerabilities
+    # TODO: first:x how many to query at once?
+    while True:
+        query_type = (
+            "securityVulnerabilities(first:100, ecosystem: "
+            + repository.upper()
+            + (
+                ""
+                if last_cursor is None or last_cursor == ""
+                else ', after: "' + last_cursor + '"'  # type: ignore
             )
+            + ", orderBy: {field: UPDATED_AT, direction: ASC})"
+        )
 
-            query = (
-                """
-                {"""
-                + query_type
-                + """
-               {
-                edges {
-                  cursor
-                  node {
-                    advisory {
-                      cwes(first: 100) {
-                        nodes {
-                          cweId
-                        }
-                      }
-                      summary
-                      permalink
-                      identifiers {
-                        value
-                        type
-                      }
+        query = (
+            """
+            {"""
+            + query_type
+            + """
+           {
+            edges {
+              cursor
+              node {
+                advisory {
+                  cwes(first: 100) {
+                    nodes {
+                      cweId
                     }
-                    package {
-                      name
-                      ecosystem
-                    }
-                    severity
-                    updatedAt
-                    firstPatchedVersion{
-                      identifier
-                    }
-                    vulnerableVersionRange
+                  }
+                  summary
+                  permalink
+                  identifiers {
+                    value
+                    type
                   }
                 }
-                pageInfo {
-                  endCursor
+                package {
+                  name
+                  ecosystem
                 }
+                severity
+                updatedAt
+                firstPatchedVersion{
+                  identifier
+                }
+                vulnerableVersionRange
               }
             }
-            """
+            pageInfo {
+              endCursor
+            }
+          }
+        }
+        """
+        )
+
+        # Add authorization token to headers
+        response = httpx.post(
+            "https://api.github.com/graphql",
+            json={"query": query},
+            headers=auth_headers,
+        )
+
+        # Print returned JSON
+        # print("response")
+        # print(json.dumps(json.loads(response.text), indent=2))
+
+        if '"message":"Bad credentials"' in response.text:
+            print("GitHub Advisory Token Error")
+            return
+        elif "errors" in json.loads(response.text).keys():
+            print("GitHub Advisory Query Error")
+            return
+
+        # Save for next query
+        last_cursor = json.loads(response.text)["data"]["securityVulnerabilities"][
+            "pageInfo"
+        ]["endCursor"]
+
+        if last_cursor is None:
+            print("no newer vulns")
+            return  # stop execution, no new data
+
+        CACHE_CURSOR = last_cursor
+
+        # Parse each vulnerability returned
+        for gh_vuln_edge in json.loads(response.text)["data"][
+            "securityVulnerabilities"
+        ]["edges"]:
+            vuln_cursor = gh_vuln_edge["cursor"]
+            gh_vuln = gh_vuln_edge["node"]
+
+            cve_id = next(
+                (
+                    item["value"]
+                    for item in gh_vuln["advisory"]["identifiers"]
+                    if item["type"] == "CVE"
+                ),
+                None,
             )
+            if cve_id is None:
+                # No CVE, don't add to database
+                print("no cve id for " + vuln_cursor)
+                continue
 
-            # Add authorization token to headers
-            response = httpx.post(
-                "https://api.github.com/graphql",
-                json={"query": query},
-                headers=auth_headers,
+            severity = gh_vuln["severity"]
+            description = gh_vuln["advisory"]["summary"]
+            cwes = ",".join(
+                [cwe_node["cweId"] for cwe_node in gh_vuln["advisory"]["cwes"]["nodes"]]
             )
+            url = gh_vuln["advisory"]["permalink"]
+            repo_name = gh_vuln["package"]["ecosystem"].lower()
+            pkg_name = gh_vuln["package"]["name"]
+            pkg_vers_range = gh_vuln["vulnerableVersionRange"]
+            pkg_vers_list = await vers_range_to_list(
+                repo_name, pkg_name, pkg_vers_range
+            )
+            try:
+                first_patched_vers = gh_vuln["firstPatchedVersion"]["identifier"]
+            except Exception:
+                # Might not have a patched version
+                first_patched_vers = None
 
-            # Print returned JSON
-            # print("response")
-            # print(json.dumps(json.loads(response.text), indent=2))
-
-            if '"message":"Bad credentials"' in response.text:
-                print("GitHub Advisory Token Error")
-                return
-            elif "errors" in json.loads(response.text).keys():
-                print("GitHub Advisory Query Error")
-                return
-
-            # Save for next query
-            last_cursor = json.loads(response.text)["data"]["securityVulnerabilities"][
-                "pageInfo"
-            ]["endCursor"]
-
-            if last_cursor is None:
-                print("no newer vulns")
-                return  # stop execution, no new data
-
-            CACHE_CURSOR = last_cursor
-
-            # Parse each vulnerability returned
-            for gh_vuln_edge in json.loads(response.text)["data"][
-                "securityVulnerabilities"
-            ]["edges"]:
-                vuln_cursor = gh_vuln_edge["cursor"]
-                gh_vuln = gh_vuln_edge["node"]
-
-                cve_id = next(
-                    (
-                        item["value"]
-                        for item in gh_vuln["advisory"]["identifiers"]
-                        if item["type"] == "CVE"
-                    ),
-                    None,
+            for release in pkg_vers_list:
+                await insert_single_vulnerability(
+                    cve_id,
+                    url,
+                    repo_name,
+                    pkg_name,
+                    release,
+                    severity,
+                    description,
+                    cwes,
+                    first_patched_vers,
                 )
-                if cve_id is None:
-                    # No CVE, don't add to database
-                    print("no cve id for " + vuln_cursor)
-                    continue
-
-                severity = gh_vuln["severity"]
-                description = gh_vuln["advisory"]["summary"]
-                cwes = ",".join(
-                    [
-                        cwe_node["cweId"]
-                        for cwe_node in gh_vuln["advisory"]["cwes"]["nodes"]
-                    ]
-                )
-                url = gh_vuln["advisory"]["permalink"]
-                repo_name = gh_vuln["package"]["ecosystem"].lower()
-                pkg_name = gh_vuln["package"]["name"]
-                pkg_vers_range = gh_vuln["vulnerableVersionRange"]
-                pkg_vers_list = await vers_range_to_list(
-                    repo_name, pkg_name, pkg_vers_range
-                )
-                try:
-                    first_patched_vers = gh_vuln["firstPatchedVersion"]["identifier"]
-                except Exception:
-                    # Might not have a patched version
-                    first_patched_vers = None
-
-                for release in pkg_vers_list:
-                    await insert_single_vulnerability(
-                        cve_id,
-                        url,
-                        repo_name,
-                        pkg_name,
-                        release,
-                        severity,
-                        description,
-                        cwes,
-                        first_patched_vers,
-                    )
