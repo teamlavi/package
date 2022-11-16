@@ -26,12 +26,6 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool
     return await updates.insert_single_vulnerability(**insert_vuln_request.dict())
 
 
-@router.post("/insert_vers")
-async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
-    await updates.insert_single_package_version(**package_ver_request.dict())
-    return Response(status_code=200)
-
-
 @router.get("/query_vers")
 async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
     lst = await updates.vers_range_to_list(repo_name, pkg_name, vers_range)
@@ -43,18 +37,6 @@ async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str
 async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
     """Delete a single vulnerability."""
     await updates.delete_single_vulnerability(**delete_vuln_request.dict())
-    return Response(status_code=200)
-
-
-@router.post("/trigger_npm_scrapper")
-async def trigger_npm_scrapper() -> Response:
-    await updates.scrape_npm_packages()
-    return Response(status_code=200)
-
-
-@router.post("/trigger_pip_scrapper")
-async def trigger_pip_scrapper() -> Response:
-    await updates.scrape_pip_packages()
     return Response(status_code=200)
 
 
