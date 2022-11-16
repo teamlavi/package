@@ -1,5 +1,5 @@
 import React from 'react';
-import { getVulnDataStats, parseApiResponse } from '../utils';
+import { getPackagePath, getVulnDataStats, parseApiResponse } from '../utils';
 import { Collapse, Box, Typography, Tooltip, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon, TableSortLabel } from "@mui/material"
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -13,7 +13,29 @@ const hoverWrapper = (str) => {
     </Tooltip>
 }
 
-const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo, row, nodes }) => {
+const OverflowTip = ({ children }) => {
+  const [isOverflowed, setIsOverflow] = React.useState(false);
+  const textElementRef = React.useRef();
+  React.useEffect(() => {
+    setIsOverflow(textElementRef.current.scrollWidth > textElementRef.current.clientWidth);
+  }, []);
+  return (
+    <Tooltip title={children} disableHoverListener={!isOverflowed}>
+      <div
+        ref={textElementRef}
+        style={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {children}
+      </div>
+    </Tooltip>
+  );
+};
+
+const CustomTableRow = ({ cds, viewCurrent, changedVersions, setChangedVersions, repo, row, nodes }) => {
     const [open, setOpen] = React.useState(false);
     const [dialogOpen, setDialogOpen] = React.useState(false)
 
@@ -43,11 +65,11 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
             <TableCell component="th" scope="row">
                 {row.name}
             </TableCell>
-            <TableCell align="right">{changeVers ? <b>{changeVers}</b> : row.version}</TableCell>
-            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.low}</TableCell>
-            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.medium}</TableCell>
-            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.high}</TableCell>
-            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.critical}</TableCell>
+            <TableCell align="right">{changeVers && viewCurrent ? <b>{changeVers}</b> : row.version}</TableCell>
+            <TableCell align="right">{changeVers && viewCurrent ? hoverWrapper("-") : row.severities.low}</TableCell>
+            <TableCell align="right">{changeVers && viewCurrent ? hoverWrapper("-") : row.severities.medium}</TableCell>
+            <TableCell align="right">{changeVers && viewCurrent ? hoverWrapper("-") : row.severities.high}</TableCell>
+            <TableCell align="right">{changeVers && viewCurrent ? hoverWrapper("-") : row.severities.critical}</TableCell>
             <TableCell align="right">
                 {viewCurrent ? <>
                     <IconButton onClick={() => setDialogOpen(true)}>
@@ -85,6 +107,7 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
                                 <TableRow>
                                     <TableCell>Package Name</TableCell>
                                     <TableCell align="right">Package Version</TableCell>
+                                    <TableCell align="right">Package Path</TableCell>
                                     <TableCell align="right">CVE ID</TableCell>
                                     <TableCell align="right">CVE Severity</TableCell>
                                 </TableRow>
@@ -92,6 +115,8 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
                             <TableBody>
                                 {row.vulnerabilities.map(v => {
                                     const node = nodes[v.associatedWith]
+                                    const path = getPackagePath(cds, node.id)
+                                    const pathString = path.join(" > ")
                                     return <>
                                         {v.vulnerabilities.map((vulnRow) => (
                                             <TableRow key={node.package + vulnRow.cveId}>
@@ -99,6 +124,7 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
                                                     {node.package}
                                                 </TableCell>
                                                 <TableCell align="right">{node.version}</TableCell>
+                                                <TableCell align="right"><OverflowTip>{pathString}</OverflowTip></TableCell>
                                                 <TableCell align="right">
                                                     <a href={vulnRow.url} target="_blank">{vulnRow.cveId}</a>
                                                 </TableCell>
@@ -141,7 +167,7 @@ const sorts = {
 }
 
 
-function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, repo, pkgs, stats, nodes }) {
+function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, repo, pkgs, stats, nodes, cds }) {
 
     const [pkgStats, accumStats] = stats
     const [sortType, setSortType] = React.useState("name")
@@ -254,7 +280,7 @@ function VulnerabilityTable({ viewCurrent, changedVersions, setChangedVersions, 
                     <TableCell align="right"><IconButton sx={{ height: "20px" }}><Icon /></IconButton></TableCell>
                 </TableRow>
                 {values.map(k =>
-                    <CustomTableRow viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={k} key={k.id} />
+                    <CustomTableRow cds={cds} viewCurrent={viewCurrent} changedVersions={changedVersions} setChangedVersions={setChangedVersions} repo={repo} nodes={nodes} row={k} key={k.id} />
                 )}
             </TableBody>
         </Table>

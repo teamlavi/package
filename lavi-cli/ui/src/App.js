@@ -43,7 +43,6 @@ function App() {
       setOriginal(resp)
       })
     })
-    
   }
 
   useEffect(() => {
@@ -72,6 +71,7 @@ function App() {
               changedVersions={changedVersions}
               setChangedVersions={setChangedVersions}
               repo={resp.repository} 
+              cds={viewCurrent ? resp : original} 
               stats={viewCurrent ? stats : originalStats} 
               nodes={viewCurrent ? resp.nodes : original.nodes} 
               pkgs={viewCurrent ? pkgs : originalPkgs} 

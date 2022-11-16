@@ -27,6 +27,22 @@ type Function struct {
 
 var Running = map[string]*Function{}
 
+func FailIfHasRunning() {
+	running := HasRunning()
+	if running != "" {
+		panic("already has an install running")
+	}
+}
+
+func HasRunning() string {
+	for k, v := range Running {
+		if v.Status != "success" && v.Status != "error" {
+			return k
+		}
+	}
+	return ""
+}
+
 func Defer(err interface{}, function *Function) {
 	if err != nil {
 		if e, ok := err.(error); ok {

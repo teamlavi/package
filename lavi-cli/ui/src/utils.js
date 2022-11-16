@@ -16,7 +16,7 @@ export function parseApiResponse(response, vulns) {
 
     for (const dep of root.dependencies) {
         const currentNode = nodes[dep]
-        const output = parseApiResponseRecursive(currentNode, nodes, vulns, [])
+        const output = parseApiResponseRecursive(currentNode, nodes, vulns, {})
         vulnData[dep] = makeVulnListUnique(output)
     }
     return vulnData
@@ -39,16 +39,13 @@ function parseApiResponseRecursive(currentNode, nodes, vulns, visited) {
     const { id, dependencies } = currentNode
     const tempVulnArray = vulns[id] ? vulns[id] : []
 
-    if (dependencies.length === 0) {
-        if (tempVulnArray.length !== 0) {
-            return [{
-                vulnerabilities: tempVulnArray,
-                associatedWith: id,
-            }]
-        } else {
-            return []
-        }
+    if (tempVulnArray.length !== 0) {
+        return [{
+            vulnerabilities: tempVulnArray,
+            associatedWith: id,
+        }]
     }
+
     for (const dep of dependencies) {
         const n = nodes[dep]
         if (visited[dep]) {
@@ -57,6 +54,7 @@ function parseApiResponseRecursive(currentNode, nodes, vulns, visited) {
             visited[dep] = true
         }
         const out = parseApiResponseRecursive(n, nodes, vulns, visited)
+        
         if (out) {
             tempVulnArray.push(...out)
         }
@@ -76,6 +74,7 @@ function makeVulnListUnique(list) {
     }
     return out
 }
+
 
 export function getVulnDataStats(nodes, pkgs) {
     const out = []
@@ -120,6 +119,22 @@ function makeCounts(vulnArray) {
             } else {
                 out.critical += 1
             }
+        }
+    }
+    return out
+}
+
+export function getPackagePath(cds, id) {
+    if (cds.root.dependencies.includes(id)) {
+        return [cds.nodes[id].package]
+    }
+
+    const out = []
+    for (const node of Object.values(cds.nodes)) {
+        if (node.dependencies.includes(id)) {
+            const path = getPackagePath(cds, node.id)
+            path.push(cds.nodes[id].package)
+            return path
         }
     }
     return out

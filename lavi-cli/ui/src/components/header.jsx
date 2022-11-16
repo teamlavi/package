@@ -90,6 +90,15 @@ export default function Header({ cds, originalCds, viewCurrent, setViewCurrent, 
         };
     }
 
+    useEffect(() => {
+        Service.hasRunning().then(r => {
+            if (r.data.id) {
+                setId(r.data.id)
+                setModalOpen(true)
+            }
+        })
+    }, [])
+
     return <Box sx={{ flexGrow: 1 }}>
         <AppBar position="fixed">
             <Toolbar>
