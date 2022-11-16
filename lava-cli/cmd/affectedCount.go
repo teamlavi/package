@@ -26,7 +26,7 @@ var affectedCountCmd = &cobra.Command{
 	Use:   "affectedCount",
 	Short: "For vulnerabilities found in queried packages return a list with the number of of packages affected by each vulnerability",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "lavi/analysis/affectedCount")
+		client.New().Run(cmd, "analysis/affected_count")
 	},
 }
 

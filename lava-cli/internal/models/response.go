@@ -1,9 +1,32 @@
 package models
 
+import (
+	"fmt"
+
+	"github.com/jedib0t/go-pretty/v6/text"
+)
+
 type LavaResponse struct {
 	Status string      `json:"status"`
 	Error  interface{} `json:"error"`
 	Result interface{} `json:"result"`
+}
+
+func statusToColor(status string) string {
+	switch status {
+	case "complete":
+		return text.FgHiGreen.Sprint(status)
+	case "pending":
+		return text.FgHiYellow.Sprint(status)
+	case "failure":
+		return text.FgHiRed.Sprint(status)
+	}
+	return status
+}
+
+func (l LavaResponse) Display(queryName string) {
+	fmt.Println(queryName)
+	fmt.Printf("Status: %s", statusToColor(l.Status))
 }
 
 type AffectedCountResponse struct {
