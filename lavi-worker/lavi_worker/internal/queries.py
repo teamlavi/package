@@ -2,8 +2,7 @@ from typing import List, Dict
 
 from lavi_worker.daos import cve, dependencies
 from lavi_worker.daos.database import get_db_tx
-from lavi_worker.utils import RepoEnum
-import json
+from lavi_worker.utils import RepoEnum, decompress_tree
 
 
 async def find_vulnerabilities_simple(
@@ -54,7 +53,7 @@ async def get_affected_packages(repo: RepoEnum, pkgs: list[str]) -> dict[str, in
     async with await get_db_tx() as tx:
         dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(tx, repo.value)
     for dep_entry in dep_table:
-        dep_tree: dict[str, list[str]] = json.loads(dep_entry.pkg_dependencies)
+        dep_tree: dict[str, list[str]] = decompress_tree(dep_entry.pkg_dependencies)
         for pkg in dep_tree.keys():
             if pkg in vuln_pkgs.keys():
                 vuln_pkg_effect[pkg] = vuln_pkg_effect.setdefault(pkg, 0) + 1
@@ -80,7 +79,7 @@ async def get_dependencies(univ_hash: str) -> Dict[str, list[str]] | None:
     async with await get_db_tx() as tx:
         dep_string: str | None = await dependencies.find_tree_id(tx, univ_hash)
     if dep_string:
-        dep_tree: Dict[str, list[str]] = json.loads(dep_string)
+        dep_tree: Dict[str, list[str]] = decompress_tree(dep_string)
         return dep_tree
     else:
         return None
