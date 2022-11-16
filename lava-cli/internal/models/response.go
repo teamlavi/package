@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"lava/internal/models/commands"
 
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -24,43 +25,45 @@ func statusToColor(status string) string {
 	return status
 }
 
+func (l LavaResponse) displayAndFinalizeByResult() {
+	var data commands.CommandResponseModel
+	switch l.Result.(type) {
+	case commands.AffectedCountResponse:
+		data = l.Result.(commands.AffectedCountResponse)
+		break
+	case commands.CountResponse:
+		data = l.Result.(commands.CountResponse)
+		break
+	case commands.CountDepResponse:
+		data = l.Result.(commands.CountDepResponse)
+		break
+	case commands.CountVulResponse:
+		data = l.Result.(commands.CountVulResponse)
+		break
+	case commands.DepthResponse:
+		data = l.Result.(commands.DepthResponse)
+		break
+	case commands.NumDownloadsResponse:
+		data = l.Result.(commands.NumDownloadsResponse)
+		break
+	case commands.SeveritiesResponse:
+		data = l.Result.(commands.SeveritiesResponse)
+		break
+	case commands.TypesResponse:
+		data = l.Result.(commands.TypesResponse)
+		break
+	case commands.VulPackagesResponse:
+		data = l.Result.(commands.VulPackagesResponse)
+		break
+	}
+	data.Display()
+	data.Finalize()
+}
+
 func (l LavaResponse) Display(queryName string) {
 	fmt.Println(queryName)
 	fmt.Printf("Status: %s", statusToColor(l.Status))
-}
-
-type AffectedCountResponse struct {
-	PkgsAffected map[string]int `json:"pkgsAffected"` // CVE id -> Number of packages affected
-}
-
-type CountResponse struct {
-	Count int `json:"count"` // Total number of packages in LAVI database
-}
-
-type CountDepResponse struct {
-	DepList map[string]int `json:"depList"` // package id -> Number of dependencies for this package
-}
-
-type CountVulResponse struct {
-	VulCount int `json:"vulCount"` // Total number of Vulns found in the packages in our database
-}
-
-type DepthResponse struct {
-	VulDepth map[string]int `json:"vulDepth"` // CVE id -> Vulnerability depth from root package
-}
-
-type NumDownloadsResponse struct {
-	Downloads map[string]int `json:"downloads"` // Package id -> Number of package downloads
-}
-
-type SeveritiesResponse struct {
-	SevList map[string]string `json:"sevList"` // Vulnerable package id -> CVE Serverity type
-}
-
-type TypesResponse struct {
-	CweList map[string]int `json:"cweList"` // CWE id -> how many Vulnerabilities for this CWE
-}
-
-type VulPackagesResponse struct {
-	VulList []string `json:"vulList"` // List of all the package ids that are vulnerable in our database
+	if l.Result != nil {
+		l.displayAndFinalizeByResult()
+	}
 }
