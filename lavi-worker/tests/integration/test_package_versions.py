@@ -5,15 +5,6 @@ from .config import BASE_URL
 
 def test_npm_versions():
     """Test that insertion of vulns works."""
-    # Reset the database
-    # TODO: don't reset it, just clear relevant entries
-    try:
-        httpx.post(f"{BASE_URL}/internal/database/nuke")
-        httpx.post(f"{BASE_URL}/internal/database/init")
-    except Exception:
-        print("Failed to reset database pre-test (not critical)")
-        pass
-
     # TODO: Make these cases not break as new versions released
     # TODO: Add cases for other packages
     test_subcases = [
