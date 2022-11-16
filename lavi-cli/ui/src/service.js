@@ -44,4 +44,8 @@ export default class Service {
         return axios.get(`${URL_PREFIX}/api/v1/cds/original/vulnerabilities`)
     }
 
+    static async hasRunning() {
+        return axios.get(`${URL_PREFIX}/api/v1/dispatch`)
+    }
+
 }

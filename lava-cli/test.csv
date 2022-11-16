@@ -1,0 +1,4 @@
+name,version,cveId,depths
+react,18.2.0,CVE-2022-41325,[2]
+react,18.2.0,CVE-2022-41323,[2]
+react,18.2.0,CVE-2022-41324,[2]

@@ -24,6 +24,7 @@ func RegisterRoutes(server *Server) {
 	server.Register("/api/v1/repositories/{repoName}/versions", GetVersions, "GET")
 	server.Register("/api/v1/install/{cmdType}", Install, "POST")
 	server.Register("/api/v1/revert/{cmdType}", Revert, "POST")
+	server.Register("/api/v1/dispatch", HasDispatchRunning, "GET")
 	server.Register("/api/v1/dispatch/status", DispatchStatus, "GET")
 	server.Register("/api/v1/dispatch/stdout", DispatchStdout, "GET")
 	server.router.PathPrefix("/").Handler(http.FileServer(getFileSystem()))
@@ -104,6 +105,7 @@ func GetVersions(s config.ConfigInterface, w http.ResponseWriter, r *http.Reques
 }
 
 func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	dispatch.FailIfHasRunning()
 	vars := mux.Vars(r)
 	cmdType, ok := vars["cmdType"]
 	if !ok {
@@ -143,6 +145,7 @@ func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 }
 
 func Revert(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	dispatch.FailIfHasRunning()
 	vars := mux.Vars(r)
 	cmdType, ok := vars["cmdType"]
 	if !ok {
@@ -176,4 +179,17 @@ func DispatchStdout(s config.ConfigInterface, w http.ResponseWriter, r *http.Req
 	JsonResponse(w, r, map[string]string{
 		"stdout": f,
 	})
+}
+
+func HasDispatchRunning(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	id := dispatch.HasRunning()
+	if id != "" {
+		JsonResponse(w, r, map[string]string{
+			"id": id,
+		})
+	} else {
+		JsonResponse(w, r, map[string]interface{}{
+			"id": nil,
+		})
+	}
 }
