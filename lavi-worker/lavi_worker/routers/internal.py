@@ -48,8 +48,10 @@ async def clear_database() -> Response:
 
 
 @router.post("/database/nuke")
-async def nuke_database() -> Response:
+async def nuke_database(verify_code: str) -> Response:
     """Completely delete all our database tables."""
+    if verify_code != "for real":
+        raise Exception("Invalid verify code")
     await updates.nuke_database()
     return Response(status_code=200)
 
