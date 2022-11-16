@@ -13,17 +13,27 @@ router = APIRouter(tags=["analysis"])
 async def post_affected_count(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        return api_models.LavaResponse(
+            status=ResponseEnum.failure,
+            error="Error! LavaRequest did not recieve a repo! repo is required.",
+            result=None,
+        )
+
     if lava_request.packages:
         return api_models.LavaResponse(
             status=ResponseEnum.complete,
             error=None,
             result=api_models.AffectedCountResponse(
-                pkgsAffected=await queries.get_affected_packages(lava_request.packages)
+                pkgsAffected=await queries.get_affected_packages(
+                    lava_request.repo, lava_request.packages
+                )
             ),
         )
     else:
         return api_models.LavaResponse(
-            status=ResponseEnum.complete,
+            status=ResponseEnum.failure,
             error="Error! No package list was given!",
             result=None,
         )
@@ -37,10 +47,20 @@ async def get_affected_count(jobID: str) -> api_models.LavaResponse:
 # 2.) Count - Number of packages.
 @router.post("/count")
 async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        return api_models.LavaResponse(
+            status=ResponseEnum.failure,
+            error="Error! LavaRequest did not recieve a repo! repo is required.",
+            result=None,
+        )
+
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
         error=None,
-        result=api_models.CountResponse(count=await queries.get_package_count()),
+        result=api_models.CountResponse(
+            count=await queries.get_package_count(lava_request.repo)
+        ),
     )
 
 
@@ -81,11 +101,19 @@ async def get_count_dependencies(jobID: str) -> api_models.LavaResponse:
 async def post_count_vul(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        return api_models.LavaResponse(
+            status=ResponseEnum.failure,
+            error="Error! LavaRequest did not recieve a repo! repo is required.",
+            result=None,
+        )
+
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
         error=None,
         result=api_models.CountVulResponse(
-            vulCount=await queries.get_vulnerable_package_count()
+            vulCount=await queries.get_vulnerable_package_count(lava_request.repo)
         ),
     )
 
@@ -203,11 +231,19 @@ async def get_types(jobID: str) -> api_models.LavaResponse:
 async def post_vulnerable_packages(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        return api_models.LavaResponse(
+            status=ResponseEnum.failure,
+            error="Error! LavaRequest did not recieve a repo! repo is required.",
+            result=None,
+        )
+
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
         error=None,
         result=api_models.VulPackagesResponse(
-            vulList=await queries.get_all_vulnerable_packages()
+            vulList=await queries.get_all_vulnerable_packages(lava_request.repo)
         ),
     )
 

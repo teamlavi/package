@@ -105,10 +105,17 @@ async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM dependencies")
         row = await cur.fetchone()
-        if isinstance(row, tuple):
-            return int(row[0])
-        else:
-            return 0
+        return int(row[0])  # type: ignore
+
+
+async def get_repo_row_count(tx: Transaction, repo: str) -> int:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT COUNT(*) FROM dependencies WHERE repo_name = %s",
+            (repo,),
+        )
+        row = await cur.fetchone()
+        return int(row[0])  # type: ignore
 
 
 async def drop_all_rows(tx: Transaction) -> None:
@@ -120,6 +127,16 @@ async def drop_all_rows(tx: Transaction) -> None:
 async def get_table(tx: Transaction) -> list[DEPENDENCY]:
     async with tx.cursor() as cur:
         await cur.execute("SELECT * FROM dependencies")
+        rows = await cur.fetchall()
+        return [DEPENDENCY(*row) for row in rows]
+
+
+async def get_repo_table(tx: Transaction, repo: str) -> list[DEPENDENCY]:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT * FROM dependencies WHERE repo_name = %s",
+            (repo,),
+        )
         rows = await cur.fetchall()
         return [DEPENDENCY(*row) for row in rows]
 
