@@ -12,25 +12,32 @@ class PipScraper(object):
     @staticmethod
     def list_packages(limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
-        packages: List[str] = []
-        client = httpx.Client(follow_redirects=True)
-        page = client.get(
-            "https://pypi.org/simple"
-        )  # Getting page HTML through request
-        # print(page.text)
-        stringHelper = page.text.replace(" ", "")
-        links = stringHelper.split("\n")
-        for pkg_name in links[7:-2]:  # -2 for this
-            if limit is not None and len(packages) >= limit:
-                break
-            try:
-                # E203: formatter puts whitespace before : but flake8 doesn't want it
-                pkg_name = pkg_name[
-                    pkg_name.find(">") + 1 : pkg_name.rfind("<")  # noqa: E203
-                ]
-                packages.append(pkg_name)
-            except Exception:
-                pass
+        packages: List[str]
+        if True:
+            # Just get top packages for now
+            with open("repo_worker/data/top_pip.txt", "r") as top_file:
+                packages = top_file.readlines()
+            packages = [package.strip() for package in packages if package.strip()]
+        else:
+            packages = []
+            client = httpx.Client(follow_redirects=True)
+            page = client.get(
+                "https://pypi.org/simple"
+            )  # Getting page HTML through request
+            # print(page.text)
+            stringHelper = page.text.replace(" ", "")
+            links = stringHelper.split("\n")
+            for pkg_name in links[7:-2]:  # -2 for this
+                if limit is not None and len(packages) >= limit:
+                    break
+                try:
+                    # E203: formatter puts whitespace before : but flake8 doesn't like
+                    pkg_name = pkg_name[
+                        pkg_name.find(">") + 1 : pkg_name.rfind("<")  # noqa: E203
+                    ]
+                    packages.append(pkg_name)
+                except Exception:
+                    pass
         return packages
 
     @staticmethod
