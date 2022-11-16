@@ -3,7 +3,7 @@ import httpx
 from .config import BASE_URL
 
 
-def test_npm_scraper():
+def test_npm_versions():
     """Test that insertion of vulns works."""
     # Reset the database
     # TODO: don't reset it, just clear relevant entries
@@ -13,10 +13,6 @@ def test_npm_scraper():
     except Exception:
         print("Failed to reset database pre-test (not critical)")
         pass
-
-    # Run the npm scraper
-    resp = httpx.post(f"{BASE_URL}/internal/trigger_npm_scrapper", timeout=30.0)
-    resp.raise_for_status()
 
     # TODO: Make these cases not break as new versions released
     # TODO: Add cases for other packages
