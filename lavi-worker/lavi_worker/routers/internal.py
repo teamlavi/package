@@ -41,8 +41,10 @@ async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Resp
 
 
 @router.post("/database/clear")
-async def clear_database() -> Response:
+async def clear_database(verify_code: str) -> Response:
     """Clear all rows of the database tables."""
+    if verify_code != "for real clear":
+        raise Exception("Invalid verify code")
     await updates.clear_database()
     return Response(status_code=200)
 
@@ -50,7 +52,7 @@ async def clear_database() -> Response:
 @router.post("/database/nuke")
 async def nuke_database(verify_code: str) -> Response:
     """Completely delete all our database tables."""
-    if verify_code != "for real":
+    if verify_code != "for real nuke":
         raise Exception("Invalid verify code")
     await updates.nuke_database()
     return Response(status_code=200)
