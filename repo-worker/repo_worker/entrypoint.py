@@ -137,11 +137,6 @@ def main() -> None:
             logging.info("Running redis-mode generate-tree")
             redis_funcs.generate_tree()
 
-        # Redis db-sync-versions command
-        if args.command == "db-sync-versions":
-            logging.info("Running redis-mode db-sync-versions")
-            redis_funcs.db_sync_versions()
-
         # Redis db-sync-trees command
         if args.command == "db-sync-trees":
             logging.info("Running redis-mode db-sync-trees")

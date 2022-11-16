@@ -10,7 +10,6 @@ from repo_worker.config import REDIS_HOST, REDIS_PORT
 known_queue_sizes = {
     "to_list_versions": 2,
     "to_generate_tree": 3,
-    "to_insert_versions": 3,
     "to_insert_tree": 4,
 }
 
