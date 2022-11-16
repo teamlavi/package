@@ -195,7 +195,8 @@ async def check_vulnerable(univ_hash: str) -> bool:
         return False
     else:
         for pkg in dep_tree.keys():
-            if await find_full_vulnerabilities_id(pkg):
+            cves: list[cve.CVE] = await find_full_vulnerabilities_id(pkg)
+            if cves:
                 return True
     return False
 
@@ -207,7 +208,10 @@ async def get_all_vulnerable_packages(repo: RepoEnum) -> list[str]:
         dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(
             tx, repo.value
         )
-    for dep in dep_table:
-        if await check_vulnerable(dep.univ_hash):
+    for i, dep in enumerate(dep_table):
+        check_val: bool = await check_vulnerable(dep.univ_hash)
+        if check_val:
             pkgs.append(dep.univ_hash)
+        print(i)
+    print(pkgs)
     return pkgs
