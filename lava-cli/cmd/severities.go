@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var severitiesCmd = &cobra.Command{
 	Use:   "severities",
 	Short: "Return list of vulnerable packages and severity for each vulnerability",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("severities called")
+		client.New().Run(cmd, "analysis/severities", reflect.TypeOf(commands.SeveritiesResponse{}))
 	},
 }
 

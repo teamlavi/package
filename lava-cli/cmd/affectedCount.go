@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var affectedCountCmd = &cobra.Command{
 	Use:   "affectedCount",
 	Short: "For vulnerabilities found in queried packages return a list with the number of of packages affected by each vulnerability",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/affected_count")
+		client.New().Run(cmd, "analysis/affected_count", reflect.TypeOf(commands.AffectedCountResponse{}))
 	},
 }
 

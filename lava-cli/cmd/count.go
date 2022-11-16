@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,9 +28,7 @@ var countCmd = &cobra.Command{
 	Use:   "count",
 	Short: "Number of packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("count called")
-		// to get repo flag
-		// repo := common.GetRepo(cmd)
+		client.New().Run(cmd, "analysis/count", reflect.TypeOf(commands.CountResponse{}))
 	},
 }
 

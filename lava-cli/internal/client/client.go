@@ -1,13 +1,17 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"lava/internal/files"
 	"lava/internal/models"
+	"lava/internal/models/commands"
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +24,7 @@ type Client struct {
 // Variadic, but only the first value provided will be used
 // Made it variadic so it can work with nothing provided
 func New(remote ...string) *Client {
-	useRemote := "https://lavi-lava.com/lavi"
+	useRemote := "https://edson.lavi-lava.com/lavi"
 	if len(remote) > 0 {
 		useRemote = remote[0]
 	}
@@ -34,7 +38,7 @@ func New(remote ...string) *Client {
 
 	DO NOT USE LOG.FATAL
 */
-func (c *Client) Run(cmd *cobra.Command, endpoint string) {
+func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type) {
 	var body []byte
 	defer func() {
 		if err := recover(); err != nil {
@@ -54,8 +58,15 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string) {
 
 	body = c.extractBytes(resp)
 
-	lavaResp := c.unmarshalBytes(body)
-	lavaResp.Display(cmd.Name())
+	lavaResp := c.unmarshalBytes(body, dataType)
+	hasDisplayed := lavaResp.Display()
+	if hasDisplayed {
+		if cmd.Flags().Changed("csv") {
+			csvName, _ := cmd.Flags().GetString("csv")
+			csvData := lavaResp.ToCSV()
+			files.SaveCSV(csvName, csvData)
+		}
+	}
 }
 
 /*
@@ -65,18 +76,15 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string) {
 	to poll the get endpoint.
 */
 func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Response, error) {
-	// TODO: THIS IS FOR POSTING WHEN THE API IS READY
-	// json_data, err := json.Marshal(body)
+	json_data, err := json.Marshal(body)
 
-	// if err != nil {
-	// 	log.Fatal("unknown error occured while sending post request")
-	// }
+	if err != nil {
+		panic("unknown error occured while sending post request")
+	}
 
-	// resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
-	// 	bytes.NewBuffer(json_data))
+	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
+		bytes.NewBuffer(json_data))
 
-	// this jobID is included just so I can get a response from prod
-	resp, err := http.Get(fmt.Sprintf("%s/%s?jobID=asdf", c.remote, endpoint))
 	return resp, err
 }
 
@@ -90,14 +98,32 @@ func (c *Client) extractBytes(resp *http.Response) []byte {
 }
 
 // Convert bytes to models.LavaResponse
-func (c *Client) unmarshalBytes(body []byte) models.LavaResponse {
+func (c *Client) unmarshalBytes(body []byte, dataType reflect.Type) models.LavaResponse {
 
-	var res models.LavaResponse
+	var res map[string]interface{}
 
 	err := json.Unmarshal(body, &res)
 	if err != nil {
 		panic("Could not decode api response body")
 	}
 
-	return res
+	value := reflect.New(dataType).Interface().(commands.CommandResponseModel)
+
+	valueBytes, err := json.Marshal(res["result"])
+	if err != nil {
+		panic("Could not decode api response body")
+
+	}
+
+	if err = json.Unmarshal(valueBytes, &value); err != nil {
+		panic("Could not decode api response body")
+	}
+
+	out := models.LavaResponse{
+		Status: res["status"].(string),
+		Error:  res["error"],
+		Result: value,
+	}
+
+	return out
 }

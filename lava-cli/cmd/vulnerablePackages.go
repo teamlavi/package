@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var vulnerablePackagesCmd = &cobra.Command{
 	Use:   "vulnerablePackages",
 	Short: "Return list of vulnerable packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("vulnerablePackages called")
+		client.New().Run(cmd, "analysis/vulnerable_packages", reflect.TypeOf(commands.VulPackagesResponse{}))
 	},
 }
 
