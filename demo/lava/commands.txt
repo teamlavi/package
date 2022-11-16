@@ -1,0 +1,11 @@
+lava -r npm count 
+lava -r pip count 
+
+lava countDependencies -r npm --packages="nedb==1.8.0"
+lava countDependencies -r pip --packages="azure-cli==2.9.1"
+
+lava depth -r npm --packages="nedb==1.8.0"
+
+lava affectedCount -r pip --packages="mysql-connector-python==8.0.6"
+
+lava types -r npm --packages="nedb==1.8.0"
