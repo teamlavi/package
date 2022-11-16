@@ -11,6 +11,7 @@ func NewSHA256(data []byte) []byte {
 	return hash[:]
 }
 
+// b64(repo):b64(package):b64(version)
 func GenerateID(pName, pVersion, pRepo string) string {
 	pNameB64 := B64Encode([]byte(strings.ToLower(pName)))
 	pVersionB64 := B64Encode([]byte(strings.ToLower(pVersion)))
