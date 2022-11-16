@@ -20,16 +20,23 @@ type PackageLock struct {
 	// } `json:"packages"`
 }
 
+type Package struct {
+	Name         string                 `json:"name"`
+	Dependencies map[string]interface{} `json:"dependencies"`
+}
+
 type Dependency struct {
 	Version      string                `json:"version"`
 	Requires     map[string]string     `json:"requires"`
 	Dependencies map[string]Dependency `json:"dependencies"`
+	Peer         bool                  `json:"peer"`
 }
 
 type DepNode struct {
 	name     string
 	version  string
 	requires []string
+	peer     bool
 }
 
 func keys(data map[string]string) []string {
@@ -48,7 +55,7 @@ func (l PackageLock) flatten() map[string]*DepNode {
 
 	flattenLockFileReq = func(deps map[string]Dependency, path []string) {
 		for dName, dVal := range deps {
-			if dVal.Version == "file:" {
+			if dVal.Version == "file:" || dVal.Peer {
 				continue
 			}
 			item := &DepNode{
@@ -91,9 +98,8 @@ func findDepsPath(startPath, depName string, depMap map[string]*DepNode) string 
 	return depName
 }
 
-func (lock PackageLock) ToCDS() models.CDS {
+func (lock PackageLock) ToCDS(pkgFile Package) models.CDS {
 	depMap := lock.flatten()
-
 	nodes := map[string]models.CDSNode{}
 	pathToId := map[string]string{}
 	for p, v := range depMap {
@@ -123,9 +129,8 @@ func (lock PackageLock) ToCDS() models.CDS {
 		nodes[pathObj.ID] = pathObj
 	}
 
-	rootPkg := lock.Dependencies[lock.Name]
 	topLvlDependencyIds := []string{}
-	for n, _ := range rootPkg.Requires {
+	for n, _ := range pkgFile.Dependencies {
 		if id, exists := pathToId[n]; exists {
 			topLvlDependencyIds = append(topLvlDependencyIds, id)
 		}
