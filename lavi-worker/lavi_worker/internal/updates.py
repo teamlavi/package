@@ -273,7 +273,7 @@ async def get_vers_less_than_eql(
     if repo_name == "npm":
         all_vers = await list_package_versions_npm(pkg_name)
     elif repo_name == "pip":
-        all_vers = await list_package_versions_npm(pkg_name)
+        all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
     res: List[str] = []
@@ -301,7 +301,7 @@ async def get_vers_less_than(
     if repo_name == "npm":
         all_vers = await list_package_versions_npm(pkg_name)
     elif repo_name == "pip":
-        all_vers = await list_package_versions_npm(pkg_name)
+        all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
     res: List[str] = []
@@ -329,7 +329,7 @@ async def get_vers_greater_than_eql(
     if repo_name == "npm":
         all_vers = await list_package_versions_npm(pkg_name)
     elif repo_name == "pip":
-        all_vers = await list_package_versions_npm(pkg_name)
+        all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
     res: List[str] = []
@@ -357,7 +357,7 @@ async def get_vers_greater_than(
     if repo_name == "npm":
         all_vers = await list_package_versions_npm(pkg_name)
     elif repo_name == "pip":
-        all_vers = await list_package_versions_npm(pkg_name)
+        all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
     res: List[str] = []
@@ -385,7 +385,7 @@ async def vers_exists(
     if repo_name == "npm":
         all_vers = await list_package_versions_npm(pkg_name)
     elif repo_name == "pip":
-        all_vers = await list_package_versions_npm(pkg_name)
+        all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
     for vers in all_vers:
