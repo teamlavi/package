@@ -30,3 +30,18 @@ func parsePackageLock(path string) PackageLock {
 
 	return data
 }
+
+func parsePackageFile(path string) Package {
+	file, err := ioutil.ReadFile(filepath.Join(path, "package.json"))
+	if err != nil {
+		log.Fatal("failed to read package.json file")
+	}
+	var data Package
+
+	err = json.Unmarshal([]byte(file), &data)
+	if err != nil {
+		log.Fatal("unknown error occured during tree generation")
+	}
+
+	return data
+}

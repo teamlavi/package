@@ -47,8 +47,7 @@ func (g NpmTreeGenerator) GetCDS() models.CDS {
 		fmt.Println("No package-lock found. Generating...") // maybe include a seconds counter just so people know its doing stuff
 		generatePackageLock(g.Path)
 	}
-
-	return parsePackageLock(g.Path).ToCDS()
+	return parsePackageLock(g.Path).ToCDS(parsePackageFile(g.Path))
 }
 
 func (g NpmTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CDS {
