@@ -85,12 +85,33 @@ async def find_tree(
             return None
 
 
+async def find_tree_id(tx: Transaction, univ_hash: str) -> str | None:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT pkg_dependencies from dependencies
+                WHERE univ_hash=%s
+            """,
+            (univ_hash,),
+        )
+        row = await cur.fetchone()
+        if isinstance(row, tuple):
+            return str(row[0])
+        else:
+            return None
+
+
 async def get_row_count(tx: Transaction) -> int:
     async with tx.cursor() as cur:
         await cur.execute("SELECT COUNT(*) FROM dependencies")
         row = await cur.fetchone()
-        return row[0]  # type: ignore
+        return int(row[0])
 
+async def get_repo_row_count(tx: Transaction, repo : str) -> int:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT COUNT(*) FROM dependencies WHERE repo_name = %s", (repo),)
+        row = await cur.fetchone()
+        return int(row[0])
 
 async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""
@@ -98,10 +119,15 @@ async def drop_all_rows(tx: Transaction) -> None:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
 
 
-async def get_table_storage_size(tx: Transaction) -> str:
+async def get_table(tx: Transaction) -> list[DEPENDENCY]:
     async with tx.cursor() as cur:
-        await cur.execute(
-            "SELECT pg_size_pretty(pg_total_relation_size('dependencies'))"
-        )
-        row = await cur.fetchone()
-        return row[0]  # type: ignore
+        await cur.execute("SELECT * FROM dependencies")
+        rows = await cur.fetchall()
+        return [DEPENDENCY(*row) for row in rows]
+
+async def get_repo_table(tx: Transaction, repo: str) -> list[DEPENDENCY]:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT * FROM dependencies WHERE repo_name = %s", (repo),)
+        rows = await cur.fetchall()
+        return [DEPENDENCY(*row) for row in rows]
+

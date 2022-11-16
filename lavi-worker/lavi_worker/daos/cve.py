@@ -150,6 +150,30 @@ async def drop_all_rows(tx: Transaction) -> None:
         await cur.execute("TRUNCATE cves RESTART IDENTITY CASCADE")
 
 
+async def get_vulnerable_package_count(tx: Transaction, repo : str) -> int:
+    """Get a block of rows."""
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT univ_hash FROM cves WHERE repo_name = %s", (repo),)
+        univ_hashes = await cur.fetchall()
+        return len({univ_hash[0] for univ_hash in univ_hashes})
+
+
+async def get_cwe_severities(tx: Transaction, cwe: str) -> list[str] | None:
+    """Get the severities of vulnerabilities with this cwe."""
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT severity FROM cves WHERE cwe = %s", (cwe))
+        severities = await cur.fetchall()
+        return [severity[0] for severity in severities] if severities else None
+
+
+async def get_cwe_num_cves(tx: Transaction, cwe: str) -> int:
+    """Get the vulnerabilities with this cwe."""
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT COUNT(*) FROM cves WHERE cwe=%s", (cwe))
+        num = await cur.fetchone()
+        return int(num[0]) if num else 0
+
+
 async def get_table_storage_size(tx: Transaction) -> str:
     async with tx.cursor() as cur:
         await cur.execute("SELECT pg_size_pretty(pg_total_relation_size('cves'))")
