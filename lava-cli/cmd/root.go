@@ -25,12 +25,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "lava",
 	Short: "Language Agnostic Vulnerability Analysis",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `Each command may have different options. Be sure to use "lava [command] --help to see what options are available before running.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -44,4 +39,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().StringP("repo", "r", "", "Repo to run analysis on (pip, npm, or go)")
+	rootCmd.PersistentFlags().String("status", "", "Vulnerability status to look at (active, patched, or all)")
+	rootCmd.PersistentFlags().String("level", "", "Vulnerability depth levels to look at (direct, indirect, or all)")
+	rootCmd.PersistentFlags().StringSlice("packages", []string{}, "Packages to look at")
 }

@@ -21,18 +21,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// countCmd represents the count command
-var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Number of packages",
+// countVulCmd represents the countVul command
+var countVulCmd = &cobra.Command{
+	Use:   "countVul",
+	Short: "Number of vulnerable packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("count called")
-		// to get repo flag
-		// repo := common.GetRepo(cmd)
+		fmt.Println("countVul called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(countCmd)
-	// we dont need any flags for this
+	rootCmd.AddCommand(countVulCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// countVulCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// countVulCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

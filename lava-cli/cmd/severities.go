@@ -21,18 +21,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// countCmd represents the count command
-var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Number of packages",
+// severitiesCmd represents the severities command
+var severitiesCmd = &cobra.Command{
+	Use:   "severities",
+	Short: "Return list of vulnerable packages and severity for each vulnerability",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("count called")
-		// to get repo flag
-		// repo := common.GetRepo(cmd)
+		fmt.Println("severities called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(countCmd)
-	// we dont need any flags for this
+	rootCmd.AddCommand(severitiesCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// severitiesCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// severitiesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

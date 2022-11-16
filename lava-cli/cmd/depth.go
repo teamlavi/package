@@ -21,18 +21,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// countCmd represents the count command
-var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Number of packages",
+// depthCmd represents the depth command
+var depthCmd = &cobra.Command{
+	Use:   "depth",
+	Short: "Returns list of how deep each vulnerability was from the top level package (how many dependencies deep)",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("count called")
-		// to get repo flag
-		// repo := common.GetRepo(cmd)
+		fmt.Println("depth called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(countCmd)
-	// we dont need any flags for this
+	rootCmd.AddCommand(depthCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// depthCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// depthCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
