@@ -115,6 +115,9 @@ const CustomTableRow = ({ cds, viewCurrent, changedVersions, setChangedVersions,
                             <TableBody>
                                 {row.vulnerabilities.map(v => {
                                     const node = nodes[v.associatedWith]
+                                    if (!node) {
+                                        return <></>
+                                    }
                                     const path = getPackagePath(cds, node.id)
                                     const pathString = path.join(" > ")
                                     return <>
