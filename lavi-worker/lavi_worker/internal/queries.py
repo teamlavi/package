@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from lavi_worker.daos import cve, package, dependencies
+from lavi_worker.daos import cve, dependencies
 from lavi_worker.daos.database import get_db_tx
 from lavi_worker.utils import RepoEnum
 import json
@@ -70,7 +70,7 @@ async def get_affected_packages(pkgs: list[str]) -> dict[str, int]:
 async def get_package_count() -> int:
     """Get number of packages in package database."""
     async with await get_db_tx() as tx:
-        num: int = await package.get_row_count(tx)
+        num: int = await dependencies.get_row_count(tx)
     return num
 
 
