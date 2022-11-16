@@ -40,7 +40,7 @@ async def find_full_vulnerabilities_id(
 
 
 # 1
-async def get_affected_packages(pkgs: list[str]) -> dict[str, int]:
+async def get_affected_packages(repo: RepoEnum, pkgs: list[str]) -> dict[str, int]:
     """Get number of affected packages. Includes self."""
     # get all pkgs and their cves
     vuln_pkgs: dict[str, list[cve.CVE]] = {}
@@ -51,7 +51,7 @@ async def get_affected_packages(pkgs: list[str]) -> dict[str, int]:
     # get number of packages that depend on the list of vulnerable packages
     vuln_pkg_effect: dict[str, int] = {}
     async with await get_db_tx() as tx:
-        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_table(tx)
+        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(tx, repo.value)
     for dep_entry in dep_table:
         dep_tree: dict[str, list[str]] = decompress_tree(dep_entry.pkg_dependencies)
         for pkg in dep_tree.keys():
@@ -66,10 +66,10 @@ async def get_affected_packages(pkgs: list[str]) -> dict[str, int]:
 
 
 # 2
-async def get_package_count() -> int:
+async def get_package_count(repo: RepoEnum) -> int:
     """Get number of packages in package database."""
     async with await get_db_tx() as tx:
-        num: int = await dependencies.get_row_count(tx)
+        num: int = await dependencies.get_repo_row_count(tx, repo.value)
     return num
 
 
@@ -96,11 +96,11 @@ async def get_num_dependencies(univ_hashes: list[str]) -> dict[str, int]:
 
 
 # 4
-async def get_vulnerable_package_count() -> int:
+async def get_vulnerable_package_count(repo : RepoEnum) -> int:
     """Get number of packages in package database with a vulnerability
     in the cve database."""
     async with await get_db_tx() as tx:
-        return await cve.get_vulnerable_package_count(tx)
+        return await cve.get_vulnerable_package_count(tx, repo.value)
 
 
 # 5
@@ -203,11 +203,11 @@ async def check_vulnerable(univ_hash: str) -> bool:
     return False
 
 
-async def get_all_vulnerable_packages() -> list[str]:
+async def get_all_vulnerable_packages(repo : RepoEnum) -> list[str]:
     """Get all vulnerable packages in our database."""
     pkgs: list[str] = []
     async with await get_db_tx() as tx:
-        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_table(tx)
+        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(tx, repo.value)
         for dep in dep_table:
             if check_vulnerable(dep.univ_hash):
                 pkgs.append(dep.univ_hash)
