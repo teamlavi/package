@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var countVulCmd = &cobra.Command{
 	Use:   "countVul",
 	Short: "Number of vulnerable packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("countVul called")
+		client.New().Run(cmd, "analysis/count_vul", reflect.TypeOf(commands.CountVulResponse{}))
 	},
 }
 
