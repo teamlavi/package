@@ -24,6 +24,12 @@ func GetGoVersions(packageName string) []string {
 	return strings.Split(txt, " ")
 }
 
+func GoRevert(cfg config.ConfigInterface) string {
+	return dispatch.DispatchRevert(cfg, reflect.ValueOf(func() *exec.Cmd {
+		return exec.Command("go", "install")
+	}))
+}
+
 func runGoInstall(packages map[string]string) *exec.Cmd {
 
 	commands := []string{"get", "-v"}

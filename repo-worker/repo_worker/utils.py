@@ -3,7 +3,10 @@ from __future__ import annotations  # Postponed annotation evaluation, remove on
 from base64 import b64encode
 from hashlib import sha256
 import logging
-from typing import List, Tuple
+import signal
+from typing import Dict, List, Tuple, Any
+
+import orjson
 
 
 class TreeNode(object):
@@ -18,7 +21,7 @@ class TreeNode(object):
         self.repo = repo
         self.package = package
         self.version = version
-        self.children = children
+        self.children = [c for c in children]  # shallow copy necessary
 
     def add_child(self, child: TreeNode) -> None:
         """Add a child node."""
@@ -28,14 +31,33 @@ class TreeNode(object):
         """Add multiple children."""
         self.children.extend(children)
 
+    def _as_json(self, all_nodes: Dict[str, List[str]]) -> None:
+        """Update the all_nodes with our children as necessary, recurse."""
+        if (univ_hash := self.univ_hash()) in all_nodes:
+            return  # This node has already been inserted
+
+        # Add this node to the dict
+        all_nodes[univ_hash] = list(set(child.univ_hash() for child in self.children))
+
+        # Recurse to childrem
+        for child in self.children:
+            # Children will skip themselves if already inserted
+            child._as_json(all_nodes)
+
     def as_json(self) -> str:
         """Return the tree represented as json."""
-        # TODO generate json how api endpoints wants it
-        raise NotImplementedError
+        # Enumerate every node in the tree into a hash table
+        all_nodes: Dict[str, List[str]] = {}
+        self._as_json(all_nodes)
+        return orjson.dumps(all_nodes).decode()
 
     def as_json_b64(self) -> str:
         """Return the tree represented as json and base64-encoded."""
         return b64encode(self.as_json().encode()).decode()
+
+    def univ_hash(self) -> str:
+        """Generate our universal hash."""
+        return generate_universal_hash(self.repo, self.package, self.version)
 
     def __str__(self) -> str:
         """Get a string representation of the self."""
@@ -94,3 +116,44 @@ def get_recent_version(versions: List[str]) -> str:
         raise Exception(f"Highest version {highest} not in set {versions}")
 
     return highest
+
+
+def generate_dependency_tree(
+    cds: Dict[str, Any],
+) -> TreeNode:
+    def get_node(
+        univ_hash: str,
+    ) -> TreeNode:
+        """recursive function to generate tree"""
+        cds_nodes = cds["nodes"]
+        node_data = cds_nodes[univ_hash]
+        children_list = node_data["dependencies"]
+        # has children, generate them first
+        children_node_list: List[TreeNode] = []
+        for child_id in children_list:
+            children_node_list.append(get_node(child_id))
+        return TreeNode(
+            cds["repository"],
+            node_data["package"],
+            node_data["version"],
+            children_node_list,
+        )
+
+    return get_node(cds["root"]["dependencies"][0])
+
+
+class timeout(object):
+    """Credit https://stackoverflow.com/users/205521/thomas-ahle."""
+
+    def __init__(self, seconds: int = 1):
+        self.seconds = seconds
+
+    def handle_timeout(self, signum: Any, frame: Any) -> None:
+        raise TimeoutError("Function timed out")
+
+    def __enter__(self) -> None:
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type: Any, value: Any, traceback: Any) -> None:
+        signal.alarm(0)

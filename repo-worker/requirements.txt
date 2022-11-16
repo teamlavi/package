@@ -1,6 +1,10 @@
 # Execution requirements
-redis[hiredis]==4.3.4
+fastapi==0.85.1
 httpx==0.23.0
+orjson==3.8.1
+python-multipart==0.0.5
+redis[hiredis]==4.3.4
+uvicorn[standard]==0.19.0
 
 # Test / lint requirements
 black==22.10.0

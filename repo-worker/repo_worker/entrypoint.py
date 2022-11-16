@@ -51,6 +51,9 @@ def parse_cmd_args() -> argparse.Namespace:
     # db-sync-trees subcommand - Send tree entries to lavi db (redis-only)
     subparsers.add_parser("db-sync-trees", help="db-sync-trees help")
 
+    # refresh-queues subcommand - Refresh lost work in the queues
+    subparsers.add_parser("refresh-queues", help="refresh-queues help")
+
     # Do the parse
     return parser.parse_args()
 
@@ -134,15 +137,15 @@ def main() -> None:
             logging.info("Running redis-mode generate-tree")
             redis_funcs.generate_tree()
 
-        # Redis db-sync-versions command
-        if args.command == "db-sync-versions":
-            logging.info("Running redis-mode db-sync-versions")
-            redis_funcs.db_sync_versions()
-
         # Redis db-sync-trees command
         if args.command == "db-sync-trees":
             logging.info("Running redis-mode db-sync-trees")
             redis_funcs.db_sync_trees()
+
+        # Redis refresh-queues command
+        if args.command == "refresh-queues":
+            logging.info("Running redis-mode refresh-queues")
+            redis_funcs.refresh_queues()
 
     else:
         raise Exception(f"Unrecognized execution mode: {args.mode}")

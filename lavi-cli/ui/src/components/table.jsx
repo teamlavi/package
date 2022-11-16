@@ -1,11 +1,17 @@
 import React from 'react';
 import { getVulnDataStats, parseApiResponse } from '../utils';
-import { Collapse, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon, TableSortLabel } from "@mui/material"
+import { Collapse, Box, Typography, Tooltip, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Icon, TableSortLabel } from "@mui/material"
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import EditIcon from '@mui/icons-material/Edit';
 import ChangeVersionDialog from "./changeVersionDialog"
 import RefreshIcon from '@mui/icons-material/Refresh';
+
+const hoverWrapper = (str) => {
+    return <Tooltip title="Unknown. Please run the changes to update.">
+        <span>{str}</span>
+    </Tooltip>
+}
 
 const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo, row, nodes }) => {
     const [open, setOpen] = React.useState(false);
@@ -38,10 +44,10 @@ const CustomTableRow = ({ viewCurrent, changedVersions, setChangedVersions, repo
                 {row.name}
             </TableCell>
             <TableCell align="right">{changeVers ? <b>{changeVers}</b> : row.version}</TableCell>
-            <TableCell align="right">{changeVers ? "-" : row.severities.low}</TableCell>
-            <TableCell align="right">{changeVers ? "-" : row.severities.medium}</TableCell>
-            <TableCell align="right">{changeVers ? "-" : row.severities.high}</TableCell>
-            <TableCell align="right">{changeVers ? "-" : row.severities.critical}</TableCell>
+            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.low}</TableCell>
+            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.medium}</TableCell>
+            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.high}</TableCell>
+            <TableCell align="right">{changeVers ? hoverWrapper("-") : row.severities.critical}</TableCell>
             <TableCell align="right">
                 {viewCurrent ? <>
                     <IconButton onClick={() => setDialogOpen(true)}>

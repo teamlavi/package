@@ -5,15 +5,20 @@ import (
 	"dep-tree-gen/generator"
 	"dep-tree-gen/models"
 	"fmt"
+	"lavi/internal/dispatch"
 	"lavi/internal/server"
 	"lavi/internal/vulnerabilities"
 	"log"
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -46,6 +51,28 @@ func isPortOpen(port int) bool {
 
 	ln.Close()
 	return true
+}
+
+func WatchId(id string) {
+	seen := 0
+	for {
+		function := dispatch.Running[id]
+		if function.Status == "error" {
+			fmt.Println("reverting failed")
+			fmt.Println(function.Error.Error())
+			return
+		}
+
+		if function.Status == "success" {
+			return
+		}
+
+		stdout := function.StdoutString
+		fmt.Print(stdout[seen:])
+		seen = len(stdout)
+
+		time.Sleep(3 * time.Second)
+	}
 }
 
 func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator, vulnData map[string][]vulnerabilities.Vulnerability) {
@@ -91,6 +118,44 @@ func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGener
 	stringPort := ":" + strconv.Itoa(port)
 
 	openbrowser("http://localhost" + stringPort)
+
+	err := gen.BackupFiles()
+	if err != nil {
+		log.Fatal("failed to backup files")
+	}
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+
+	go func() {
+		<-gracefulStop
+		cfg := api.Cfg()
+		if !reflect.DeepEqual(cfg.GetCDS(), cfg.GetOriginalCDS()) {
+			r := bufio.NewReader(os.Stdin)
+			fmt.Print("You are exiting with a modified dependency tree. Would you like to revert back to the original tree? [Y/n]: ")
+
+			res, err := r.ReadString('\n')
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if len(res) < 2 {
+				fmt.Println("reverting")
+				id := server.RevertCommon(cfg, cfg.GetCDS().CmdType)
+				WatchId(id)
+			}
+
+			if strings.ToLower(strings.TrimSpace(res))[0] != 'y' {
+				os.Exit(0)
+			} else {
+				fmt.Println("reverting")
+				id := server.RevertCommon(cfg, cfg.GetCDS().CmdType)
+				WatchId(id)
+			}
+		}
+
+		os.Exit(0)
+	}()
 
 	api.Serve(stringPort)
 }

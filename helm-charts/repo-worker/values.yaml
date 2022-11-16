@@ -1,3 +1,5 @@
+apiReplicas: 1
+
 ghAccessToken:
   secretKey: ghAccessToken
   secretName: gh-access-token
@@ -6,6 +8,12 @@ image:
   pullPolicy: Always
   repository:
   tag:
+
+ingress:
+  enabled: true
+  host:
+  prefix: /repo
+  tlsSecretName: ingress-cert
 
 redis:
   image:
@@ -21,10 +29,6 @@ workers:
   - name: generate-trees
     replicas: 1
     subcommand: generate-tree
-
-  - name: db-sync-versions
-    replicas: 1
-    subcommand: db-sync-versions
 
   - name: db-sync-trees
     replicas: 1

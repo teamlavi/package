@@ -1,8 +1,13 @@
+from base64 import b64decode
+from typing import Dict, List
+
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
+import orjson
 
 from lavi_worker.internal import updates
 from lavi_worker.routers import api_models
+from lavi_worker.utils import compress_tree, decompress_tree
 
 
 router = APIRouter(tags=["internal"])
@@ -21,12 +26,6 @@ async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool
     return await updates.insert_single_vulnerability(**insert_vuln_request.dict())
 
 
-@router.post("/insert_vers")
-async def insert_vers(package_ver_request: api_models.PackageVers) -> Response:
-    await updates.insert_single_package_version(**package_ver_request.dict())
-    return Response(status_code=200)
-
-
 @router.get("/query_vers")
 async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str]:
     lst = await updates.vers_range_to_list(repo_name, pkg_name, vers_range)
@@ -38,18 +37,6 @@ async def query_vers(repo_name: str, pkg_name: str, vers_range: str) -> list[str
 async def delete_vuln(delete_vuln_request: api_models.DeleteVulnRequest) -> Response:
     """Delete a single vulnerability."""
     await updates.delete_single_vulnerability(**delete_vuln_request.dict())
-    return Response(status_code=200)
-
-
-@router.post("/trigger_npm_scrapper")
-async def trigger_npm_scrapper() -> Response:
-    await updates.scrape_npm_packages()
-    return Response(status_code=200)
-
-
-@router.post("/trigger_pip_scrapper")
-async def trigger_pip_scrapper() -> Response:
-    await updates.scrape_pip_packages()
     return Response(status_code=200)
 
 
@@ -97,4 +84,26 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    ...
+    unpacked: Dict[str, List[str]]
+    unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
+    print(f"insert tree endpoint got tree with {len(unpacked)} nodes")
+
+    compressed_tree = compress_tree(unpacked)
+    await updates.insert_single_dependency_tree(
+        repo, package, f"{major_vers}.{minor_vers}.{patch_vers}", compressed_tree
+    )
+    return Response(status_code=200)
+
+
+@router.get("/get_tree")
+async def get_tree(repo: str, package: str, version: str) -> str | None:
+    compressed_tree = await updates.get_single_dependency_tree(repo, package, version)
+    if compressed_tree is None:
+        return None
+    else:
+        return str(decompress_tree(compressed_tree))
+
+
+@router.get("/get_table_storage_size")
+async def get_table_storage_size(table_name: str = "dependencies") -> str:
+    return await updates.get_table_storage_size(table_name)

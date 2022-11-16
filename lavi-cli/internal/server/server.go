@@ -65,6 +65,10 @@ func New(config *ServerConfig) *Server {
 	}
 }
 
+func (s *Server) Cfg() config.ConfigInterface {
+	return s.cfg
+}
+
 func (s *Server) Register(path string, handler func(cfg config.ConfigInterface, w http.ResponseWriter, r *http.Request), methods ...string) {
 	methods = append(methods, "OPTIONS")
 	wrappedHandler := CfgWrapper(s.cfg, handler)

@@ -16,26 +16,73 @@ class DEPENDENCY:
 async def create(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
 ) -> None:
+    # check if tree already exists
+    if await find_tree(tx, repo_name, pkg_name, pkg_vers) is not None:
+        await update(tx, repo_name, pkg_name, pkg_vers, pkg_dependencies)
+    else:
+        univ_hash = generate_universal_hash(
+            repo_name,
+            pkg_name,
+            pkg_vers,
+        )
+        async with tx.cursor() as cur:
+            await cur.execute(
+                """
+                INSERT INTO dependencies
+                VALUES (%s, %s, %s, %s, %s)
+            """,
+                (
+                    univ_hash,
+                    repo_name,
+                    pkg_name,
+                    pkg_vers,
+                    str(pkg_dependencies),
+                ),
+            )
+
+
+async def update(
+    tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
+) -> None:
     univ_hash = generate_universal_hash(
         repo_name,
         pkg_name,
         pkg_vers,
     )
-    # TODO: catch error if already exists
     async with tx.cursor() as cur:
         await cur.execute(
             """
-                INSERT INTO dependencies
-                VALUES (%s, %s, %s, %s, %s)
+                UPDATE dependencies
+                set pkg_dependencies=%s WHERE univ_hash=%s
             """,
             (
-                univ_hash,
-                repo_name,
-                pkg_name,
-                pkg_vers,
                 str(pkg_dependencies),
+                univ_hash,
             ),
         )
+
+
+async def find_tree(
+    tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
+) -> str | None:
+    univ_hash = generate_universal_hash(
+        repo_name,
+        pkg_name,
+        pkg_vers,
+    )
+    async with tx.cursor() as cur:
+        await cur.execute(
+            """
+                SELECT pkg_dependencies from dependencies
+                WHERE univ_hash=%s
+            """,
+            (univ_hash,),
+        )
+        row = await cur.fetchone()
+        if isinstance(row, tuple):
+            return str(row[0])
+        else:
+            return None
 
 
 async def get_row_count(tx: Transaction) -> int:
@@ -49,3 +96,12 @@ async def drop_all_rows(tx: Transaction) -> None:
     """Drop all table rows."""
     async with tx.cursor() as cur:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
+
+
+async def get_table_storage_size(tx: Transaction) -> str:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT pg_size_pretty(pg_total_relation_size('dependencies'))"
+        )
+        row = await cur.fetchone()
+        return row[0]  # type: ignore
