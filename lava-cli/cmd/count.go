@@ -24,13 +24,7 @@ import (
 // countCmd represents the count command
 var countCmd = &cobra.Command{
 	Use:   "count",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Number of packages",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("count called")
 		// to get repo flag

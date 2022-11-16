@@ -38,7 +38,7 @@ func (g NpmTreeGenerator) RestoreFiles() error {
 }
 
 func (g NpmTreeGenerator) GetCDS() models.CDS {
-	common.HasExecutableFailOut("go")
+	common.HasExecutableFailOut("npm")
 
 	if _, err := os.Stat(filepath.Join(g.Path, "package.json")); err != nil {
 		log.Fatal("project must contain a package.json file")

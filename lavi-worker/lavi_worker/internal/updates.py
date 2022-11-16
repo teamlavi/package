@@ -496,7 +496,7 @@ async def scrape_vulnerabilities() -> None:
     global CACHE_CURSOR
     # Ran on repositories individually so that only relevant vulnerabilities are pulled
     # from GitHub
-    for repository in ["npm"]:
+    for repository in ["npm", "pip"]:
         auth_headers = {"Authorization": f"Bearer {config.GH_ACCESS_TOKEN}"}
 
         # Get vulnerabilities after:
