@@ -10,14 +10,35 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 type PoetryTreeGenerator struct {
 	Path string
 }
 
+func (g PoetryTreeGenerator) BackupFiles() error {
+	if err := common.BackupToTemp(filepath.Join(g.Path, "pyproject.toml")); err != nil {
+		return err
+	}
+	if err := common.BackupToTemp(filepath.Join(g.Path, "poetry.lock")); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g PoetryTreeGenerator) RestoreFiles() error {
+	if err := common.RestoreFromTemp(filepath.Join(g.Path, "pyproject.toml")); err != nil {
+		return err
+	}
+	if err := common.RestoreFromTemp(filepath.Join(g.Path, "poetry.lock")); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g PoetryTreeGenerator) GetCDS() models.CDS {
-	verifyPoetryDependency()
+	common.HasExecutableFailOut("poetry")
 	lockFile := getPoetryLockFile(g.Path)
 	pyproject := getPoetryTomlFileDependencues(g.Path)
 
@@ -31,6 +52,8 @@ func (g PoetryTreeGenerator) GetCDSForPackages(pkgs map[string]string) models.CD
 }
 
 func (g PoetryTreeGenerator) GenerateSinglePackageCds(pkg, version string) models.CDS {
+	common.HasExecutableFailOut("poetry")
+
 	// generate a pyproject.toml WITHOUT dependencies installed
 	// question: how do we reconcile existing python versions, and the 3.8 specified in this file
 	fileData := `

@@ -36,7 +36,6 @@ def list_packages(repo: str) -> None:
 def list_package_versions(lease_time: int = 30) -> None:
     """Handle redis runs of list-package-versions."""
     in_wq = get_redis_wq("to_list_versions")
-    out_versions_wq = get_redis_wq("to_insert_versions")
     out_recent_wq = get_redis_wq("to_generate_tree")
 
     while True:
@@ -60,11 +59,6 @@ def list_package_versions(lease_time: int = 30) -> None:
                 in_wq.complete(item)
                 elapsed_t = int(1000 * (time.time() - start_t))
                 in_wq.save_metrics(elapsed_t, len(versions))
-
-                logging.info(f"Inserting {len(versions)} scraped package versions")
-                for version in versions:
-                    out_versions_wq.insert((repo, package, version))
-                logging.info("Done inserting scraped package versions")
 
                 recent_version = get_recent_version(versions)
                 logging.info(f"Inserting most recent package version {recent_version}")
@@ -104,50 +98,6 @@ def generate_tree(lease_time: int = 300) -> None:
                 logging.info("Inserting tree")
                 out_wq.insert((repo, package, version, tree.as_json_b64()))
                 logging.info("Done inserting tree")
-
-        except Exception:
-            traceback.print_exc()
-
-
-def db_sync_versions(lease_time: int = 30) -> None:
-    """Insert items from versions queue in lavi db."""
-    in_wq = get_redis_wq("to_insert_versions")
-
-    while True:
-        try:
-            with timeout(lease_time + 10):
-                item: Tuple[str, str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
-                if not item:
-                    logging.info("No work received, waiting")
-                    continue
-                repo, package, version = item
-                parsed_version = parse_version(version)
-                if parsed_version is None:
-                    logging.info("Failed to parse version, skipping")
-                    continue
-                major, minor, patch = parsed_version
-                start_t = time.time()
-
-                logging.info(
-                    f"Sending version to lavi db: {repo} - {package} - {version}"
-                )
-                body = {
-                    "repo_name": repo,
-                    "pkg_name": package,
-                    "major_vers": major,
-                    "minor_vers": minor,
-                    "patch_vers": patch,
-                    "num_downloads": 0,
-                    "s3_bucket": "0",
-                }
-                resp = httpx.post(f"{LAVI_API_URL}/internal/insert_vers", json=body)
-                resp.raise_for_status()
-                logging.info("Succesfully sent version to db")
-
-                in_wq.complete(item)
-                elapsed_t = int(1000 * (time.time() - start_t))
-                in_wq.save_metrics(elapsed_t, 1)
 
         except Exception:
             traceback.print_exc()

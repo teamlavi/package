@@ -23,6 +23,7 @@ func RegisterRoutes(server *Server) {
 	server.Register("/api/v1/cds/original/vulnerabilities", GetOriginalCdsVulns, "GET")
 	server.Register("/api/v1/repositories/{repoName}/versions", GetVersions, "GET")
 	server.Register("/api/v1/install/{cmdType}", Install, "POST")
+	server.Register("/api/v1/revert/{cmdType}", Revert, "POST")
 	server.Register("/api/v1/dispatch/status", DispatchStatus, "GET")
 	server.Register("/api/v1/dispatch/stdout", DispatchStdout, "GET")
 	server.router.PathPrefix("/").Handler(http.FileServer(getFileSystem()))
@@ -121,7 +122,8 @@ func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 
 	if cmdType == common.PIP_CMD_NAME {
 		pythonPath, _ := s.GetCmd().Flags().GetString("python")
-		JsonResponse(w, r, map[string]string{"id": repositories.PipInstall(s, pythonPath, t.Packages)})
+		requirementsPath, _ := s.GetCmd().Flags().GetString("path")
+		JsonResponse(w, r, map[string]string{"id": repositories.PipInstall(s, pythonPath, requirementsPath, t.Packages)})
 		return
 	}
 	if cmdType == common.GO_CMD_NAME {
@@ -138,6 +140,21 @@ func Install(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
 	}
 
 	panic("failed")
+}
+
+func Revert(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cmdType, ok := vars["cmdType"]
+	if !ok {
+		panic("no repo provided")
+	}
+
+	id := RevertCommon(s, cmdType)
+	if id == "" {
+		panic("failed")
+	} else {
+		JsonResponse(w, r, map[string]string{"id": id})
+	}
 }
 
 func DispatchStatus(s config.ConfigInterface, w http.ResponseWriter, r *http.Request) {

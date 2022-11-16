@@ -10,19 +10,36 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import { useSnackbar } from 'notistack';
 
-export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, setChangedVersions, changedVersions, update }) {
-    const [confirmModalOpen, setConfirmModalOpen] = useState(false)
+export default function Header({ cds, originalCds, viewCurrent, setViewCurrent, repo, cmd, setChangedVersions, changedVersions, update }) {
+    const [confirmModalOpen, _setConfirmModalOpen] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [helpModalOpen, setHelpModalOpen] = useState(false)
     const [id, setId] = useState("")
     const fileInputRef = React.useRef(null);
     const { enqueueSnackbar } = useSnackbar();
+    
+    const canRevert = JSON.stringify(cds) !== JSON.stringify(originalCds);
 
     const runChanges = () => {
         Service.runInstall(cds.cmdType, { packages: changedVersions }).then(r => {
             setId(r.data.id)
             setModalOpen(true)
         })
+    }
+    
+    const runRevert = () => {
+        Service.revert(cds.cmdType).then(r => {
+            setId(r.data.id)
+            setModalOpen(true)
+        })
+    }
+    const [func, setFunc] = useState("revert")
+
+    const setConfirmModalOpen = (v, f) => {
+        if (f) {
+            setFunc(f)
+        }
+        _setConfirmModalOpen(v)
     }
 
     const downloadCds = () => {
@@ -83,21 +100,21 @@ export default function Header({ cds, viewCurrent, setViewCurrent, repo, cmd, se
                     [{cmd}]
                 </Typography>
                 <Button style={{ marginRight: "1em" }} color="inherit" onClick={() => setViewCurrent(!viewCurrent)}>View {viewCurrent ? "Original" : "Modified"}</Button>
-                <Button style={{ marginRight: "1em" }} color="inherit">Revert</Button>
-                <Button style={{ marginRight: "0.75em" }} color="inherit" onClick={() => setConfirmModalOpen(true)} disabled={Object.keys(changedVersions).length === 0}>Run Changes</Button>
+                <Button style={{ marginRight: "1em" }} color="inherit" disabled={!canRevert} onClick={() => setConfirmModalOpen(true, "revert")}>Revert</Button>
+                <Button style={{ marginRight: "0.75em" }} color="inherit" onClick={() => setConfirmModalOpen(true, "install")} disabled={Object.keys(changedVersions).length === 0}>Run Changes</Button>
                 <IconButton onClick={() => setHelpModalOpen(true)} style={{ color: "white" }}>
                     <InfoIcon />
                 </IconButton>
-                <IconButton style={{ marginLeft: "0.25em" }} onClick={downloadCds} style={{ color: "white" }}>
+                {/* <IconButton style={{ marginLeft: "0.25em" }} onClick={downloadCds} style={{ color: "white" }}>
                     <DownloadIcon />
                 </IconButton>
                 <IconButton style={{ marginLeft: "0.25em" }} onClick={() => fileInputRef.current.click()} style={{ color: "white" }}>
                     <UploadIcon />
-                </IconButton>
+                </IconButton> */}
                 <InstallConfirmation open={confirmModalOpen} onClose={(v) => {
                     setConfirmModalOpen(false)
                     if (v) {
-                        runChanges()
+                        func === "revert" ? runRevert() : runChanges()
                     }
                 }} />
                 <InstallModal update={update} id={id} open={modalOpen} onClose={(result) => {

@@ -122,3 +122,12 @@ async def get_table(tx: Transaction) -> list[DEPENDENCY]:
         await cur.execute("SELECT * FROM dependencies")
         rows = await cur.fetchall()
         return [DEPENDENCY(*row) for row in rows]
+
+
+async def get_table_storage_size(tx: Transaction) -> str:
+    async with tx.cursor() as cur:
+        await cur.execute(
+            "SELECT pg_size_pretty(pg_total_relation_size('dependencies'))"
+        )
+        row = await cur.fetchone()
+        return row[0]  # type: ignore

@@ -24,6 +24,10 @@ export default class Service {
         return axios.post(`${URL_PREFIX}/api/v1/install/${cmd}`, changes)
     }
 
+    static async revert(cmd) {
+        return axios.post(`${URL_PREFIX}/api/v1/revert/${cmd}`)
+    }
+
     static async getStdout(id) {
         return axios.get(`${URL_PREFIX}/api/v1/dispatch/stdout`, { params: { id } })
     }

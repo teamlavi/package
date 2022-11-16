@@ -172,3 +172,10 @@ async def get_cwe_num_cves(tx: Transaction, cwe: str) -> int:
         await cur.execute("SELECT COUNT(*) FROM cves WHERE cwe=%s", (cwe))
         num = await cur.fetchone()
         return int(num[0]) if num else 0
+
+
+async def get_table_storage_size(tx: Transaction) -> str:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT pg_size_pretty(pg_total_relation_size('cves'))")
+        row = await cur.fetchone()
+        return row[0]  # type: ignore

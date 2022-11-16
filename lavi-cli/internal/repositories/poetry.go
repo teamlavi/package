@@ -7,6 +7,11 @@ import (
 	"reflect"
 )
 
+func PoetryRevert(cfg config.ConfigInterface) string {
+	return dispatch.DispatchRevert(cfg, reflect.ValueOf(func() *exec.Cmd {
+		return exec.Command("poetry", "install")
+	}))
+}
 func runPoetryInstall(packages map[string]string) *exec.Cmd {
 
 	commands := []string{"add"}

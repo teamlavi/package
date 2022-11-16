@@ -10,7 +10,6 @@ REPO_API_URL = os.getenv("REPO_API_URL") or "https://levi.lavi-lava.com/repo"
 queue_names = [
     "to_list_versions",
     "to_generate_tree",
-    "to_insert_versions",
     "to_insert_tree",
 ]
 

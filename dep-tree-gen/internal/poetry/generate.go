@@ -10,14 +10,6 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func verifyPoetryDependency() {
-	cmd := exec.Command("poetry")
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal("failed to find poetry on the system")
-	}
-}
-
 func getPoetryLockFile(path string) LockFile {
 	var lf LockFile
 	_, err := ioutil.ReadFile(filepath.Join(path, "poetry.lock"))
