@@ -82,9 +82,9 @@ async def initialize_database() -> None:
                             cwe TEXT,
                             url TEXT NOT NULL,
                             repo_name VARCHAR(50) NOT NULL,
-                            pkg_name VARCHAR(50) NOT NULL,
+                            pkg_name VARCHAR(100) NOT NULL,
                             pkg_vers VARCHAR(50) NOT NULL,
-                            univ_hash VARCHAR(100) NOT NULL,
+                            univ_hash VARCHAR(200) NOT NULL,
                             first_patched_vers VARCHAR(50)
                         );
                         ALTER TABLE cves
@@ -95,9 +95,9 @@ async def initialize_database() -> None:
                 await cur.execute(
                     """
                     CREATE TABLE dependencies (
-                      univ_hash VARCHAR(100) PRIMARY KEY,
+                      univ_hash VARCHAR(200) PRIMARY KEY,
                       repo_name VARCHAR(50) NOT NULL,
-                      pkg_name VARCHAR(50) NOT NULL,
+                      pkg_name VARCHAR(100) NOT NULL,
                       pkg_vers VARCHAR(50),
                       pkg_dependencies TEXT NOT NULL
                     );
