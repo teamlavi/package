@@ -105,6 +105,7 @@ async def get_tree(repo: str, package: str, version: str) -> str | None:
     if compressed_tree is None:
         return None
     else:
+        print("HERE IS TEH DEBGUGGING PKVJRINT: " + package)
         return str(decompress_tree(compressed_tree))
 
 
