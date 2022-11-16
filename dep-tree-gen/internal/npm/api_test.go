@@ -219,7 +219,7 @@ func (d DisabledList) contains(v int) bool {
 	return false
 }
 
-var DISABLED = DisabledList{1}
+var DISABLED = DisabledList{}
 
 // just a util func for when needed
 func saveCds(cds models.CDS) {
