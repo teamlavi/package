@@ -80,6 +80,8 @@ def decompress_tree(compressed: str) -> Dict[str, List[str]]:
 
     tree: Dict[str, list[str]] = {node: [] for node in nodes}
     for dependency_str in lines[1:]:
+        if not dependency_str:
+            continue
         parent_index: str
         children_indices: str
         parent_index, children_indices = dependency_str.split(">")
