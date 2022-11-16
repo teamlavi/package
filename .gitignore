@@ -6,3 +6,4 @@
 /.idea/
 
 **/cds.json
+**/*.csv
