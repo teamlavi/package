@@ -30,31 +30,22 @@ func (l LavaResponse) displayAndFinalizeByResult() {
 	switch l.Result.(type) {
 	case commands.AffectedCountResponse:
 		data = l.Result.(commands.AffectedCountResponse)
-		break
 	case commands.CountResponse:
 		data = l.Result.(commands.CountResponse)
-		break
 	case commands.CountDepResponse:
 		data = l.Result.(commands.CountDepResponse)
-		break
 	case commands.CountVulResponse:
 		data = l.Result.(commands.CountVulResponse)
-		break
 	case commands.DepthResponse:
 		data = l.Result.(commands.DepthResponse)
-		break
 	case commands.NumDownloadsResponse:
 		data = l.Result.(commands.NumDownloadsResponse)
-		break
 	case commands.SeveritiesResponse:
 		data = l.Result.(commands.SeveritiesResponse)
-		break
 	case commands.TypesResponse:
 		data = l.Result.(commands.TypesResponse)
-		break
 	case commands.VulPackagesResponse:
 		data = l.Result.(commands.VulPackagesResponse)
-		break
 	}
 	data.Display()
 	data.Finalize()
