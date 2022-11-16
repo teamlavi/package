@@ -61,7 +61,6 @@ func (l LavaResponse) displayAndFinalizeByResult() {
 }
 
 func (l LavaResponse) Display(queryName string) {
-	fmt.Println(queryName)
 	fmt.Printf("Status: %s", statusToColor(l.Status))
 	if l.Result != nil {
 		l.displayAndFinalizeByResult()
