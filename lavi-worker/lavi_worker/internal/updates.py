@@ -239,7 +239,7 @@ async def list_package_versions_npm(
                 res_versions.append(SemVer(*vers.split(".")))
         return res_versions
     except Exception as e:
-        print(f"Unable to interpret versions for {package}", e)
+        print(f"Unable to interpret npm versions for {package}", e)
         return []
 
 
@@ -247,20 +247,24 @@ async def list_package_versions_pip(
     package: str, limit: int | None = None
 ) -> List[SemVer]:
     """Given a repository and package, return a list of available versions."""
-    page2 = f"https://pypi.org/pypi/{package}/json"
+    try:
+        page2 = f"https://pypi.org/pypi/{package}/json"
+        all_versions = json.loads(httpx.get(page2).text)["releases"].keys()
 
-    all_versions = json.loads(httpx.get(page2).text)["releases"].keys()
-    res_versions: List[SemVer] = []
-    for vers in all_versions:
-        if limit is not None and len(res_versions) >= limit:
-            break
-        elif vers.replace(".", "").isnumeric():
-            # checks if there are characters in version number
-            while vers.count(".") < 2:
-                # if no minor or patch version included
-                vers += ".0"
-            res_versions.append(SemVer(*vers.split(".")))
-    return res_versions
+        res_versions: List[SemVer] = []
+        for vers in all_versions:
+            if limit is not None and len(res_versions) >= limit:
+                break
+            elif vers.replace(".", "").isnumeric():
+                # checks if there are characters in version number
+                while vers.count(".") < 2:
+                    # if no minor or patch version included
+                    vers += ".0"
+                res_versions.append(SemVer(*vers.split(".")))
+        return res_versions
+    except Exception as e:
+        print(f"Unable to interpret pip versions for {package}", e)
+        return []
 
 
 async def get_vers_less_than_eql(
