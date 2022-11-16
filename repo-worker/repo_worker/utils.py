@@ -80,8 +80,8 @@ def _sha256(content: str | bytes) -> bytes:
 
 def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
     """Generate the hash given the basic data."""
-    univ_hash: bytes = _sha256(_sha256(pkg) + _sha256(vers) + _sha256(repo))
-    return b64encode(univ_hash).decode("UTF-8")
+    items = [repo, pkg, vers]
+    return ":".join(b64encode(item.encode()).decode() for item in items)
 
 
 def parse_version(version: str) -> Tuple[int, int, int] | None:

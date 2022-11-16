@@ -11,14 +11,25 @@ func NewSHA256(data []byte) []byte {
 	return hash[:]
 }
 
+// b64(repo):b64(package):b64(version)
 func GenerateID(pName, pVersion, pRepo string) string {
-	pNameSha := NewSHA256([]byte(strings.ToLower(pName)))
-	pVersionSha := NewSHA256([]byte(strings.ToLower(pVersion)))
-	pRepoSha := NewSHA256([]byte(pRepo))
+	pNameB64 := B64Encode([]byte(strings.ToLower(pName)))
+	pVersionB64 := B64Encode([]byte(strings.ToLower(pVersion)))
+	pRepoB64 := B64Encode([]byte(pRepo))
 
-	joinedSha := NewSHA256(append(pNameSha, append(pVersionSha, pRepoSha...)...))
-	return B64Encode(joinedSha)
+	joined := pRepoB64 + ":" + pNameB64 + ":" + pVersionB64
+	return joined
 }
+
+// old way
+// func GenerateID(pName, pVersion, pRepo string) string {
+// 	pNameSha := NewSHA256([]byte(strings.ToLower(pName)))
+// 	pVersionSha := NewSHA256([]byte(strings.ToLower(pVersion)))
+// 	pRepoSha := NewSHA256([]byte(pRepo))
+
+// 	joinedSha := NewSHA256(append(pNameSha, append(pVersionSha, pRepoSha...)...))
+// 	return B64Encode(joinedSha)
+// }
 
 func B64Encode(bytes []byte) string {
 	return b64.StdEncoding.EncodeToString([]byte(bytes))
