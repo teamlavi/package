@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var countDependenciesCmd = &cobra.Command{
 	Use:   "countDependencies",
 	Short: "Returns list of how many other packages each package relies on",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("countDependencies called")
+		client.New().Run(cmd, "analysis/count_dependencies", reflect.TypeOf(commands.CountDepResponse{}))
 	},
 }
 

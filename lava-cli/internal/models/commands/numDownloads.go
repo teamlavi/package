@@ -8,6 +8,6 @@ func (a NumDownloadsResponse) Display() {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a NumDownloadsResponse) Finalize() {
-	panic("not implemented") // TODO: Implement
+func (a NumDownloadsResponse) ToCSV() [][]string {
+	return [][]string{}
 }

@@ -1,7 +1,11 @@
 package models
 
 import (
+	"fmt"
 	"log"
+	"strings"
+
+	"dep-tree-gen/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -38,7 +42,17 @@ func getPackages(cmd *cobra.Command) []string {
 	if err != nil {
 		log.Fatal("failed to read packages flag")
 	}
-	return v
+
+	out := []string{}
+	for _, pkg := range v {
+		if !strings.Contains(pkg, "==") {
+			panic(fmt.Sprintf("Package %s is invalid. Format must be PACKAGE_NAME==PACKAGE_VERSION", pkg))
+		}
+		nameVers := strings.Split(pkg, "==")
+		out = append(out, utils.GenerateID(nameVers[0], nameVers[1], string(getRepo(cmd))))
+	}
+
+	return out
 }
 
 func BuildLavaRequest(cmd *cobra.Command) *LavaRequest {

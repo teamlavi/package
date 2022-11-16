@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +28,7 @@ var depthCmd = &cobra.Command{
 	Use:   "depth",
 	Short: "Returns list of how deep each vulnerability was from the top level package (how many dependencies deep)",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("depth called")
+		client.New().Run(cmd, "analysis/depth", reflect.TypeOf(commands.DepthResponse{}))
 	},
 }
 

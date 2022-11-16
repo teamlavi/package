@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"lava/internal/client"
+	"lava/internal/models/commands"
+	"reflect"
 
 	"github.com/spf13/cobra"
 )
@@ -24,9 +26,9 @@ import (
 // typesCmd represents the types command
 var typesCmd = &cobra.Command{
 	Use:   "types",
-	Short: "Returns CSV with CWEs and a count of how many vulnerabilities for each CWE",
+	Short: "Returns CWEs and a count of how many vulnerabilities for each CWE",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("types called")
+		client.New().Run(cmd, "analysis/types", reflect.TypeOf(commands.TypesResponse{}))
 	},
 }
 
