@@ -6,10 +6,10 @@ from lavi_worker.utils import generate_universal_hash
 
 @define(frozen=True)
 class DEPENDENCY:
+    univ_hash: str
     repo_name: str
     pkg_name: str
     pkg_vers: str
-    univ_hash: str
     pkg_dependencies: str
 
 
