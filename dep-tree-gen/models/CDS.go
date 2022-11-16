@@ -1,5 +1,7 @@
 package models
 
+import "sort"
+
 type CDS struct {
 	// need this because pip and poetry are the same repo but different commands
 	CmdType    string             `json:"cmdType"`
@@ -41,4 +43,32 @@ func (c CDS) GetPathString(id string) []string {
 		}
 	}
 	return out
+}
+
+func sliceCompare(s1 []string, s2 []string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+	// order dont matter
+	sort.Strings(s1)
+	sort.Strings(s2)
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (c CDSNode) IsEqual(other CDSNode) bool {
+	if c.ID != other.ID {
+		return false
+	}
+	if c.Package != other.Package {
+		return false
+	}
+	if c.Version != other.Version {
+		return false
+	}
+	return sliceCompare(c.Dependencies, other.Dependencies)
 }

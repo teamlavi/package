@@ -1,0 +1,65 @@
+{
+ "cmdType": "npm",
+ "repository": "npm",
+ "nodes": {
+  "bnBt:YQ==:MS4yLjM=": {
+   "id": "bnBt:YQ==:MS4yLjM=",
+   "package": "A",
+   "version": "1.2.3",
+   "dependencies": [
+    "bnBt:Yg==:MS4yLjM=",
+    "bnBt:Yw==:MS40LjI="
+   ]
+  },
+  "bnBt:Yg==:MS4yLjM=": {
+   "id": "bnBt:Yg==:MS4yLjM=",
+   "package": "B",
+   "version": "1.2.3",
+   "dependencies": [
+    "bnBt:ZA==:MC42Ljk="
+   ]
+  },
+  "bnBt:Yw==:MS40LjI=": {
+   "id": "bnBt:Yw==:MS40LjI=",
+   "package": "C",
+   "version": "1.4.2",
+   "dependencies": [
+    "bnBt:ZA==:MC42Ljk="
+   ]
+  },
+  "bnBt:ZA==:MC42Ljk=": {
+   "id": "bnBt:ZA==:MC42Ljk=",
+   "package": "D",
+   "version": "0.6.9",
+   "dependencies": []
+  },
+  "bnBt:ZA==:Ni4wLjk=": {
+   "id": "bnBt:ZA==:Ni4wLjk=",
+   "package": "D",
+   "version": "6.0.9",
+   "dependencies": [
+    "bnBt:ZQ==:Ni44LjI="
+   ]
+  },
+  "bnBt:ZQ==:Ni44LjI=": {
+   "id": "bnBt:ZQ==:Ni44LjI=",
+   "package": "E",
+   "version": "6.8.2",
+   "dependencies": []
+  },
+  "bnBt:eg==:MC4wLjA=": {
+   "id": "bnBt:eg==:MC4wLjA=",
+   "package": "Z",
+   "version": "0.0.0",
+   "dependencies": [
+    "bnBt:Yw==:MS40LjI="
+   ]
+  }
+ },
+ "root": {
+  "dependencies": [
+   "bnBt:YQ==:MS4yLjM=",
+   "bnBt:eg==:MC4wLjA="
+  ]
+ }
+}

@@ -21,15 +21,15 @@ func GenerateID(pName, pVersion, pRepo string) string {
 	return joined
 }
 
-// old way
-// func GenerateID(pName, pVersion, pRepo string) string {
-// 	pNameSha := NewSHA256([]byte(strings.ToLower(pName)))
-// 	pVersionSha := NewSHA256([]byte(strings.ToLower(pVersion)))
-// 	pRepoSha := NewSHA256([]byte(pRepo))
+// returns name, version, repo
+func DecodeID(pId string) (string, string, string) {
+	splits := strings.Split(pId, ":")
 
-// 	joinedSha := NewSHA256(append(pNameSha, append(pVersionSha, pRepoSha...)...))
-// 	return B64Encode(joinedSha)
-// }
+	pRepo := B64Decode(splits[0])
+	pName := B64Decode(splits[1])
+	pVersion := B64Decode(splits[2])
+	return string(pName), string(pVersion), string(pRepo)
+}
 
 func B64Encode(bytes []byte) string {
 	return b64.StdEncoding.EncodeToString([]byte(bytes))
