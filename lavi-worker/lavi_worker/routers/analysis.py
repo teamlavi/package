@@ -26,7 +26,9 @@ async def post_affected_count(
             status=ResponseEnum.complete,
             error=None,
             result=api_models.AffectedCountResponse(
-                pkgsAffected=await queries.get_affected_packages(lava_request.repo, lava_request.packages)
+                pkgsAffected=await queries.get_affected_packages(
+                    lava_request.repo, lava_request.packages
+                )
             ),
         )
     else:
@@ -56,7 +58,9 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
         error=None,
-        result=api_models.CountResponse(count=await queries.get_package_count(lava_request.repo)),
+        result=api_models.CountResponse(
+            count=await queries.get_package_count(lava_request.repo)
+        ),
     )
 
 
