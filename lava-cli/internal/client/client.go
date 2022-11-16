@@ -24,7 +24,7 @@ type Client struct {
 // Variadic, but only the first value provided will be used
 // Made it variadic so it can work with nothing provided
 func New(remote ...string) *Client {
-	useRemote := "https://edson.lavi-lava.com/lavi"
+	useRemote := "https://lavi-lava.com/lavi"
 	if len(remote) > 0 {
 		useRemote = remote[0]
 	}
