@@ -1,4 +1,6 @@
+import asyncio
 import json
+import time
 
 import httpx
 import psycopg
@@ -26,6 +28,31 @@ class SemVer:
 
     def __repr__(self) -> str:
         return f"{self.major_vers}.{self.minor_vers}.{self.patch_vers}"
+
+
+async def wait_for_live(timeout: int = 60) -> None:
+    """Wait for database to spin up."""
+    start_t = time.time()
+    while time.time() - start_t < timeout:
+        is_up = await is_db_up()
+        if is_up:
+            return
+        await asyncio.sleep(1)
+    raise Exception(f"Failed to connect in {timeout}s")
+
+
+async def is_db_up() -> bool:
+    """Check if database is alive and responding."""
+    try:
+        async with await get_db_tx() as tx:
+            async with tx.cursor() as cur:
+                await cur.execute("SELECT 1")
+                resp = await cur.fetchone()
+                if resp != (1,):
+                    raise Exception(f"Unexpected resp: {resp}")
+                return True
+    except psycopg.errors.OperationalError:
+        return False
 
 
 async def is_db_initialized() -> bool:

@@ -40,6 +40,9 @@ async def app_startup() -> None:
     if any([var is None for var in config.REQUIRED_ENV_FOR_DEPLOY]):
         raise Exception(f"Missing required env vars: {config.REQUIRED_ENV_FOR_DEPLOY}")
 
+    # Wait for database to come up
+    await updates.wait_for_live()
+
     # Check if db initialized
     if not await updates.is_db_initialized():
         await updates.initialize_database()
