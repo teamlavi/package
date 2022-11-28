@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   lavi-worker:
-    build: ./lavi-worker
+    build: ./backend
     command:
       - uvicorn
       - --port=80
