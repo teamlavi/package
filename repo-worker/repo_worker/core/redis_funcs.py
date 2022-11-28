@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 
 import httpx
 
-from repo_worker.config import LAVI_API_URL  # Only used if triggered
+from repo_worker.config import CYCLE_TIME, LAVI_API_URL
 from repo_worker.core.redis_wq import get_redis_wq, known_queue_sizes
 from repo_worker.scrapers import repo_scrapers
 from repo_worker.utils import get_recent_version, parse_version, timeout
@@ -40,9 +40,9 @@ def list_packages_worker(lease_time: int = 600) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -75,9 +75,9 @@ def list_package_versions(lease_time: int = 30) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -111,9 +111,9 @@ def generate_tree(lease_time: int = 300) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -144,9 +144,9 @@ def db_sync_trees(lease_time: int = 30) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str, str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
