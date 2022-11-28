@@ -11,7 +11,7 @@ class NpmScraper(object):
     @staticmethod
     def list_packages(limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
-        if True:
+        if limit == 1000:
             # Just get top packages for now
             with open("repo_worker/data/top_npm.txt", "r") as top_file:
                 packages = top_file.readlines()

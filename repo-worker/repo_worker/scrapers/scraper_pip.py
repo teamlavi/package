@@ -13,7 +13,7 @@ class PipScraper(object):
     def list_packages(limit: int | None = None) -> List[str]:
         """Given a repository, return a list of its packages."""
         packages: List[str]
-        if True:
+        if limit == 1000:
             # Just get top packages for now
             with open("repo_worker/data/top_pip.txt", "r") as top_file:
                 packages = top_file.readlines()

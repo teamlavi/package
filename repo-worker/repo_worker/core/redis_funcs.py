@@ -47,13 +47,13 @@ def list_packages_worker(lease_time: int = 600) -> None:
                     logging.info("No work received, waiting")
                     continue
                 repo, run_full_raw = item
-                run_full = run_full_raw == "true"
+                run_full = run_full_raw.lower() == "true"
                 start_t = time.time()
 
                 num_run_str = "all" if run_full else "partial"
                 logging.info(f"Scraping {num_run_str} package names for {repo}")
                 scraper = repo_scrapers[repo]
-                packages = scraper.list_packages()
+                packages = scraper.list_packages(None if run_full else 1000)
 
                 in_wq.complete(item)
                 elapsed_t = int(1000 * (time.time() - start_t))
