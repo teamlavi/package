@@ -5,7 +5,7 @@ from lavi_worker.utils import generate_universal_hash
 
 
 @define(frozen=True)
-class DEPENDENCY:
+class Dependency:
     univ_hash: str
     repo_name: str
     pkg_name: str
@@ -124,21 +124,21 @@ async def drop_all_rows(tx: Transaction) -> None:
         await cur.execute("TRUNCATE dependencies RESTART IDENTITY CASCADE")
 
 
-async def get_table(tx: Transaction) -> list[DEPENDENCY]:
+async def get_table(tx: Transaction) -> list[Dependency]:
     async with tx.cursor() as cur:
         await cur.execute("SELECT * FROM dependencies")
         rows = await cur.fetchall()
-        return [DEPENDENCY(*row) for row in rows]
+        return [Dependency(*row) for row in rows]
 
 
-async def get_repo_table(tx: Transaction, repo: str) -> list[DEPENDENCY]:
+async def get_repo_table(tx: Transaction, repo: str) -> list[Dependency]:
     async with tx.cursor() as cur:
         await cur.execute(
             "SELECT * FROM dependencies WHERE repo_name = %s",
             (repo,),
         )
         rows = await cur.fetchall()
-        return [DEPENDENCY(*row) for row in rows]
+        return [Dependency(*row) for row in rows]
 
 
 async def get_table_storage_size(tx: Transaction) -> str:

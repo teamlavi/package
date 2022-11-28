@@ -51,7 +51,7 @@ async def get_affected_packages(repo: RepoEnum, pkgs: list[str]) -> dict[str, in
     # get number of packages that depend on the list of vulnerable packages
     vuln_pkg_effect: dict[str, int] = {}
     async with await get_db_tx() as tx:
-        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(
+        dep_table: list[dependencies.Dependency] = await dependencies.get_repo_table(
             tx, repo.value
         )
     for dep_entry in dep_table:
@@ -205,7 +205,7 @@ async def get_all_vulnerable_packages(repo: RepoEnum) -> list[str]:
     """Get all vulnerable packages in our database."""
     pkgs: list[str] = []
     async with await get_db_tx() as tx:
-        dep_table: list[dependencies.DEPENDENCY] = await dependencies.get_repo_table(
+        dep_table: list[dependencies.Dependency] = await dependencies.get_repo_table(
             tx, repo.value
         )
     for i, dep in enumerate(dep_table):
