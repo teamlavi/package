@@ -33,6 +33,21 @@ services:
     ports:
       - 6379:6379
 
+  repo-worker-worker-list-packages:
+    build: ./repo-worker
+    command:
+      - python3
+      - repo_worker/entrypoint.py
+      - --mode=redis
+      - list-packages-worker
+    deploy:
+      replicas: 1
+    environment:
+      REDIS_HOST: repo-worker-redis
+      REDIS_PORT: 6379
+      LAVI_API_URL: http://lavi-worker
+      GH_ACCESS_TOKEN: abcd
+
   repo-worker-worker-list-versions:
     build: ./repo-worker
     command:

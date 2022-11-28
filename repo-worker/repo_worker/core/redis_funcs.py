@@ -33,6 +33,41 @@ def list_packages(repo: str) -> None:
     logging.info("Done inserting scraped package names")
 
 
+def list_packages_worker(lease_time: int = 600) -> None:
+    """List all packages in a repository."""
+    in_wq = get_redis_wq("to_list_packages")
+    out_wq = get_redis_wq("to_list_versions")
+
+    while True:
+        try:
+            with timeout(lease_time + 10):
+                item: Tuple[str, str] | None
+                item = in_wq.lease(lease_time, 10)  # type: ignore
+                if not item:
+                    logging.info("No work received, waiting")
+                    continue
+                repo, run_full_raw = item
+                run_full = run_full_raw == "true"
+                start_t = time.time()
+
+                num_run_str = "all" if run_full else "partial"
+                logging.info(f"Scraping {num_run_str} package names for {repo}")
+                scraper = repo_scrapers[repo]
+                packages = scraper.list_packages()
+
+                in_wq.complete(item)
+                elapsed_t = int(1000 * (time.time() - start_t))
+                in_wq.save_metrics(elapsed_t, len(packages))
+
+                logging.info(f"Inserting scraped {len(packages)} package names")
+                for package in packages:
+                    out_wq.insert((repo, package))
+                logging.info("Done inserting scraped package names")
+
+        except Exception:
+            traceback.print_exc()
+
+
 def list_package_versions(lease_time: int = 30) -> None:
     """Handle redis runs of list-package-versions."""
     in_wq = get_redis_wq("to_list_versions")
