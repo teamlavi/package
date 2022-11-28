@@ -30,7 +30,7 @@ async def find_vuln_versions(repo: RepoEnum, package: str) -> List[str]:
 
 async def find_full_vulnerabilities_id(
     univ_id: str,
-) -> List[cve.CVE]:
+) -> List[cve.Cve]:
     """Find CVE data from a universal hash."""
 
     # Get cves from the database
@@ -43,9 +43,9 @@ async def find_full_vulnerabilities_id(
 async def get_affected_packages(repo: RepoEnum, pkgs: list[str]) -> dict[str, int]:
     """Get number of affected packages. Includes self."""
     # get all pkgs and their cves
-    vuln_pkgs: dict[str, list[cve.CVE]] = {}
+    vuln_pkgs: dict[str, list[cve.Cve]] = {}
     for pkg in pkgs:
-        cves: list[cve.CVE] = await find_full_vulnerabilities_id(pkg)
+        cves: list[cve.Cve] = await find_full_vulnerabilities_id(pkg)
         if cves:
             vuln_pkgs[pkg] = cves
     # get number of packages that depend on the list of vulnerable packages
@@ -114,7 +114,7 @@ async def get_vulnerability_depth(univ_hash: str) -> Dict[str, list[int]] | None
         async def get_vulnerabilities(rec_univ_hash: str, depth: int) -> None:
             deps = dep_tree2[rec_univ_hash]
             for dep in deps:
-                vulns: list[cve.CVE] = await find_full_vulnerabilities_id(dep)
+                vulns: list[cve.Cve] = await find_full_vulnerabilities_id(dep)
                 for vuln in vulns:
                     if vuln.cve_id in vulnerabilities.keys():
                         vulnerabilities[vuln.cve_id].append(depth)
@@ -195,7 +195,7 @@ async def check_vulnerable(univ_hash: str) -> bool:
         return False
     else:
         for pkg in dep_tree.keys():
-            cves: list[cve.CVE] = await find_full_vulnerabilities_id(pkg)
+            cves: list[cve.Cve] = await find_full_vulnerabilities_id(pkg)
             if cves:
                 return True
     return False

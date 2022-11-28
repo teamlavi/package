@@ -14,7 +14,7 @@ from lavi_worker.utils import generate_universal_hash
 
 
 @define(frozen=True)
-class CVE:
+class Cve:
     _id: int
     cve_id: str
     severity: str | None
@@ -68,7 +68,7 @@ async def create(
             return False
 
 
-async def delete(tx: Transaction, cve: CVE) -> None:
+async def delete(tx: Transaction, cve: Cve) -> None:
     """Delete the given CVE from the db."""
     async with tx.cursor() as cur:
         await cur.execute(
@@ -77,7 +77,7 @@ async def delete(tx: Transaction, cve: CVE) -> None:
         )
 
 
-async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[CVE]:
+async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[Cve]:
     """Find by the universal hash string."""
     # Query the database
     async with tx.cursor() as cur:
@@ -88,7 +88,7 @@ async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[CVE]:
         raw_cves = await cur.fetchall()
 
     # Parse output into objects, return
-    return [CVE(*raw_cve) for raw_cve in raw_cves]
+    return [Cve(*raw_cve) for raw_cve in raw_cves]
 
 
 async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[str]:
@@ -106,7 +106,7 @@ async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[
 
 async def find_by_repo_pkg_vers(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
-) -> List[CVE]:
+) -> List[Cve]:
     """Find any entries by their repo, pkg, vers tuple."""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
     return await find_by_univ_hash(tx, univ_hash)
@@ -114,7 +114,7 @@ async def find_by_repo_pkg_vers(
 
 async def find_by_univ_hash_cve(
     tx: Transaction, univ_hash: str, cve_id: str
-) -> CVE | None:
+) -> Cve | None:
     """Check if a specific CVE applies to a specific universal hash."""
     # Query the database
     async with tx.cursor() as cur:
@@ -125,12 +125,12 @@ async def find_by_univ_hash_cve(
         raw_cve = await cur.fetchone()
 
     # Parse output into object if appropriate, return
-    return CVE(*raw_cve) if raw_cve else None
+    return Cve(*raw_cve) if raw_cve else None
 
 
 async def find_by_repo_pkg_vers_cve(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, cve_id: str
-) -> CVE | None:
+) -> Cve | None:
     """Check if a specific CVE applies to a specific repo, pkg, vers tuple."""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
     return await find_by_univ_hash_cve(tx, univ_hash, cve_id)
