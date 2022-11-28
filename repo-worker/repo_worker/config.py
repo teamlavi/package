@@ -1,6 +1,6 @@
 import os
 
-CYCLE_TIME = os.getenv("CYCLE_TIME") or 5
+CYCLE_TIME = int(os.getenv("CYCLE_TIME") or "5")
 EXPECTED_PREFIX = os.getenv("EXPECTED_PREFIX") or ""
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = os.getenv("REDIS_PORT")

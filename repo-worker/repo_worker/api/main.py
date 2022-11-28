@@ -67,7 +67,7 @@ def generate_tree_status(repo: str, package: str, version: str) -> str:
 
 
 @app.post("/list_packages", tags=["triggers"])
-def list_packages(repo: str, run_full: bool):
+def list_packages(repo: str, run_full: bool) -> Response:
     """Trigger package listing."""
     wq = get_redis_wq("to_list_packages")
     wq.insert((repo, str(run_full)))
