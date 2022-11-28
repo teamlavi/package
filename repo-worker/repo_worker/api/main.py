@@ -64,3 +64,11 @@ def generate_tree_status(repo: str, package: str, version: str) -> str:
     """Get the status of the given job."""
     wq = get_redis_wq("to_generate_tree")
     return wq.get_status((repo, package, version))
+
+
+@app.post("/list_packages", tags=["triggers"])
+def list_packages(repo: str, run_full: bool):
+    """Trigger package listing."""
+    wq = get_redis_wq("to_list_packages")
+    wq.insert((repo, str(run_full)))
+    return Response(status_code=200)

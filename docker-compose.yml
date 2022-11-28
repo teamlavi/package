@@ -33,6 +33,21 @@ services:
     ports:
       - 6379:6379
 
+  repo-worker-api:
+    build: ./repo-worker
+    command:
+      - uvicorn
+      - --port=80
+      - --host=0.0.0.0
+      - repo_worker.api.main:app
+    environment:
+      REDIS_HOST: repo-worker-redis
+      REDIS_PORT: 6379
+      LAVI_API_URL: http://lavi-worker
+      GH_ACCESS_TOKEN: abcd
+    ports:
+      - 8002:80
+
   repo-worker-worker-list-packages:
     build: ./repo-worker
     command:
