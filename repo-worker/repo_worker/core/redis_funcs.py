@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 
 import httpx
 
-from repo_worker.config import LAVI_API_URL  # Only used if triggered
+from repo_worker.config import CYCLE_TIME, LAVI_API_URL
 from repo_worker.core.redis_wq import get_redis_wq, known_queue_sizes
 from repo_worker.scrapers import repo_scrapers
 from repo_worker.utils import get_recent_version, parse_version, timeout
@@ -33,6 +33,41 @@ def list_packages(repo: str) -> None:
     logging.info("Done inserting scraped package names")
 
 
+def list_packages_worker(lease_time: int = 600) -> None:
+    """List all packages in a repository."""
+    in_wq = get_redis_wq("to_list_packages")
+    out_wq = get_redis_wq("to_list_versions")
+
+    while True:
+        try:
+            with timeout(lease_time + CYCLE_TIME):
+                item: Tuple[str, str] | None
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
+                if not item:
+                    logging.info("No work received, waiting")
+                    continue
+                repo, run_full_raw = item
+                run_full = run_full_raw.lower() == "true"
+                start_t = time.time()
+
+                num_run_str = "all" if run_full else "partial"
+                logging.info(f"Scraping {num_run_str} package names for {repo}")
+                scraper = repo_scrapers[repo]
+                packages = scraper.list_packages(None if run_full else 1000)
+
+                in_wq.complete(item)
+                elapsed_t = int(1000 * (time.time() - start_t))
+                in_wq.save_metrics(elapsed_t, len(packages))
+
+                logging.info(f"Inserting scraped {len(packages)} package names")
+                for package in packages:
+                    out_wq.insert((repo, package))
+                logging.info("Done inserting scraped package names")
+
+        except Exception:
+            traceback.print_exc()
+
+
 def list_package_versions(lease_time: int = 30) -> None:
     """Handle redis runs of list-package-versions."""
     in_wq = get_redis_wq("to_list_versions")
@@ -40,9 +75,9 @@ def list_package_versions(lease_time: int = 30) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -76,9 +111,9 @@ def generate_tree(lease_time: int = 300) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -109,9 +144,9 @@ def db_sync_trees(lease_time: int = 30) -> None:
 
     while True:
         try:
-            with timeout(lease_time + 10):
+            with timeout(lease_time + CYCLE_TIME):
                 item: Tuple[str, str, str, str] | None
-                item = in_wq.lease(lease_time, 10)  # type: ignore
+                item = in_wq.lease(lease_time, CYCLE_TIME)  # type: ignore
                 if not item:
                     logging.info("No work received, waiting")
                     continue
@@ -131,7 +166,6 @@ def db_sync_trees(lease_time: int = 30) -> None:
                     "minor_vers": str(minor),
                     "patch_vers": str(patch),
                 }
-                logging.critical(tree)
                 resp = httpx.post(
                     f"{LAVI_API_URL}/internal/insert_tree",
                     params=query_params,

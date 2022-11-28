@@ -29,6 +29,9 @@ def parse_cmd_args() -> argparse.Namespace:
     # CLI-only args
     list_packages.add_argument("-l", "--limit", action="store")
 
+    # list-packages-worker subcommand - List packages given repo (redis-only)
+    subparsers.add_parser("list-packages-worker", help="list-packages-worker help")
+
     # list-package-versions subcommand - List versions given (repo, package)
     list_package_versions = subparsers.add_parser(
         "list-package-versions", help="list-package-versions help"
@@ -66,7 +69,7 @@ def main() -> None:
     if args.command is None:
         raise Exception("No command provided")
 
-    redis_only_commands = ["db-sync-versions", "db-sync-trees"]
+    redis_only_commands = ["list-packages-worker", "db-sync-versions", "db-sync-trees"]
     if args.mode != "redis" and args.command in redis_only_commands:
         raise Exception(f"Can only run {args.command} command in redis-mode")
 
@@ -126,6 +129,11 @@ def main() -> None:
                 raise Exception(f"Unrecognized repository: {args.repo}")
             logging.info("Running redis-mode list-packages")
             redis_funcs.list_packages(args.repo)
+
+        # Redis list-packages-worker command
+        if args.command == "list-packages-worker":
+            logging.info("Running redis-mode list-packages-worker")
+            redis_funcs.list_packages_worker()
 
         # Redis list-package-versions command
         if args.command == "list-package-versions":
