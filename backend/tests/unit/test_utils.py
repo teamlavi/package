@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import pytest
 
-from lavi_worker import utils
+from utils import utils
 
 
 @pytest.mark.parametrize(

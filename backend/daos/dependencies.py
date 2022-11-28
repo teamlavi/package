@@ -1,7 +1,7 @@
 from attrs import define
 
-from lavi_worker.daos.database import Transaction
-from lavi_worker.utils import generate_universal_hash
+from daos.database import Transaction
+from utils.utils import generate_universal_hash
 
 
 @define(frozen=True)

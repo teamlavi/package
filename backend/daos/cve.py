@@ -4,8 +4,8 @@ from typing import List
 
 from attrs import define
 
-from lavi_worker.daos.database import Transaction
-from lavi_worker.utils import generate_universal_hash
+from daos.database import Transaction
+from utils.utils import generate_universal_hash
 
 
 # Not actually a DAO, but we're going for minimum viable product here.

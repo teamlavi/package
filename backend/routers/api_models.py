@@ -4,10 +4,10 @@ from pydantic import BaseModel
 
 from typing import Any
 
-from lavi_worker.utils import RepoEnum
-from lavi_worker.utils import LevelEnum
-from lavi_worker.utils import StatusEnum
-from lavi_worker.utils import ResponseEnum
+from utils.utils import RepoEnum
+from utils.utils import LevelEnum
+from utils.utils import StatusEnum
+from utils.utils import ResponseEnum
 
 
 class InsertTreeData(BaseModel):

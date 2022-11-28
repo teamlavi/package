@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from lavi_worker.internal import queries
-from lavi_worker.routers import api_models
+from internal import queries
+from routers import api_models
 from typing import List
 
 router = APIRouter(tags=["external"])

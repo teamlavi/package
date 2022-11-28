@@ -1,8 +1,8 @@
 from typing import List, Dict
 
-from lavi_worker.daos import cve, dependencies
-from lavi_worker.daos.database import get_db_tx
-from lavi_worker.utils import RepoEnum, decompress_tree
+from daos import cve, dependencies
+from daos.database import get_db_tx
+from utils.utils import RepoEnum, decompress_tree
 
 
 async def find_vulnerabilities_simple(

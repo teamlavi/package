@@ -5,9 +5,9 @@ from fastapi.responses import PlainTextResponse
 from psycopg.types.json import set_json_dumps, set_json_loads
 import orjson
 
-from lavi_worker import config
-from lavi_worker.internal import updates
-from lavi_worker.routers import analysis, external, internal
+from utils import config
+from internal import updates
+from routers import analysis, external, internal
 
 
 # Create the app

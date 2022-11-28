@@ -5,10 +5,10 @@ import time
 import httpx
 import psycopg
 
-from lavi_worker.daos import cve
-from lavi_worker.daos import dependencies
-from lavi_worker.daos.database import get_db_tx
-from lavi_worker import config
+from daos import cve
+from daos import dependencies
+from daos.database import get_db_tx
+from utils import config
 from typing import List
 
 CACHE_CURSOR: str | None = None

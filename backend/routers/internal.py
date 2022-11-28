@@ -5,9 +5,9 @@ from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
 import orjson
 
-from lavi_worker.internal import updates
-from lavi_worker.routers import api_models
-from lavi_worker.utils import compress_tree, decompress_tree
+from internal import updates
+from routers import api_models
+from utils.utils import compress_tree, decompress_tree
 
 
 router = APIRouter(tags=["internal"])

@@ -6,7 +6,7 @@ services:
       - uvicorn
       - --port=80
       - --host=0.0.0.0
-      - lavi_worker.routers.main:app
+      - routers.main:app
     environment:
       DB_ADDRESS: lavi-worker-db
       DB_NAME: cvedb

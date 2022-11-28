@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from lavi_worker import utils
-from lavi_worker.routers import api_models
-from lavi_worker.internal import queries
-from lavi_worker.utils import ResponseEnum
+from utils import utils
+from routers import api_models
+from internal import queries
+from utils.utils import ResponseEnum
 
 router = APIRouter(tags=["analysis"])
 

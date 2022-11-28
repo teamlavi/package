@@ -40,8 +40,7 @@ COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=$PYTHONPATH:/src
 
-COPY lavi_worker /src/lavi_worker
-COPY tests /src/tests
+COPY . /src
 
 WORKDIR /src
 CMD ["echo", "No cmd provided"]

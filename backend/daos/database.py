@@ -2,7 +2,7 @@ from typing import Any
 
 import psycopg
 
-from lavi_worker import config
+from utils import config
 
 
 # Type alias for cleanliness
