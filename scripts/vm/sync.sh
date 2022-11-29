@@ -9,9 +9,21 @@ then
     exit 1
 fi
 
+if [[ -z "${GH_ACCESS_TOKEN}" ]]
+then
+    echo "GH_ACCESS_TOKEN env var is not set"
+    exit 1
+fi
+
+if [[ -z "${API_PORT}" ]]
+then
+    echo "API_PORT env var is not set"
+    exit 1
+fi
+
 cd "$PACKAGE_DIR" || exit 1
 
 sudo git pull
 
-sudo docker compose build
-sudo docker compose up -d
+sudo --preserve-env docker compose build
+sudo --preserve-env docker compose up -d

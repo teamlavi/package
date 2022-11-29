@@ -9,6 +9,8 @@ sudo git clone https://para.cs.umd.edu/levi/package.git
 ```
 When prompted, give any username. For the password, give a project access token [generated here](https://para.cs.umd.edu/levi/package/-/settings/access_tokens) with `Reporter` role and `read_repository` scope.
 
+export gh toke
+
 ```bash
 cd package
 sudo git pull
