@@ -11,5 +11,7 @@ fi
 
 cd "$PACKAGE_DIR" || exit 1
 
+sudo git pull
+
 sudo docker compose build
 sudo docker compose up -d
