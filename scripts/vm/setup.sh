@@ -11,7 +11,7 @@ fi
 
 # Basic installs
 sudo apt-get update -y
-sudo apt-get install -y ca-certificates curl gnupg lsb-release
+sudo apt-get install -y ca-certificates curl gnupg lsb-release postfix
 
 # Install docker and its dependencies
 sudo mkdir -p /etc/apt/keyrings

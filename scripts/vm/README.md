@@ -22,4 +22,6 @@ sudo git pull
 bash scripts/vm/setup.sh
 ```
 
+When prompted with the `postfix` post-install configuration, just set it to local-only mail. This allows us to see logs from the cron job if it should fail.
+
 The setup script will then install dependencies, then update your cron as necessary to keep this VM live with prod every minute or so.
