@@ -1,21 +1,21 @@
 version: "3.9"
 services:
   lavi-worker:
-    build: ./lavi-worker
+    build: ./backend
     command:
       - uvicorn
       - --port=80
       - --host=0.0.0.0
-      - lavi_worker.routers.main:app
+      - routers.main:app
     environment:
       DB_ADDRESS: lavi-worker-db
       DB_NAME: cvedb
       DB_PASS: password
       DB_PORT: 5432
       DB_USER: user
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
     ports:
-      - 8001:80
+      - ${API_PORT:-8001}:80
 
   lavi-worker-db:
     environment:
@@ -44,7 +44,7 @@ services:
       REDIS_HOST: repo-worker-redis
       REDIS_PORT: 6379
       LAVI_API_URL: http://lavi-worker
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
     ports:
       - 8002:80
 
@@ -61,7 +61,7 @@ services:
       REDIS_HOST: repo-worker-redis
       REDIS_PORT: 6379
       LAVI_API_URL: http://lavi-worker
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
 
   repo-worker-worker-list-versions:
     build: ./repo-worker
@@ -76,7 +76,7 @@ services:
       REDIS_HOST: repo-worker-redis
       REDIS_PORT: 6379
       LAVI_API_URL: http://lavi-worker
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
 
   repo-worker-worker-generate-trees:
     build: ./repo-worker
@@ -91,7 +91,7 @@ services:
       REDIS_HOST: repo-worker-redis
       REDIS_PORT: 6379
       LAVI_API_URL: http://lavi-worker
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
 
   repo-worker-worker-db-sync-trees:
     build: ./repo-worker
@@ -106,7 +106,7 @@ services:
       REDIS_HOST: repo-worker-redis
       REDIS_PORT: 6379
       LAVI_API_URL: http://lavi-worker
-      GH_ACCESS_TOKEN: abcd
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
 
 volumes:
   postgres_data:

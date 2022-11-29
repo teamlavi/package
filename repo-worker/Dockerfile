@@ -13,15 +13,10 @@ RUN pip3 install --upgrade --user -r /requirements.txt
 FROM python:3.10-slim as main
 LABEL org.opencontainers.image.authors="Levi Lutz (contact.levilutz@gmail.com)"
 
-# TODO Move these lines to builder
 RUN apt-get update -y
-RUN apt-get install -y npm
+RUN apt-get install -y npm curl
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && apt-get install -y nodejs
 RUN apt-get clean -y
-
-# Gotta install npm for lavi npm command
-RUN apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
- apt-get install -y nodejs
 
 # Gotta install poetry for lavi poetry command
 ENV POETRY_VERSION=1.2.0
@@ -34,7 +29,7 @@ RUN python3 -m venv $POETRY_VENV \
     && $POETRY_VENV/bin/pip install -U pip setuptools \
     && $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
 
-# Add `poetry` to PATH
+# Add `poetry` to end of PATH
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
 # Copy lavi binary to image
