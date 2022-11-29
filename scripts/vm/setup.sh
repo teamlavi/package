@@ -2,6 +2,13 @@
 
 # Follow README.md to install
 
+# Check if env var set
+if [[ -z "${GH_ACCESS_TOKEN}" ]]
+then
+    echo "GH_ACCESS_TOKEN env var is not set"
+    exit 1
+fi
+
 # Basic installs
 sudo apt-get update -y
 sudo apt-get install -y ca-certificates curl gnupg lsb-release

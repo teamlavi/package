@@ -2,7 +2,7 @@
 
 # Follow README.md to install
 
-# Check if env var set
+# Check if env vars set
 if [[ -z "${PACKAGE_DIR}" ]]
 then
     echo "PACKAGE_DIR env var is not set"
