@@ -18,4 +18,4 @@ sudo systemctl enable docker
 sudo systemctl start docker
 
 # Add sync job to crontab
-(sudo crontab -l 2>/dev/null; echo "*/5 * * * * PACKAGE_DIR=\"$(pwd)\" \"$(pwd)/scripts/vm/sync.sh\"") | sudo crontab -
+(sudo crontab -l 2>/dev/null; echo "*/5 * * * * PACKAGE_DIR=\"$(pwd)\" bash \"$(pwd)/scripts/vm/sync.sh\"") | sudo crontab -
