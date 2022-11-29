@@ -52,7 +52,7 @@ async def app_startup() -> None:
 @app.get("/ping", response_class=PlainTextResponse, tags=["maintenance"])
 def ping() -> str:
     """Ping pong."""
-    return "pong"
+    return "ponggy"
 
 
 # Basic health ping
