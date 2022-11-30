@@ -14,12 +14,18 @@
     - id: lavi-install
       title: Install
       path: /docs/lavi/install.html
+    - id: lavi-usage
+      title: LAVI Usage
+      path: /docs/lavi/usage.html
 - title: LAVA
   isOrdered: false
   items:
     - id: lava-install
       title: Install
       path: /docs/lava/install.html
+    - id: lava-usage
+      title: LAVA Usage
+      path: /docs/lava/usage.html
 - title: Backend
   isOrdered: false
   items:

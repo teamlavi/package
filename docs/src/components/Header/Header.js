@@ -16,7 +16,8 @@ const Header = () => {
                             </Typography>
                             <NavigationBarItem title="Home" route="/" />
                             <NavigationBarItem title="Docs" route="/docs/getting-started/getting-started.html" />
-                            <NavigationBarItem title="Interactive API Documentation" route="/docs/api" />
+                            <NavigationBarItem title="Interactive API Documentation" route="/api/docs" />
+                            <NavigationBarItem title="Downloads" route="/downloads" />
                         </Toolbar>
                     </Grid>
                 </Grid>
