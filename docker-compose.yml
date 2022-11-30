@@ -76,7 +76,7 @@ services:
       - bash
       - worker.sh
     deploy:
-      replicas: 5
+      replicas: 16
     environment:
       DB_ADDRESS: backend-db
       DB_NAME: cvedb
