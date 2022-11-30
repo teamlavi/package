@@ -1,5 +1,6 @@
 from typing import Protocol
 
+from scrapers.scraper_dud import DudScraper
 from utils.tree_node import TreeNode
 
 
@@ -20,4 +21,6 @@ class RepoScraper(Protocol):
         ...
 
 
-repo_scrapers: dict[str, RepoScraper] = {}
+repo_scrapers: dict[str, RepoScraper] = {
+    "dud": DudScraper(),
+}
