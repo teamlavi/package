@@ -46,7 +46,8 @@ build () {
     then
         sudo mv "$FILE/$PREFIX" "$FILE/$PREFIX.exe"
     fi
-    sudo zip -r "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip" "$FILE/"
+    
+    sudo zip -r -j "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip" "$FILE/"
     sudo rm -rf "$FILE"
 }
 
@@ -55,6 +56,8 @@ cd "$PACKAGE_DIR" || exit 1
 sudo git pull
 
 echo "building lavi archives"
+
+rm -rf "$PACKAGE_DIR/downloads" || :
 
 mkdir "$PACKAGE_DIR/downloads/lavi" -p
 mkdir "$PACKAGE_DIR/downloads/lava" -p
