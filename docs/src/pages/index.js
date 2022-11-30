@@ -100,6 +100,7 @@ const DocsPage = () => {
 				</Typography>
 				<Typography style={{paddingTop: "2em"}}>
 					LAVI searches through packages included in your project to determine if any known vulnerabilities are included in a package. If it finds vulnerabilities it explains what they are, where to find more information about the vulnerability and optionally will help you find alternate package versions that aren't vulnerable.
+					Acceptance test survey: https://docs.google.com/forms/d/e/1FAIpQLSelj_4qQ6SHjHM-nNtYDy_y48QYlUqB891OfLJpz-Hnoc4UXw/viewform?usp=sf_link
 				</Typography>
 			</div>
 	</Layout>
