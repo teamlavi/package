@@ -34,7 +34,7 @@ services:
     ports:
       - 6379:6379
 
-  backend-worker-list-packages:
+  worker-list-packages:
     build: ./backend
     command:
       - rq
@@ -55,7 +55,7 @@ services:
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
 
-  backend-worker-list-versions:
+  worker-list-versions:
     build: ./backend
     command:
       - rq
@@ -76,7 +76,7 @@ services:
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
 
-  backend-worker-generate-tree:
+  worker-generate-tree:
     build: ./backend
     command:
       - rq
