@@ -15,8 +15,6 @@ services:
       DB_USER: user
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       EXPECTED_PREFIX: /api
-    ports:
-      - ${API_PORT:-8001}
 
   lavi-worker-db:
     environment:
@@ -123,7 +121,7 @@ services:
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
     ports:
-      - 80:80
+      - ${API_PORT:-8001}:80
 
 volumes:
   postgres_data:
