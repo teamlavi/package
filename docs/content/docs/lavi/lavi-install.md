@@ -7,9 +7,7 @@ permalink: docs/lavi/install.html
 LAVI install
 
 ## Mac
-1. Download LAVI binaries
-   - ARM if M1
-   - AMD if non-M1
+1. Download LAVA binaries from http://vocation.cs.umd.edu/downloads/
 2. Open terminal and `cd` into the downloaded folder
 3. From the folder run the following commands:
    (Enter your password if prompted)
@@ -27,12 +25,13 @@ LAVI install
       4. Close the opened window
 
 ## Windows
-1. Download lavi-cli-windows-amd64.zip and extract files in a new folder of \<name\>
-2. Inside \<name\>, if there is not already a `lavi.exe`, rename `lavi` to `lavi.exe`  
-3. Type in Windows menu `Edit the system environment variables`; click 
-4. Click `environment variables` to obtain popup
-5. Double-click on "Path" in the top section 
-6. Click "New" -> "Browse..." 
-7. Locate and select \<name\>, which is the file you just created 
-8. Go to powershell and run `lavi.exe` 
+1. Download LAVA binaries from http://vocation.cs.umd.edu/downloads/
+2. Extract zip into a new folder of \<name\>
+3. Inside \<name\>, if there is not already a `lavi.exe`, rename `lavi` to `lavi.exe`  
+4. Type in Windows menu `Edit the system environment variables`; click 
+5. Click `environment variables` to obtain popup
+6. Double-click on "Path" in the top section 
+7. Click "New" -> "Browse..." 
+8. Locate and select \<name\>, which is the file you just created 
+9. Go to powershell and run `lavi.exe` 
 
