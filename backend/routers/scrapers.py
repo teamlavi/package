@@ -1,6 +1,9 @@
 from fastapi import APIRouter
 from fastapi.responses import PlainTextResponse
 
+from internal.queues import QueueName, get_queue
+from internal import scraping
+
 
 router = APIRouter(tags=["scrapers"])
 
@@ -8,7 +11,10 @@ router = APIRouter(tags=["scrapers"])
 @router.post("/trigger/list_packages", response_class=PlainTextResponse)
 def trigger_list_packages(repo_name: str, partial: bool) -> str:
     """Trigger listing package names given a repo name."""
-    ...
+    job = get_queue(QueueName.to_list_packages).enqueue(
+        scraping.list_packages, repo_name, partial
+    )
+    return job.get_id()  # type: ignore
 
 
 @router.post("/trigger/list_versions", response_class=PlainTextResponse)
