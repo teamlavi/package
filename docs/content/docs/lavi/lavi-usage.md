@@ -19,7 +19,7 @@ Example commands:
 <br><br>
 
 Available Commands:
- | Commands | Description |
+ | Commands: | Description: |
  | - | - | 
  | completion | Generate the autocompletion script for the specified shell | 
 | help |       Help about any command and get description of what each command does|
@@ -30,7 +30,7 @@ Available Commands:
 
 <br><br>
 
-
+Available Flags:
 | Flags: | Description: |
 | -    |    - |
 | `--critical`  |  Only show critical severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--high, --medium, --low] to also show vulnerabilities based on severity. |
