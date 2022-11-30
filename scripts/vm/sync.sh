@@ -22,6 +22,8 @@ then
 fi
 
 build_lavi () {
+    mkdir ui/build
+    echo "<p>empty</p>" >> ui/build/index.html
     GOOS=$1 GOARCH=$2 go build -o lavi-cli-$1-$2
     if [[ $1 = "darwin" || $1 = "linux" ]]
     then
@@ -40,15 +42,35 @@ build_lavi () {
     rm -rf "$PACKAGE_DIR/lavi-cli-$1-$2"
 }
 
+build_lava () {
+    GOOS=$1 GOARCH=$2 go build -o lava-cli-$1-$2
+    if [[ $1 = "darwin" || $1 = "linux" ]]
+    then
+        chmod +x lava-cli-$1-$2
+    fi
+
+    mkdir "$PACKAGE_DIR/lava-cli-$1-$2"
+    mv lava-cli-$1-$2 "$PACKAGE_DIR/lava-cli-$1-$2"
+    cp INSTALL.txt "$PACKAGE_DIR/lava-cli-$1-$2"
+
+    if [[ $1 = "windows" ]]
+    then
+        mv lava-cli-$1-$2 lava-cli-$1-$2.exe
+    fi
+    zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2"
+    rm -rf "$PACKAGE_DIR/lava-cli-$1-$2"
+}
+
 cd "$PACKAGE_DIR" || exit 1
 
 sudo git pull
 
-echo "building archives"
-
-cd "$PACKAGE_DIR/lavi-cli" || exit 1
+echo "building lavi archives"
 
 mkdir "$PACKAGE_DIR/downloads/lavi" -p
+mkdir "$PACKAGE_DIR/downloads/lava" -p
+
+cd "$PACKAGE_DIR/lavi-cli" || exit 1
 
 build_lavi darwin amd64
 build_lavi darwin arm64
@@ -57,6 +79,16 @@ build_lavi linux amd64
 build_lavi linux arm64
 
 build_lavi windows amd64
+
+cd "$PACKAGE_DIR/lava-cli" || exit 1
+
+build_lava darwin amd64
+build_lava darwin arm64
+
+build_lava linux amd64
+build_lava linux arm64
+
+build_lava windows amd64
 
 cd "$PACKAGE_DIR" || exit 1
 
