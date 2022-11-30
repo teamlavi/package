@@ -26,3 +26,20 @@ LAVI install
       3. When the popup window appears asking if you're sure you want to open it select `Open`
       4. Close the opened window
 
+
+---
+id: lavi-install
+title: Install LAVI
+permalink: docs/lavi/install.html
+---
+
+Windows <br />
+1. Download lavi-cli-windows-amd64.zip and extract files in a new folder of \<name\> <br />
+2. Inside \<name\>, if there is not already a lavi.exe, rename lavi to lavi.exe <br />   
+3. Type in Windows menu "Edit the system environment variables"; click <br /> 
+4. Click "environment variables" to obtain popup <br />
+5. Double click on "Path" in the top section <br />
+6. Click "New" -> "Browse..." <br />
+7. Locate and select \<name\>, which is the file you just created <br />
+8. Go to powershell and run lavi.exe <br />
+
