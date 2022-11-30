@@ -14,7 +14,7 @@ class PipScraper(object):
         packages: list[str]
         if partial:
             # Just get top packages for now
-            with open("scrapers/data/top_pip.txt", "r") as top_file:
+            with open("data/top_pip.txt", "r") as top_file:
                 packages = top_file.readlines()
             packages = [package.strip() for package in packages if package.strip()]
         else:
