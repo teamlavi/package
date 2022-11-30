@@ -62,26 +62,26 @@ const DocsPage = () => {
 			>
 				<Grid item xs={4}>
 					<Typography sx={{fontSize: "20px", fontWeight: 200, pb: 2}}>
-						Feature/benefit/value 1
+						Find vulnerable packages in your project
 					</Typography>
 					<Typography>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+						LAVI helps you find vulnerable packages you project relies on.
 					</Typography>
 				</Grid>
 				<Grid item xs={4}>
 					<Typography sx={{fontSize: "20px", fontWeight: 200, pb: 2}}>
-						Feature/benefit/value 2
+						Look for non-vulnerable packages to replaced
 					</Typography>
 					<Typography>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+						LAVI helps find alternate package versions that aren't vulnerable for you to use in your project.
 					</Typography>
 				</Grid>
 				<Grid item xs={4}>
 					<Typography sx={{fontSize: "20px", fontWeight: 200, pb: 2}}>
-						Feature/benefit/value 3
+						Learn about vulnerability rates in repositories
 					</Typography>
 					<Typography>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+						LAVI's subproduct LAVA, helps perform research on package repositories to learn about vulnerability rates
 					</Typography>
 				</Grid>
 			</Grid>
@@ -96,11 +96,10 @@ const DocsPage = () => {
 						letterSpacing: '2px',
 						fontWeight: 600,
 					}}>
-						Big Section
+						LAVI
 				</Typography>
 				<Typography style={{paddingTop: "2em"}}>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+					LAVI searches through packages included in your project to determine if any known vulnerabilities are included in a package. If it finds vulnerabilities it explains what they are, where to find more information about the vulnerability and optionally will help you find alternate package versions that aren't vulnerable.
 				</Typography>
 			</div>
 	</Layout>
