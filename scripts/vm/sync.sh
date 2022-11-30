@@ -22,7 +22,7 @@ then
 fi
 
 build_lavi () {
-    mkdir ui/build
+    mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
     echo "<p>empty</p>" >> ui/build/index.html
     GOOS=$1 GOARCH=$2 go build -o lavi-cli-$1-$2
     if [[ $1 = "darwin" || $1 = "linux" ]]
