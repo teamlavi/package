@@ -102,8 +102,8 @@ services:
     restart: always
     volumes:
       - "${PACKAGE_DIR}/nginx.conf:/etc/nginx/nginx.conf"
-      - "${PACKAGE_DIR}/downloads/lavi:/var/downloads/lavi"
-      - "${PACKAGE_DIR}/downloads/lava:/var/downloads/lava"
+      - "${PACKAGE_DIR}/downloads/lavi/:/var/downloads/lavi"
+      - "${PACKAGE_DIR}/downloads/lava/:/var/downloads/lava"
     ports:
       - ${API_PORT:-8001}:80
 
