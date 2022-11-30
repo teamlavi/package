@@ -8,21 +8,17 @@ from utils.tree_node import TreeNode, generate_dependency_tree
 
 class NpmScraper(object):
     @staticmethod
-    def list_packages(limit: int | None = None) -> list[str]:
+    def list_packages(partial: bool) -> list[str]:
         """Given a repository, return a list of its packages."""
-        if limit == 1000:
+        if partial:
             # Just get top packages for now
             with open("repo_worker/data/top_npm.txt", "r") as top_file:
                 packages = top_file.readlines()
-            packages = [package.strip() for package in packages if package.strip()]
+            return [package.strip() for package in packages if package.strip()]
         else:
             # install all the package names
             os.system("npm i -g all-the-package-names")
-            packages = os.popen("all-the-package-names").read().split()
-        if limit is None:
-            return packages
-        else:
-            return packages[:limit]
+            return os.popen("all-the-package-names").read().split()
 
     @staticmethod
     def list_package_versions(package: str, limit: int | None = None) -> list[str]:
