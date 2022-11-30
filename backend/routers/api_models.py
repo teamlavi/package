@@ -149,6 +149,10 @@ class LavaRequest(BaseModel):
     # include active, patched or all vulnerabilities.
     # Includes only ACTIVE vulnerabilities by default if None
     status: StatusEnum | None
+    # Query with cves in list
+    cves: List[str] | None
+    # Only consider dependencies up to this depth
+    depthLimit: int | None
 
 
 # LAVA Responses
@@ -165,7 +169,7 @@ class LavaResponse(BaseModel):
 
 # job finished successfully Responses
 class AffectedCountResponse(BaseModel):
-    # CVE id -> Number of packages affected
+    # Package id -> Number of packages affected
     pkgsAffected: Dict[str, int]
 
 
@@ -185,7 +189,7 @@ class CountVulResponse(BaseModel):
 
 
 class DepthResponse(BaseModel):
-    # CVE id -> Vulnerability depth from root package
+    # Package id -> CVE id -> Vulnerability depths from root package
     vulDepth: Dict[str, dict[str, list[int]]]
 
 
@@ -207,3 +211,18 @@ class TypesResponse(BaseModel):
 class VulPackagesResponse(BaseModel):
     # List of all the package ids that are vulnerable in our database
     vulList: List[str]
+
+
+class VulPathResponse(BaseModel):
+    # Package id -> Vulnerable Package id -> List of path lists
+    vulPath: Dict[str, Dict[str, List[List[str]]]]
+
+
+class AffectedByCVECountResponse(BaseModel):
+    # CVE id -> List of affected packages
+    pkgsAffected: Dict[str, int]
+
+
+class PackageVulnsResponse(BaseModel):
+    # Package id -> List of CVE ids
+    cveList: Dict[str, List[str]]
