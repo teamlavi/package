@@ -8,6 +8,13 @@ from internal import scraping
 router = APIRouter(tags=["scrapers"])
 
 
+@router.post("/trigger/get_cves", response_class=PlainTextResponse)
+def trigger_get_cves(repo_name: str) -> str:
+    """Trigger getting cves from gh advisories."""
+    job = get_queue(QueueName.to_get_cves).enqueue(scraping.get_cves, repo_name)
+    return job.get_id()  # type: ignore
+
+
 @router.post("/trigger/list_packages", response_class=PlainTextResponse)
 def trigger_list_packages(repo_name: str, partial: bool) -> str:
     """Trigger listing package names given a repo name."""

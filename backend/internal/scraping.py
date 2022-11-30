@@ -4,6 +4,11 @@ from scrapers import repo_scrapers
 from utils.utils import compress_tree, get_recent_version
 
 
+async def get_cves(repo: str) -> None:
+    """Get cves from repository."""
+    await updates.scrape_vulnerabilities(repo)
+
+
 def list_packages(repo: str, partial: bool) -> None:
     """List packages given a repo."""
     scraper = repo_scrapers[repo]
