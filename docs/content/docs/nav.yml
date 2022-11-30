@@ -1,0 +1,28 @@
+- title: Getting Started
+  isOrdered: false
+  items:
+    - id: getting-started
+      title: Getting Started
+      path: /docs/getting-started/getting-started.html
+      subitems:
+        - id: subsection-example
+          title: Subsection Example
+          path: /docs/getting-started/subsection-example.html
+- title: LAVI
+  isOrdered: false
+  items:
+    - id: lavi-install
+      title: Install
+      path: /docs/lavi/install.html
+- title: LAVA
+  isOrdered: false
+  items:
+    - id: lava-install
+      title: Install
+      path: /docs/lava/install.html
+- title: Backend
+  isOrdered: false
+  items:
+    - id: backend-install
+      title: Install
+      path: /docs/backend/install.html
