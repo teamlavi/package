@@ -23,7 +23,7 @@ fi
 
 build_lavi () {
     sudo mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
-    GOOS=$1 GOARCH=$2 /usr/local/bin/go/bin/go build -o lavi-cli-$1-$2
+    GOOS=$1 GOARCH=$2 /usr/local/go/bin/go build -o lavi-cli-$1-$2
     if [[ $1 = "darwin" || $1 = "linux" ]]
     then
         sudo chmod +x lavi-cli-$1-$2
@@ -42,7 +42,7 @@ build_lavi () {
 }
 
 build_lava () {
-    GOOS=$1 GOARCH=$2 /usr/local/bin/go/bin/go build -o lava-cli-$1-$2
+    GOOS=$1 GOARCH=$2 /usr/local/go/bin/go build -o lava-cli-$1-$2
     if [[ $1 = "darwin" || $1 = "linux" ]]
     then
         sudo chmod +x lava-cli-$1-$2
