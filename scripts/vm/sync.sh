@@ -60,5 +60,5 @@ build_lavi windows amd64
 
 cd "$PACKAGE_DIR" || exit 1
 
-# sudo --preserve-env docker compose build
-# sudo --preserve-env docker compose up -d
+sudo --preserve-env docker compose build
+sudo --preserve-env docker compose up -d
