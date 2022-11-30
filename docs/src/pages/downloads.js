@@ -49,7 +49,7 @@ const Downloads = () => {
 						LAVI Downloads
 				</Typography>
 				<Typography style={{paddingTop: "2em"}}>
-                    MacOS (non M series CPU): <a href="/downloads/lavi/lavi-cli-darwin-arm64.zip">Download</a>
+                    MacOS (M series CPU): <a href="/downloads/lavi/lavi-cli-darwin-arm64.zip">Download</a>
 				</Typography>
 				<Typography style={{paddingTop: "2em"}}>
                     MacOS (Intel CPU): <a href="/downloads/lavi/lavi-cli-darwin-amd64.zip">Download</a>
