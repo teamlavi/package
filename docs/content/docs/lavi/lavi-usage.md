@@ -16,6 +16,8 @@ Example commands:
     
     lavi npm -s
 
+<br><br>
+
 Available Commands:
  | Commands | Description |
  | - | - | 
@@ -26,7 +28,7 @@ Available Commands:
 | poetry   |   Run LAVI against a python project (using poetry) to build the package-lock.json if your project doesn't have one by running the command when in the project directory |
 
 
-<br><br><br><br>
+<br><br>
 
 
 | Flags: | Description: |
