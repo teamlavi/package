@@ -116,7 +116,7 @@ services:
 
   nginx:
     depends_on:
-        - docs
+        - lavi-docs
         - lavi-worker
     image: nginx:alpine
     restart: always
