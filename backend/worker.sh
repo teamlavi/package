@@ -40,5 +40,17 @@ then
     exit 1
 fi
 
+# Pass sigterm to child
+_term() { 
+  echo "Caught SIGTERM signal!"
+  kill -TERM "$child" 2>/dev/null
+}
+
+trap _term SIGTERM
+
 # Start the worker
-rq worker --with-scheduler --url "$REDIS_URL" --worker-ttl 300 "$QUEUE_NAME"
+rq worker --with-scheduler --url "$REDIS_URL" --worker-ttl 300 "$QUEUE_NAME" &
+
+# Make child pid available to sigterm handler
+child=$! 
+wait "$child"
