@@ -6,21 +6,34 @@ permalink: docs/lavi/usage.html
 
 LAVI is a tool built to help uncover hidden vulnerabilities that can be nested deeply inside a project's dependency tree.
 
-Usage:
+## General Usage:
 
     lavi [command] --Flags
 
-Example commands:
+## Example commands:
+    
+    # Simple command to run Lavi on an node project. Make sure in the directory with the package-lock.json file
+    # In this example the npm command tells lavi you are working in npm
+    # The flag -s tells lavi to open up the UI element after running lavi
+    
+    lavi npm -show
+
+    # This is an example with multiple flags lavi will only flag severities that it gets from the cve database
+    # that are filtered under critical or high danger
     
     lavi npm --critical --high
-    
-    lavi npm -s
 
+    # This example is using the pip command if you would like to run lavi on a python project
+    # The severity tags work as usual so only low severity  vulnerabilities ignored and show pops the UI 
+    # write will write a tree to a file that will be available for the user to use and since write-with-vulns is used with 
+    # write command, lavi will also include vulnerabilities in the written tree file
+    
+    lavi pip --critical --high --medium -show -write -write-with-vulns
 <br><br>
 
 Available Commands:
  | Commands: | Description: |
- | - | - | 
+ | ----------- | - | 
  | completion | Generate the autocompletion script for the specified shell | 
 | help |       Help about any command and get description of what each command does|
 | npm  |       Run LAVI against an npm project by running the command when in the project directory|
@@ -32,7 +45,7 @@ Available Commands:
 
 Available Flags:
 | Flags: | Description: |
-| -    |    - |
+| ---------------------------    |----------------------------------------------------------- |
 | `--critical`  |  Only show critical severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--high, --medium, --low] to also show vulnerabilities based on severity. |
 | `-h, --help` |               If you need help with LAVI documentation, run the command to view all possible Flags.     |
 | `--high`     |          Only show high-severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --medium, --low] as other filters for vulnerabilities.|

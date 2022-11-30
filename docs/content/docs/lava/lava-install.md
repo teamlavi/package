@@ -6,8 +6,10 @@ permalink: docs/lava/install.html
 
 LAVA install
 
+NOTE: Make sure that you received the email confirming your LAVA access and an attachment to install LAVA before attempting to install LAVA
+
 ## Mac
-1. Download LAVA from http://vocation.cs.umd.edu/downloads/ and unzip the folder
+1. Download LAVA binaries using the attachment provided in the email
 2. Open terminal and `cd` into the downloaded folder
 3. From the folder run the following command (enter your password if prompted):
    `sudo mv lava /usr/local/bin/lava`
@@ -22,7 +24,7 @@ LAVA install
 
    
 ## Windows
-1. Download LAVA binaries from http://vocation.cs.umd.edu/downloads/
+1. Download LAVA binaries using the atttachment provided in the email
 2. Create a `lava` folder in your `C:\` directory
 3. Extract the `lava.exe` file from the zip to the `C:\lava` folder
 4. Add `C:\lava` to your environment variables
