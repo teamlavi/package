@@ -120,6 +120,7 @@ services:
     restart: always
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "./downloads:/var/downloads"
     ports:
       - ${API_PORT:-8001}:80
 
