@@ -39,7 +39,7 @@ build () {
     fi
 
     sudo mkdir $FILE
-    sudo mv lavi "$FILE/"
+    sudo mv $PREFIX "$FILE/"
     sudo cp INSTALL.txt "$FILE/"
 
     if [[ $GOOS = "windows" ]]
