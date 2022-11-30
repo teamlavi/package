@@ -11,7 +11,9 @@ Usage:
     lavi [command] --Flags
 
 Example commands:
+    
     lavi npm --critical --high
+    
     lavi npm -s
 
 Available Commands:
