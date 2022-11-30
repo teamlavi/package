@@ -6,7 +6,7 @@ from utils.tree_node import TreeNode
 
 class RepoScraper(Protocol):
     @staticmethod
-    def list_packages(limit: int | None = None) -> list[str]:
+    def list_packages(partial: bool) -> list[str]:
         """Given a repository, return a list of its packages."""
         ...
 

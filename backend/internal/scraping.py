@@ -4,10 +4,10 @@ from scrapers import repo_scrapers
 from utils.utils import compress_tree, get_recent_version
 
 
-def list_packages(repo: str) -> None:
+def list_packages(repo: str, partial: bool) -> None:
     """List packages given a repo."""
     scraper = repo_scrapers[repo]
-    packages = scraper.list_packages()
+    packages = scraper.list_packages(partial)
 
     # Insert into next queue
     # TODO pipeline batch insert for performance

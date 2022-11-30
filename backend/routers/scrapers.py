@@ -6,7 +6,7 @@ router = APIRouter(tags=["scrapers"])
 
 
 @router.post("/trigger/list_packages", response_class=PlainTextResponse)
-def trigger_list_packages(repo_name: str, limit: int | None) -> str:
+def trigger_list_packages(repo_name: str, partial: bool) -> str:
     """Trigger listing package names given a repo name."""
     ...
 

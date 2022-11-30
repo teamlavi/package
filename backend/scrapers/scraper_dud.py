@@ -7,7 +7,7 @@ class DudScraper(object):
     repo = "dud"
 
     @staticmethod
-    def list_packages(limit: int | None = None) -> list[str]:
+    def list_packages(partial: bool) -> list[str]:
         """Given a repository, return a list of its packages."""
         return ["mypkg1", "mypkg2", "mypkg3", "mypkg4"]
 
