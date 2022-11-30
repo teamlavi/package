@@ -19,7 +19,6 @@ Available Commands:
  | Commands | Description |
  | - | - | 
  | affectedCount | For vulnerabilities found in queried packages return a list with the number of packages affected by each vulnerability. | 
-| cancel | A brief description of your command. | 
 | completion | Generate the auto-completion script for the specified shell. |
 | count  |     Returns the number of packages inside the specified repository. Ex: lava count --repo "pip" returns the total number of packages stored in the pip repository|
 | countDependencies  | Returns list of how many other packages each package relies on. This command requires the user to pass in a list of packages using the --packages flag documented in the Flags table below.|
