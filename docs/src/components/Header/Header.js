@@ -17,6 +17,7 @@ const Header = () => {
                             <NavigationBarItem title="Home" route="/" />
                             <NavigationBarItem title="Docs" route="/docs/getting-started/getting-started.html" />
                             <NavigationBarItem title="Interactive API Documentation" route="/api/docs" />
+                            <NavigationBarItem title="Downloads" route="/downloads" />
                         </Toolbar>
                     </Grid>
                 </Grid>
