@@ -4,15 +4,17 @@ import (
 	"dep-tree-gen/common"
 	"dep-tree-gen/models"
 	"dep-tree-gen/utils"
+	"fmt"
 	"strings"
 )
 
 type PackageLock struct {
-	Name            string                `json:"name"`
-	Version         string                `json:"version"`
-	LockfileVersion int                   `json:"lockfileVersion"`
-	Requires        bool                  `json:"requires"`
-	Dependencies    map[string]Dependency `json:"dependencies"`
+	Name            string                  `json:"name"`
+	Version         string                  `json:"version"`
+	LockfileVersion int                     `json:"lockfileVersion"`
+	Requires        bool                    `json:"requires"`
+	Dependencies    map[string]Dependency   `json:"dependencies"`
+	Packages        map[string]DependencyV3 `json:"packages"`
 	// Packages        map[string]struct {
 	// 	Name         string            `json:"name"`
 	// 	Version      string            `json:"version"`
@@ -22,6 +24,11 @@ type PackageLock struct {
 
 type Package struct {
 	Name         string                 `json:"name"`
+	Dependencies map[string]interface{} `json:"dependencies"`
+}
+
+type DependencyV3 struct {
+	Version      string                 `json:"version"`
 	Dependencies map[string]interface{} `json:"dependencies"`
 }
 
@@ -47,8 +54,21 @@ func keys(data map[string]string) []string {
 	return out
 }
 
+func keysInterface(data map[string]interface{}) []string {
+	out := []string{}
+	for k, _ := range data {
+		out = append(out, k)
+	}
+	return out
+}
+
 // flatten everything out into a map of the dependency path to dependency node
 func (l PackageLock) flatten() map[string]*DepNode {
+
+	if l.LockfileVersion == 3 {
+		return l.flattenV3()
+	}
+
 	depMap := map[string]*DepNode{}
 
 	var flattenLockFileReq func(deps map[string]Dependency, path []string)
@@ -78,6 +98,62 @@ func (l PackageLock) flatten() map[string]*DepNode {
 	}
 
 	flattenLockFileReq(l.Dependencies, []string{})
+	return depMap
+}
+
+func (l PackageLock) FindDependencyV3InPackages(name string) (DependencyV3, error) {
+	for n, d := range l.Packages {
+		if strings.HasSuffix(n, name) {
+			return d, nil
+		}
+	}
+	return DependencyV3{}, fmt.Errorf("not found")
+}
+
+// lockfiles v3 are stupid and dont use the dependencies part anymore
+func (l PackageLock) flattenV3() map[string]*DepNode {
+	depMap := map[string]*DepNode{}
+	rootDeps := l.Packages[""].Dependencies
+
+	var flattenLockFileReq func(deps []string, path []string)
+
+	flattenLockFileReq = func(deps []string, path []string) {
+		for _, dName := range deps {
+
+			dVal, err := l.FindDependencyV3InPackages(dName)
+			if err != nil {
+				continue
+			}
+
+			if dVal.Version == "file:" {
+				continue
+			}
+			item := &DepNode{
+				name:     dName,
+				version:  dVal.Version,
+				requires: []string{},
+			}
+
+			if len(dVal.Dependencies) != 0 {
+				item.requires = keysInterface(dVal.Dependencies)
+			}
+
+			newPath := append(path, dName)
+			key := strings.Join(newPath, "|")
+			depMap[key] = item
+			if len(dVal.Dependencies) != 0 {
+				flattenLockFileReq(item.requires, newPath)
+			}
+		}
+	}
+
+	queue := []string{}
+
+	for r, _ := range rootDeps {
+		queue = append(queue, r)
+	}
+
+	flattenLockFileReq(queue, []string{})
 	return depMap
 }
 
