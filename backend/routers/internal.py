@@ -13,13 +13,6 @@ from utils.utils import compress_tree, decompress_tree
 router = APIRouter(tags=["internal"])
 
 
-@router.post("/trigger_vuln_scraper")
-async def trigger_vuln_scraper(repository: str) -> Response:
-    """Trigger the scraper to refresh the database."""
-    await updates.scrape_vulnerabilities(repository)
-    return Response(status_code=200)
-
-
 @router.post("/insert_vuln")
 async def insert_vuln(insert_vuln_request: api_models.InsertVulnRequest) -> bool:
     """Insert a single vulnerability."""
