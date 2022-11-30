@@ -1,7 +1,6 @@
 from base64 import b64encode
 from enum import Enum
 from hashlib import sha256
-from typing import Dict, List
 
 
 class RepoEnum(str, Enum):
@@ -52,7 +51,7 @@ def generate_universal_hash(repo: str, pkg: str, vers: str) -> str:
     return ":".join(b64encode(item.encode()).decode() for item in items)
 
 
-def compress_tree(tree: Dict[str, List[str]]) -> str:
+def compress_tree(tree: dict[str, list[str]]) -> str:
     """Compress a tree into a smaller data structure for storage."""
     nodes_str = ""  # comma seperated ordered list of nodes
     dependencies_str = ""
@@ -73,12 +72,12 @@ def compress_tree(tree: Dict[str, List[str]]) -> str:
     return nodes_str + "\n" + dependencies_str
 
 
-def decompress_tree(compressed: str) -> Dict[str, List[str]]:
+def decompress_tree(compressed: str) -> dict[str, list[str]]:
     """Take a compressed tree and convert back to a python object."""
     lines = compressed.split("\n")
     nodes = lines[0].split(",")  # list of nodes
 
-    tree: Dict[str, list[str]] = {node: [] for node in nodes}
+    tree: dict[str, list[str]] = {node: [] for node in nodes}
     for dependency_str in lines[1:]:
         if not dependency_str:
             continue
@@ -90,3 +89,37 @@ def decompress_tree(compressed: str) -> Dict[str, List[str]]:
         children = [nodes[int(child)] for child in children]  # get children nodes
         tree[parent].extend(children)  # append children to parent dependencies
     return tree
+
+
+def parse_version(version: str) -> tuple[int, int, int] | None:
+    """Try to parse a version string into major, minor, patch version numbers."""
+    subvers = version.split(".")
+    if len(subvers) != 3 or not all(subver.isdigit() for subver in subvers):
+        return None
+    # Checking isdigit should make this try-except redundant, but who cares
+    try:
+        return tuple(subvers)  # type: ignore
+    except Exception as e:
+        print(f"Unexpected issue parsing version '{version}' - {str(e)}")
+        return None
+
+
+def get_recent_version(versions: list[str]) -> str:
+    """Get the most recent version from a list."""
+    # Parse strings into list of tuples
+    all_parsed = [parse_version(version) for version in versions]
+    parsed: list[tuple[int, int, int]] = [tup for tup in all_parsed if tup is not None]
+
+    # Find highest
+    max_c1 = max(parsed, key=lambda row: row[0])[0]
+    parsed = [row for row in parsed if row[0] == max_c1]
+    max_c2 = max(parsed, key=lambda row: row[1])[1]
+    parsed = [row for row in parsed if row[1] == max_c2]
+    max_c3 = max(parsed, key=lambda row: row[2])[2]
+    highest = f"{max_c1}.{max_c2}.{max_c3}"
+
+    # Ensure correct and return
+    if highest not in versions:
+        raise Exception(f"Highest version {highest} not in set {versions}")
+
+    return highest
