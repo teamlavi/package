@@ -15,16 +15,19 @@ LAVI is a tool built to help uncover hidden vulnerabilities that can be nested d
     # Simple command to run Lavi on an node project. Make sure in the directory with the package-lock.json file
     # In this example the npm command tells lavi you are working in npm
     # The flag -s tells lavi to open up the UI element after running lavi
+    
     lavi npm -show
 
     # This is an example with multiple flags lavi will only flag severities that it gets from the cve database
     # that are filtered under critical or high danger
+    
     lavi npm --critical --high
 
     # This example is using the pip command if you would like to run lavi on a python project
     # The severity tags work as usual so only low severity  vulnerabilities ignored and show pops the UI 
     # write will write a tree to a file that will be available for the user to use and since write-with-vulns is used with 
     # write command, lavi will also include vulnerabilities in the written tree file
+    
     lavi pip --critical --high --medium -show -write -write-with-vulns
 <br><br>
 
