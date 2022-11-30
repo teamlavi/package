@@ -16,7 +16,7 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       EXPECTED_PREFIX: /api
     ports:
-      - ${API_PORT:-8001}:80
+      - ${API_PORT:-8001}
 
   lavi-worker-db:
     environment:
