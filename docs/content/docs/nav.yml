@@ -4,10 +4,6 @@
     - id: getting-started
       title: Getting Started
       path: /docs/getting-started/getting-started.html
-      subitems:
-        - id: subsection-example
-          title: Subsection Example
-          path: /docs/getting-started/subsection-example.html
 - title: LAVI
   isOrdered: false
   items:
