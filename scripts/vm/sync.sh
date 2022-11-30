@@ -21,48 +21,34 @@ then
     exit 1
 fi
 
-build_lavi () {
-    sudo mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
-    GOOS=$1 GOARCH=$2 /usr/local/go/bin/go build -o lavi-cli-$1-$2
-    if [[ $1 = "darwin" || $1 = "linux" ]]
+build () {
+    PREFIX=$1
+    GOOS=$2
+    GOARCH=$3
+
+    FILE="$PREFIX-cli-$GOOS-$GOARCH"
+
+    if [[ $PREFIX = "lavi" ]]
     then
-        sudo chmod +x lavi-cli-$1-$2
+        sudo mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
+    fi
+    GOOS=$GOOS GOARCH=$GOARCH /usr/local/go/bin/go build -o $PREFIX
+    if [[ $GOOS = "darwin" || $GOOS = "linux" ]]
+    then
+        sudo chmod +x $PREFIX
     fi
 
-    sudo mkdir "$PACKAGE_DIR/lavi-cli-$1-$2"
-    sudo mv lavi-cli-$1-$2 "$PACKAGE_DIR/lavi-cli-$1-$2"
-    sudo cp INSTALL.txt "$PACKAGE_DIR/lavi-cli-$1-$2"
+    sudo mkdir $FILE
+    sudo mv $PREFIX "$FILE/"
+    sudo cp INSTALL.txt "$FILE/"
 
-    if [[ $1 = "windows" ]]
+    if [[ $GOOS = "windows" ]]
     then
-        sudo mv lavi-cli-$1-$2 lavi-cli-$1-$2.exe
-        sudo zip -r "$PACKAGE_DIR/downloads/lavi/lavi-cli-$1-$2.zip" "$PACKAGE_DIR/lavi-cli-$1-$2.exe"
-    else
-        sudo zip -r "$PACKAGE_DIR/downloads/lavi/lavi-cli-$1-$2.zip" "$PACKAGE_DIR/lavi-cli-$1-$2"
+        sudo mv "$FILE/$PREFIX" "$FILE/$PREFIX.exe"
     fi
-    sudo rm -rf "$PACKAGE_DIR/lavi-cli-$1-$2"
-}
-
-build_lava () {
-    GOOS=$1 GOARCH=$2 /usr/local/go/bin/go build -o lava-cli-$1-$2
-    if [[ $1 = "darwin" || $1 = "linux" ]]
-    then
-        sudo chmod +x lava-cli-$1-$2
-    fi
-
-    sudo mkdir "$PACKAGE_DIR/lava-cli-$1-$2"
-    sudo mv lava-cli-$1-$2 "$PACKAGE_DIR/lava-cli-$1-$2"
-    sudo cp INSTALL.txt "$PACKAGE_DIR/lava-cli-$1-$2"
-
-    if [[ $1 = "windows" ]]
-    then
-        sudo mv lava-cli-$1-$2 lava-cli-$1-$2.exe
-        sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2.exe"
-    else
-        sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2"
-    fi
-    sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2"
-    sudo rm -rf "$PACKAGE_DIR/lava-cli-$1-$2"
+    
+    sudo zip -r -j "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip" "$FILE/"
+    sudo rm -rf "$FILE"
 }
 
 cd "$PACKAGE_DIR" || exit 1
@@ -71,28 +57,30 @@ sudo git pull
 
 echo "building lavi archives"
 
+rm -rf "$PACKAGE_DIR/downloads" || :
+
 mkdir "$PACKAGE_DIR/downloads/lavi" -p
 mkdir "$PACKAGE_DIR/downloads/lava" -p
 
 cd "$PACKAGE_DIR/lavi-cli" || exit 1
 
-build_lavi darwin amd64
-build_lavi darwin arm64
+build lavi darwin amd64
+build lavi darwin arm64
 
-build_lavi linux amd64
-build_lavi linux arm64
+build lavi linux amd64
+build lavi linux arm64
 
-build_lavi windows amd64
+build lavi windows amd64
 
 cd "$PACKAGE_DIR/lava-cli" || exit 1
 
-build_lava darwin amd64
-build_lava darwin arm64
+build lava darwin amd64
+build lava darwin arm64
 
-build_lava linux amd64
-build_lava linux arm64
+build lava linux amd64
+build lava linux arm64
 
-build_lava windows amd64
+build lava windows amd64
 
 cd "$PACKAGE_DIR" || exit 1
 
