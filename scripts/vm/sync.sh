@@ -28,10 +28,6 @@ build () {
 
     FILE="$PREFIX-cli-$GOOS-$GOARCH"
 
-    if [[ $PREFIX = "lavi" ]]
-    then
-        sudo mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
-    fi
     GOOS=$GOOS GOARCH=$GOARCH /usr/local/go/bin/go build -o $PREFIX
     if [[ $GOOS = "darwin" || $GOOS = "linux" ]]
     then
@@ -61,6 +57,16 @@ mkdir "$PACKAGE_DIR/downloads/lavi" -p || :
 mkdir "$PACKAGE_DIR/downloads/lava" -p || :
 
 cd "$PACKAGE_DIR/lavi-cli" || exit 1
+
+echo "building lavi ui"
+
+cd "$PACKAGE_DIR/lavi-cli/ui" || exit 1
+
+npm install
+npm run build
+
+cd "$PACKAGE_DIR/lavi-cli" || exit 1
+
 
 build lavi darwin amd64
 build lavi darwin arm64
