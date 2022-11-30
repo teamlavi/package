@@ -36,8 +36,10 @@ build_lavi () {
     if [[ $1 = "windows" ]]
     then
         sudo mv lavi-cli-$1-$2 lavi-cli-$1-$2.exe
+        sudo zip -r "$PACKAGE_DIR/downloads/lavi/lavi-cli-$1-$2.zip" "$PACKAGE_DIR/lavi-cli-$1-$2.exe"
+    else
+        sudo zip -r "$PACKAGE_DIR/downloads/lavi/lavi-cli-$1-$2.zip" "$PACKAGE_DIR/lavi-cli-$1-$2"
     fi
-    sudo zip -r "$PACKAGE_DIR/downloads/lavi/lavi-cli-$1-$2.zip" "$PACKAGE_DIR/lavi-cli-$1-$2"
     sudo rm -rf "$PACKAGE_DIR/lavi-cli-$1-$2"
 }
 
@@ -55,6 +57,9 @@ build_lava () {
     if [[ $1 = "windows" ]]
     then
         sudo mv lava-cli-$1-$2 lava-cli-$1-$2.exe
+        sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2.exe"
+    else
+        sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2"
     fi
     sudo zip -r "$PACKAGE_DIR/downloads/lava/lava-cli-$1-$2.zip" "$PACKAGE_DIR/lava-cli-$1-$2"
     sudo rm -rf "$PACKAGE_DIR/lava-cli-$1-$2"
