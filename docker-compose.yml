@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  lavi-worker:
+  backend:
     build: ./backend
     command:
       - uvicorn
@@ -8,16 +8,18 @@ services:
       - --host=0.0.0.0
       - routers.main:app
     environment:
-      DB_ADDRESS: lavi-worker-db
+      DB_ADDRESS: backend-db
       DB_NAME: cvedb
       DB_PASS: password
       DB_PORT: 5432
       DB_USER: user
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
+      REDIS_HOST: backend-redis
+      REDIS_PORT: 6379
     ports:
       - ${API_PORT:-8001}:80
 
-  lavi-worker-db:
+  backend-db:
     environment:
       POSTGRES_DB: cvedb
       POSTGRES_USER: user
@@ -28,7 +30,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  repo-worker-redis:
+  backend-redis:
     image: docker.io/redis:7.0.5
     ports:
       - 6379:6379
