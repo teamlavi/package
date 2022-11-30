@@ -16,8 +16,7 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
-    ports:
-      - ${API_PORT:-8001}:80
+      EXPECTED_PREFIX: /api
 
   backend-db:
     environment:
@@ -97,6 +96,22 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
+
+  docs:
+    build: ./docs
+    deploy:
+      replicas: 1
+
+  nginx:
+    depends_on:
+        - docs
+        - backend
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+    ports:
+      - ${API_PORT:-8001}:80
 
 volumes:
   postgres_data:
