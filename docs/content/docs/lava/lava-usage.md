@@ -1,3 +1,9 @@
+---
+id: lava-usage
+title: LAVA Usage
+permalink: docs/lava/usage.html
+---
+
 LAVA is a tool that developers and researchers can use to query our CVE databases in order to find trends and 
 statistics about vulnerabilities inside repos such as npm.
 
@@ -6,6 +12,9 @@ Each command may have different options. Be sure to use "lava [command] --help t
 Usage:
 
     lava [command] --Flags
+
+Example Commands: 
+    lava affectedCount --repo "npm"
 
 Available Commands:
  | Commands | Description |
@@ -32,6 +41,6 @@ Available Commands:
 | `-h, --help` |               help for lava.     |
 | `--level string`     |    Vulnerability depth levels to look at (direct, indirect, or all). |
 | `--packages strings`   |  A list of packages that will be queried with specified command. |
-| `-r, --repo string`       |   Repository to run the analysis on (Options: pip, nmp or go)|
+| `-r, --repo string`       |   Repository to run the analysis on (Options: pip, npm or go)|
 | `--status string`   |     Vulnerability status to look at (options: active, patched, or all). Active vulnerabilities are vulnerabilities that have not been patched and still exist. Patched vulnerabilities are vulnerabilities that have been patched and are no longer active.  |
 
