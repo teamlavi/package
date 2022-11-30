@@ -7,7 +7,7 @@ import orjson
 
 from utils import config
 from internal import updates
-from routers import analysis, external, internal
+from routers import analysis, external, internal, scrapers
 
 
 # Create the app
@@ -30,6 +30,7 @@ set_json_loads(orjson.loads)
 app.include_router(analysis.router, prefix="/analysis")
 app.include_router(external.router)
 app.include_router(internal.router, prefix="/internal")
+app.include_router(scrapers.router, prefix="/scrapers")
 
 
 # App startup script
