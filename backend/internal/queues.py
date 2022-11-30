@@ -1,7 +1,7 @@
 from enum import Enum
 
-from redis import Redis  # Same as StrictRedis now
-from rq import Queue
+from redis import Redis
+from rq import Queue  # type: ignore
 
 from utils import config
 
