@@ -47,7 +47,7 @@ build () {
         sudo mv "$FILE/$PREFIX" "$FILE/$PREFIX.exe"
     fi
     
-    sudo zip -r -j "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip" "$FILE/"
+    sudo zip -r -j - "$FILE/" > "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip"
     sudo rm -rf "$FILE"
 }
 
@@ -57,10 +57,8 @@ sudo git pull
 
 echo "building lavi archives"
 
-rm -rf "$PACKAGE_DIR/downloads" || :
-
-mkdir "$PACKAGE_DIR/downloads/lavi" -p
-mkdir "$PACKAGE_DIR/downloads/lava" -p
+mkdir "$PACKAGE_DIR/downloads/lavi" -p || :
+mkdir "$PACKAGE_DIR/downloads/lava" -p || :
 
 cd "$PACKAGE_DIR/lavi-cli" || exit 1
 
