@@ -27,11 +27,12 @@ LAVA install
    
 ## Windows
 1. Download LAVA binaries from http://vocation.cs.umd.edu/downloads/
-2. Extract zip into a new folder of \<name\>
-3. Inside \<name\>, if there is not already a `lava.exe`, rename `lavi` to `lavi.exe`  
-4. Type in Windows menu `Edit the system environment variables`; click 
-5. Click "environment variables" to obtain popup 
-6. Double-click on `Path` in the top section 
-7. Click "New" -> "Browse..." 
-8. Locate and select \<name\>, which is the file you just created 
-9. Go to powershell and run lava.exe
+2. Create a `lava` folder in your `C:\` directory
+3. Extract the `lava.exe` file from the zip to the `C:\lava` folder
+4. Add `C:\lava` to your environment variables
+   1. Search `Edit the system environment variables` in the Windows menu and click the first option
+   2. In the window, click "environment variables" in the lower right
+   3. In the new popup, double click `Path` in the top section
+   4. Click `New` in the right side menu, and type in the folder you extracted `lava.exe` to (in this case, `C:\lava`)
+   5. Click `Ok`, and close the popups
+5. Open up powershell or command prompt, and run `lava`
