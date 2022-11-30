@@ -97,6 +97,7 @@ services:
     depends_on:
         - docs
         - backend
+        - rqmonitor
     image: nginx:alpine
     restart: always
     volumes:
@@ -105,6 +106,17 @@ services:
       - "./downloads/lava:/var/downloads/lava"
     ports:
       - ${API_PORT:-8001}:80
+
+  rqmonitor:
+    image: docker.io/pranavgupta1234/rqmonitor
+    entrypoint:
+      - rqmonitor
+      - --url-prefix
+      - "/rqmonitor"
+      - --port
+      - "80"
+    environment:
+      RQ_MONITOR_REDIS_URL: redis://backend-redis:6379/0
 
 volumes:
   postgres_data:
