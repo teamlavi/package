@@ -35,5 +35,68 @@ services:
     ports:
       - 6379:6379
 
+  backend-worker-list-packages:
+    build: ./backend
+    command:
+      - rq
+      - worker
+      - --with-scheduler
+      - --url
+      - redis://backend-redis:6379/0
+      - to_list_packages
+    deploy:
+      replicas: 1
+    environment:
+      DB_ADDRESS: backend-db
+      DB_NAME: cvedb
+      DB_PASS: password
+      DB_PORT: 5432
+      DB_USER: user
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
+      REDIS_HOST: backend-redis
+      REDIS_PORT: 6379
+
+  backend-worker-list-versions:
+    build: ./backend
+    command:
+      - rq
+      - worker
+      - --with-scheduler
+      - --url
+      - redis://backend-redis:6379/0
+      - to_list_versions
+    deploy:
+      replicas: 1
+    environment:
+      DB_ADDRESS: backend-db
+      DB_NAME: cvedb
+      DB_PASS: password
+      DB_PORT: 5432
+      DB_USER: user
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
+      REDIS_HOST: backend-redis
+      REDIS_PORT: 6379
+
+  backend-worker-generate-tree:
+    build: ./backend
+    command:
+      - rq
+      - worker
+      - --with-scheduler
+      - --url
+      - redis://backend-redis:6379/0
+      - to_generate_tree
+    deploy:
+      replicas: 5
+    environment:
+      DB_ADDRESS: backend-db
+      DB_NAME: cvedb
+      DB_PASS: password
+      DB_PORT: 5432
+      DB_USER: user
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
+      REDIS_HOST: backend-redis
+      REDIS_PORT: 6379
+
 volumes:
   postgres_data:
