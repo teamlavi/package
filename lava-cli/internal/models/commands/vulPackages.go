@@ -11,5 +11,11 @@ func (a VulPackagesResponse) Display() {
 }
 
 func (a VulPackagesResponse) ToCSV() [][]string {
-	return [][]string{}
+	out := [][]string{
+		{"package"},
+	}
+	for _, k := range a.VulList {
+		out = append(out, []string{k})
+	}
+	return out
 }

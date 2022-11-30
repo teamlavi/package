@@ -11,5 +11,6 @@ func (a CountVulResponse) Display() {
 }
 
 func (a CountVulResponse) ToCSV() [][]string {
+	fmt.Println("no csv written for this query")
 	return [][]string{}
 }

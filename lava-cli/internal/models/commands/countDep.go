@@ -3,6 +3,7 @@ package commands
 import (
 	"dep-tree-gen/utils"
 	"fmt"
+	"strconv"
 )
 
 type CountDepResponse struct {
@@ -17,5 +18,13 @@ func (a CountDepResponse) Display() {
 }
 
 func (a CountDepResponse) ToCSV() [][]string {
-	return [][]string{}
+	out := [][]string{
+		{"name", "version", "count"},
+	}
+	for k, v := range a.DepList {
+		name, version, _ := utils.DecodeID(k)
+		out = append(out, []string{name, version, strconv.Itoa(v)})
+	}
+
+	return out
 }
