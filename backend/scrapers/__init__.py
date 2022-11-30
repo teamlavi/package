@@ -1,6 +1,8 @@
 from typing import Protocol
 
 from scrapers.scraper_dud import DudScraper
+from scrapers.scraper_npm import NpmScraper
+from scrapers.scraper_pip import PipScraper
 from utils.tree_node import TreeNode
 
 
@@ -23,4 +25,6 @@ class RepoScraper(Protocol):
 
 repo_scrapers: dict[str, RepoScraper] = {
     "dud": DudScraper(),
+    "npm": NpmScraper(),
+    "pip": PipScraper(),
 }

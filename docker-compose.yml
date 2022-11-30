@@ -37,12 +37,8 @@ services:
   worker-list-packages:
     build: ./backend
     command:
-      - rq
-      - worker
-      - --with-scheduler
-      - --url
-      - redis://backend-redis:6379/0
-      - to_list_packages
+      - bash
+      - worker.sh
     deploy:
       replicas: 1
     environment:
@@ -54,16 +50,13 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
+      QUEUE_NAME: to_list_packages
 
   worker-list-versions:
     build: ./backend
     command:
-      - rq
-      - worker
-      - --with-scheduler
-      - --url
-      - redis://backend-redis:6379/0
-      - to_list_versions
+      - bash
+      - worker.sh
     deploy:
       replicas: 1
     environment:
@@ -75,16 +68,13 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
+      QUEUE_NAME: to_list_versions
 
   worker-generate-tree:
     build: ./backend
     command:
-      - rq
-      - worker
-      - --with-scheduler
-      - --url
-      - redis://backend-redis:6379/0
-      - to_generate_tree
+      - bash
+      - worker.sh
     deploy:
       replicas: 5
     environment:
@@ -96,6 +86,7 @@ services:
       GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
+      QUEUE_NAME: to_generate_tree
 
   docs:
     build: ./docs
