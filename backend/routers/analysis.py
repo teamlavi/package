@@ -51,20 +51,17 @@ async def post_affected_count(
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.AffectedCountResponse(
-            pkgsAffected=await queries.get_affected_packages(
-                lava_request.repo, lava_request.packages
-            )
-        ),
+    return _handle_enqueue(
+        queries.get_affected_packages, lava_request.repo, lava_request.packages
     )
 
 
 @router.get("/affected_count")
 async def get_affected_count(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.AffectedCountResponse(pkgsAffected=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 2.) Count - Number of packages.
