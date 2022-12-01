@@ -186,6 +186,8 @@ async def post_types(lava_request: api_models.LavaRequest) -> api_models.LavaRes
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
 
+    return _handle_enqueue(queries.get_num_types, lava_request.packages)
+
     return api_models.LavaResponse(
         status=utils.ResponseEnum.complete,
         error=None,
@@ -197,7 +199,10 @@ async def post_types(lava_request: api_models.LavaRequest) -> api_models.LavaRes
 
 @router.get("/types")
 async def get_types(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.TypesResponse(cweList=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 9.) vulnerablePackages - Return list of vulnerable packages.
