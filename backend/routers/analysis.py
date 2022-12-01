@@ -169,18 +169,15 @@ async def post_severities(
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.SeveritiesResponse(
-            sevList=await queries.get_pkg_severity(lava_request.packages)
-        ),
-    )
+    return _handle_enqueue(queries.get_pkg_severity, lava_request.packages)
 
 
 @router.get("/severities")
 async def get_severities(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.SeveritiesResponse(sevList=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 8.) Types - Returns CSV with CWEs and a count of how many vulnerabilities for each CWE
