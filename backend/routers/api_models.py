@@ -158,8 +158,16 @@ class LavaResponse(BaseModel):
     result: Any
 
 
+def lava_success(result: Any) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.complete, error=None, result=result)
+
+
 def lava_failure(error_text: str) -> LavaResponse:
     return LavaResponse(status=ResponseEnum.failure, error=error_text, result=None)
+
+
+def lava_pending(job_id: str) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.pending, error=None, result=job_id)
 
 
 # job finished successfully Responses
