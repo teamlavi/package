@@ -129,18 +129,15 @@ async def post_depth(lava_request: api_models.LavaRequest) -> api_models.LavaRes
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.DepthResponse(
-            vulDepth=await queries.get_vulnerability_depths(lava_request.packages)
-        ),
-    )
+    return _handle_enqueue(queries.get_vulnerability_depths, lava_request.packages)
 
 
 @router.get("/depth")
 async def get_depth(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.DepthResponse(vulDepth=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 6.) numDownloads - Returns a list with the number of downloads for each
