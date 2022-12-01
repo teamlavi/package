@@ -149,18 +149,15 @@ async def post_num_downloads(
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        response=api_models.NumDownloadsResponse(
-            downloads=await queries.get_num_downloads(lava_request.packages)
-        ),
-    )
+    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
 
 
 @router.get("/num_downloads")
 async def get_num_downloads(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.NumDownloadsResponse(downloads=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 7.) Severities - Return list of vulnerable packages and severity for each
