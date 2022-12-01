@@ -106,6 +106,24 @@ services:
       REDIS_PORT: 6379
       QUEUE_NAME: to_generate_tree
 
+  worker-analysis:
+    build: ./backend
+    command:
+      - bash
+      - worker.sh
+    deploy:
+      replicas: 5
+    environment:
+      DB_ADDRESS: backend-db
+      DB_NAME: cvedb
+      DB_PASS: password
+      DB_PORT: 5432
+      DB_USER: user
+      GH_ACCESS_TOKEN: ${GH_ACCESS_TOKEN}
+      REDIS_HOST: backend-redis
+      REDIS_PORT: 6379
+      QUEUE_NAME: analysis
+
   docs:
     build: ./docs
     deploy:
