@@ -9,3 +9,5 @@
 **/*.csv
 
 downloads
+
+db_backup.sql

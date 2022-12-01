@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker-compose exec repo-worker-redis redis-cli
+docker compose exec backend-redis redis-cli

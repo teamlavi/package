@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import PlainTextResponse
 
-from internal.queues import QueueName, get_queue
 from internal import scraping
+from internal.queues import QueueName, get_queue
 
 
 router = APIRouter(tags=["scrapers"])
@@ -11,7 +11,9 @@ router = APIRouter(tags=["scrapers"])
 @router.post("/trigger/get_cves", response_class=PlainTextResponse)
 def trigger_get_cves(repo_name: str) -> str:
     """Trigger getting cves from gh advisories."""
-    job = get_queue(QueueName.to_get_cves).enqueue(scraping.get_cves, repo_name)
+    job = get_queue(QueueName.to_get_cves).enqueue(
+        scraping.get_cves, repo_name, job_timeout=7200
+    )
     return job.get_id()  # type: ignore
 
 
