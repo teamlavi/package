@@ -1,5 +1,4 @@
 from base64 import b64decode
-from typing import Dict, List
 
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
@@ -81,7 +80,7 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    unpacked: Dict[str, List[str]]
+    unpacked: dict[str, list[str]]
     unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
     print(f"insert tree endpoint got tree with {len(unpacked)} nodes")
 

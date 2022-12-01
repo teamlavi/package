@@ -5,11 +5,10 @@ import time
 import httpx
 import psycopg
 
-from daos import cve
-from daos import dependencies
+from daos import cve, dependencies
 from daos.database import get_db_tx
 from utils import config
-from typing import List
+
 
 CACHE_CURSOR: str | None = None
 
@@ -238,7 +237,7 @@ async def delete_single_vulnerability(
 
 async def list_package_versions_npm(
     package: str, limit: int | None = None
-) -> List[SemVer]:
+) -> list[SemVer]:
     """Given a repository and package, return a list of available versions."""
     try:
         resp = httpx.get(
@@ -253,7 +252,7 @@ async def list_package_versions_npm(
         elif isinstance(version_list[0], list):
             version_list = version_list[0]
 
-        res_versions: List[SemVer] = []
+        res_versions: list[SemVer] = []
 
         for vers in version_list:
             if limit is not None and len(res_versions) >= limit:
@@ -272,13 +271,13 @@ async def list_package_versions_npm(
 
 async def list_package_versions_pip(
     package: str, limit: int | None = None
-) -> List[SemVer]:
+) -> list[SemVer]:
     """Given a repository and package, return a list of available versions."""
     try:
         page2 = f"https://pypi.org/pypi/{package}/json"
         all_versions = json.loads(httpx.get(page2).text)["releases"].keys()
 
-        res_versions: List[SemVer] = []
+        res_versions: list[SemVer] = []
         for vers in all_versions:
             if limit is not None and len(res_versions) >= limit:
                 break
@@ -307,7 +306,7 @@ async def get_vers_less_than_eql(
         all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
-    res: List[str] = []
+    res: list[str] = []
     for vers in all_vers:
         if vers.major_vers < int(major_vers):
             res.append(str(vers))
@@ -335,7 +334,7 @@ async def get_vers_less_than(
         all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
-    res: List[str] = []
+    res: list[str] = []
     for vers in all_vers:
         if vers.major_vers < int(major_vers):
             res.append(str(vers))
@@ -363,7 +362,7 @@ async def get_vers_greater_than_eql(
         all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
-    res: List[str] = []
+    res: list[str] = []
     for vers in all_vers:
         if vers.major_vers > int(major_vers):
             res.append(str(vers))
@@ -391,7 +390,7 @@ async def get_vers_greater_than(
         all_vers = await list_package_versions_pip(pkg_name)
     else:
         all_vers = []
-    res: List[str] = []
+    res: list[str] = []
     for vers in all_vers:
         if vers.major_vers > int(major_vers):
             res.append(str(vers))

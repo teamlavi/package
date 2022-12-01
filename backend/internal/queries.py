@@ -1,5 +1,3 @@
-from typing import List, Dict
-
 from daos import cve, dependencies
 from daos.database import get_db_tx
 from utils.utils import RepoEnum, decompress_tree
@@ -7,7 +5,7 @@ from utils.utils import RepoEnum, decompress_tree
 
 async def find_vulnerabilities_simple(
     repo: RepoEnum, package: str, version: str
-) -> List[str]:
+) -> list[str]:
     """Find CVE ids only for a single repo, package, and version."""
 
     # Get cves from the database
@@ -18,7 +16,7 @@ async def find_vulnerabilities_simple(
     return [cve.cve_id for cve in cves]
 
 
-async def find_vuln_versions(repo: RepoEnum, package: str) -> List[str]:
+async def find_vuln_versions(repo: RepoEnum, package: str) -> list[str]:
 
     # Get list of versions of the package from the database
     async with await get_db_tx() as tx:
@@ -30,7 +28,7 @@ async def find_vuln_versions(repo: RepoEnum, package: str) -> List[str]:
 
 async def find_full_vulnerabilities_id(
     univ_id: str,
-) -> List[cve.Cve]:
+) -> list[cve.Cve]:
     """Find CVE data from a universal hash."""
 
     # Get cves from the database
@@ -71,12 +69,12 @@ async def get_package_count(repo: RepoEnum) -> int:
 
 
 # 3
-async def get_dependencies(univ_hash: str) -> Dict[str, list[str]] | None:
+async def get_dependencies(univ_hash: str) -> dict[str, list[str]] | None:
     """Get the list of dependencies for a package"""
     async with await get_db_tx() as tx:
         dep_string: str | None = await dependencies.find_tree_id(tx, univ_hash)
     if dep_string:
-        dep_tree: Dict[str, list[str]] = decompress_tree(dep_string)
+        dep_tree: dict[str, list[str]] = decompress_tree(dep_string)
         return dep_tree
     else:
         return None
@@ -101,15 +99,15 @@ async def get_vulnerable_package_count(repo: RepoEnum) -> int:
 
 
 # 5
-async def get_vulnerability_depth(univ_hash: str) -> Dict[str, list[int]] | None:
+async def get_vulnerability_depth(univ_hash: str) -> dict[str, list[int]] | None:
     """Get the depth(s) of each vulnerability. Vulnerabilities with multiple paths
     have the length of each path in the list."""
-    vulnerabilities: Dict[str, list[int]] = {}
-    dep_tree: Dict[str, list[str]] | None = await get_dependencies(univ_hash)
+    vulnerabilities: dict[str, list[int]] = {}
+    dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
     if dep_tree is None:
         return None
     else:
-        dep_tree2: Dict[str, list[str]] = dep_tree
+        dep_tree2: dict[str, list[str]] = dep_tree
 
         async def get_vulnerabilities(rec_univ_hash: str, depth: int) -> None:
             deps = dep_tree2[rec_univ_hash]
@@ -190,7 +188,7 @@ async def get_num_types(pkgs: list[str]) -> dict[str, int]:
 # 9
 async def check_vulnerable(univ_hash: str) -> bool:
     """Check if there is a vulnerability in a package or its dependencies"""
-    dep_tree: Dict[str, list[str]] | None = await get_dependencies(univ_hash)
+    dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
     if dep_tree is None:
         return False
     else:

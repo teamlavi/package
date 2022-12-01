@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import PlainTextResponse
 
-from internal.queues import QueueName, get_queue
 from internal import scraping
+from internal.queues import QueueName, get_queue
 
 
 router = APIRouter(tags=["scrapers"])

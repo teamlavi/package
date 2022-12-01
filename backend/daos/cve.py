@@ -1,8 +1,5 @@
-import psycopg
-
-from typing import List
-
 from attrs import define
+import psycopg
 
 from daos.database import Transaction
 from utils.utils import generate_universal_hash
@@ -77,7 +74,7 @@ async def delete(tx: Transaction, cve: Cve) -> None:
         )
 
 
-async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[Cve]:
+async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> list[Cve]:
     """Find by the universal hash string."""
     # Query the database
     async with tx.cursor() as cur:
@@ -91,7 +88,7 @@ async def find_by_univ_hash(tx: Transaction, univ_hash: str) -> List[Cve]:
     return [Cve(*raw_cve) for raw_cve in raw_cves]
 
 
-async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[str]:
+async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> list[str]:
     """Find by the universal hash string."""
     # Query the database
     async with tx.cursor() as cur:
@@ -106,7 +103,7 @@ async def find_pkg_vers(tx: Transaction, repo_name: str, pkg_name: str) -> List[
 
 async def find_by_repo_pkg_vers(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str
-) -> List[Cve]:
+) -> list[Cve]:
     """Find any entries by their repo, pkg, vers tuple."""
     univ_hash = generate_universal_hash(repo_name, pkg_name, pkg_vers)
     return await find_by_univ_hash(tx, univ_hash)

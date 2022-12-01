@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from utils import utils
-from routers import api_models
+
 from internal import queries
-from utils.utils import ResponseEnum
+from routers import api_models
+from utils import utils
 
 router = APIRouter(tags=["analysis"])
 
@@ -21,7 +21,7 @@ async def post_affected_count(
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.AffectedCountResponse(
             pkgsAffected=await queries.get_affected_packages(
@@ -44,7 +44,7 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.CountResponse(
             count=await queries.get_package_count(lava_request.repo)
@@ -67,7 +67,7 @@ async def post_count_dependencies(
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.CountDepResponse(
             depList=await queries.get_num_dependencies(lava_request.packages)
@@ -90,7 +90,7 @@ async def post_count_vul(
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.CountVulResponse(
             vulCount=await queries.get_vulnerable_package_count(lava_request.repo)
@@ -111,7 +111,7 @@ async def post_depth(lava_request: api_models.LavaRequest) -> api_models.LavaRes
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.DepthResponse(
             vulDepth=await queries.get_vulnerability_depths(lava_request.packages)
@@ -134,7 +134,7 @@ async def post_num_downloads(
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         response=api_models.NumDownloadsResponse(
             downloads=await queries.get_num_downloads(lava_request.packages)
@@ -157,7 +157,7 @@ async def post_severities(
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.SeveritiesResponse(
             sevList=await queries.get_pkg_severity(lava_request.packages)
@@ -177,7 +177,7 @@ async def post_types(lava_request: api_models.LavaRequest) -> api_models.LavaRes
         return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.TypesResponse(
             cweList=await queries.get_num_types(lava_request.packages)
@@ -200,7 +200,7 @@ async def post_vulnerable_packages(
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
-        status=ResponseEnum.complete,
+        status=utils.ResponseEnum.complete,
         error=None,
         result=api_models.VulPackagesResponse(
             vulList=await queries.get_all_vulnerable_packages(lava_request.repo)
