@@ -214,15 +214,12 @@ async def post_vulnerable_packages(
     if not lava_request.repo:
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.VulPackagesResponse(
-            vulList=await queries.get_all_vulnerable_packages(lava_request.repo)
-        ),
-    )
+    return _handle_enqueue(queries.get_all_vulnerable_packages, lava_request.repo)
 
 
 @router.get("/vulnerable_packages")
 async def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.VulPackagesResponse(vulList=job_result)
+
+    return _handle_get_job(jobID, parse_result)
