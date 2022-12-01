@@ -10,6 +10,18 @@ from utils import utils
 router = APIRouter(tags=["analysis"])
 
 
+def _handle_enqueue(func: Callable[..., Any], *args: Any) -> api_models.LavaResponse:
+    """Handle enqueueing a function, return pending response."""
+    job = get_queue(QueueName.analysis).enqueue(
+        func,
+        *args,
+        job_timeout=3600,
+        result_ttl=3600,
+    )
+
+    return api_models.lava_pending(job.get_id())
+
+
 def _handle_get_job(
     job_id: str, result_parser: Callable[[Any], Any]
 ) -> api_models.LavaResponse:
@@ -62,22 +74,7 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
     if not lava_request.repo:
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
-    job = get_queue(QueueName.analysis).enqueue(
-        queries.get_package_count,
-        lava_request.repo,
-        job_timeout=3600,
-        result_ttl=3600,
-    )
-
-    return api_models.lava_pending(job.get_id())
-
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.CountResponse(
-            count=await queries.get_package_count(lava_request.repo)
-        ),
-    )
+    return _handle_enqueue(queries.get_package_count, lava_request.repo)
 
 
 @router.get("/count")
