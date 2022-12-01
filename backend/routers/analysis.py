@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from internal import queries
+from internal.queues import QueueName, get_queue
 from routers import api_models
 from utils import utils
 
@@ -43,6 +44,15 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
     if not lava_request.repo:
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
+    job = get_queue(QueueName.analysis).enqueue(
+        queries.get_package_count,
+        lava_request.repo,
+        job_timeout=3600,
+        result_ttl=3600,
+    )
+
+    return api_models.lava_pending(job.get_id())
+
     return api_models.LavaResponse(
         status=utils.ResponseEnum.complete,
         error=None,
@@ -54,7 +64,16 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
 
 @router.get("/count")
 async def get_count(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    job = get_queue(QueueName.analysis).fetch_job(jobID)
+    status = job.get_status()
+    if status in ["queued", "started", "deferred", "scheduled"]:
+        return api_models.lava_pending(jobID)
+    elif status in ["stopped", "cancelled", "failed"]:
+        return api_models.lava_failure(str(job.exc_info))
+    elif status == "finished":
+        return api_models.lava_success(api_models.CountResponse(count=job.result))
+    else:
+        return api_models.lava_failure(f"Unrecognized job status: {status}")
 
 
 # 3.) countDependencies - Returns list of how many other packages each package
