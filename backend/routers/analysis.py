@@ -111,18 +111,15 @@ async def post_count_vul(
     if not lava_request.repo:
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
-    return api_models.LavaResponse(
-        status=utils.ResponseEnum.complete,
-        error=None,
-        result=api_models.CountVulResponse(
-            vulCount=await queries.get_vulnerable_package_count(lava_request.repo)
-        ),
-    )
+    return _handle_enqueue(queries.get_vulnerable_package_count, lava_request.repo)
 
 
 @router.get("/count_vul")
 async def get_count_vul(jobID: str) -> api_models.LavaResponse:
-    return api_models.LavaResponse(status=utils.ResponseEnum.pending)
+    def parse_result(job_result: Any) -> Any:
+        return api_models.CountVulResponse(vulCount=job_result)
+
+    return _handle_get_job(jobID, parse_result)
 
 
 # 5.) Depth - Returns list of how deep each vulnerability was from the top level
