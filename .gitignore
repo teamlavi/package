@@ -7,3 +7,7 @@
 
 **/cds.json
 **/*.csv
+
+downloads
+
+db_backup.sql

@@ -1,5 +1,4 @@
 from base64 import b64decode
-from typing import Dict, List
 
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
@@ -11,13 +10,6 @@ from utils.utils import compress_tree, decompress_tree
 
 
 router = APIRouter(tags=["internal"])
-
-
-@router.post("/trigger_vuln_scraper")
-async def trigger_vuln_scraper(repository: str) -> Response:
-    """Trigger the scraper to refresh the database."""
-    await updates.scrape_vulnerabilities(repository)
-    return Response(status_code=200)
 
 
 @router.post("/insert_vuln")
@@ -88,7 +80,7 @@ async def insert_tree(
     patch_vers: str,
 ) -> Response:
     """Insert a tree into the database"""
-    unpacked: Dict[str, List[str]]
+    unpacked: dict[str, list[str]]
     unpacked = orjson.loads(b64decode(tree.tree.encode()).decode())
     print(f"insert tree endpoint got tree with {len(unpacked)} nodes")
 

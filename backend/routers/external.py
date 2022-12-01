@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from internal import queries
 from routers import api_models
-from typing import List
+
 
 router = APIRouter(tags=["external"])
 
@@ -45,7 +45,7 @@ async def find_vulnerabilities_id_list(
     """Find all vulnerabilities given a list of package universal hash ids."""
 
     # get CVE data from the database
-    async def format_cve(pkgId: str) -> List[api_models.CveResponse]:
+    async def format_cve(pkgId: str) -> list[api_models.CveResponse]:
         cves = await queries.find_full_vulnerabilities_id(pkgId)
         return [
             api_models.CveResponse(
