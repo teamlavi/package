@@ -15,10 +15,10 @@ async def post_affected_count(
 ) -> api_models.LavaResponse:
     """Check to make sure repo was sent"""
     if not lava_request.repo:
-        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!",)
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     if not lava_request.packages:
-        return api_models.lava_failure(error="Error! No package list was given!")
+        return api_models.lava_failure("Error! No package list was given!")
 
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
@@ -132,7 +132,7 @@ async def post_num_downloads(
 ) -> api_models.LavaResponse:
     if not lava_request.packages:
         return api_models.lava_failure("Error! No package list was given!")
-    
+
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
         error=None,
