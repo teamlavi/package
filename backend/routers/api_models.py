@@ -233,3 +233,26 @@ class AffectedByCVECountResponse(BaseModel):
 class PackageVulnsResponse(BaseModel):
     # Package id -> List of CVE ids
     cveList: dict[str, list[str]]
+
+
+class AllPackagesResponse(BaseModel):
+    # Repo -> List of packages
+    allPkgs: dict[str, list[str]]
+
+
+class DependencyStats(BaseModel):
+    # Dependency count statistics
+    mean: int
+    stdDev: int
+    median: int
+    mode: int
+
+
+class DependencyStatsResponse(BaseModel):
+    # Repo -> Dependency count statistics
+    depStats: dict[str, DependencyStats]
+
+
+class allPackageDependenciesResponse(BaseModel):
+    # Repo -> package id -> number of dependencies
+    depCount: dict[str, dict[str, int]]
