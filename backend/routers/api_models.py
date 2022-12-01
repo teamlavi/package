@@ -4,10 +4,7 @@ from pydantic import BaseModel
 
 from typing import Any
 
-from utils.utils import RepoEnum
-from utils.utils import LevelEnum
-from utils.utils import StatusEnum
-from utils.utils import ResponseEnum
+from utils.utils import LevelEnum, RepoEnum, ResponseEnum, StatusEnum
 
 
 class InsertTreeData(BaseModel):
@@ -161,6 +158,10 @@ class LavaResponse(BaseModel):
     error: str | None
     # If status=complete, will return job response. will be one of the responses below
     result: Any
+
+
+def lava_failure(error_text: str) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.failure, error=error_text, result=None)
 
 
 # job finished successfully Responses

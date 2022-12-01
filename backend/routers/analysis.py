@@ -15,28 +15,20 @@ async def post_affected_count(
 ) -> api_models.LavaResponse:
     """Check to make sure repo was sent"""
     if not lava_request.repo:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! LavaRequest did not recieve a repo! repo is required.",
-            result=None,
-        )
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!",)
 
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            result=api_models.AffectedCountResponse(
-                pkgsAffected=await queries.get_affected_packages(
-                    lava_request.repo, lava_request.packages
-                )
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            result=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure(error="Error! No package list was given!")
+
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        result=api_models.AffectedCountResponse(
+            pkgsAffected=await queries.get_affected_packages(
+                lava_request.repo, lava_request.packages
+            )
+        ),
+    )
 
 
 @router.get("/affected_count")
@@ -49,11 +41,7 @@ async def get_affected_count(jobID: str) -> api_models.LavaResponse:
 async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaResponse:
     """Check to make sure repo was sent"""
     if not lava_request.repo:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! LavaRequest did not recieve a repo! repo is required.",
-            result=None,
-        )
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
@@ -75,20 +63,16 @@ async def get_count(jobID: str) -> api_models.LavaResponse:
 async def post_count_dependencies(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            result=api_models.CountDepResponse(
-                depList=await queries.get_num_dependencies(lava_request.packages)
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            result=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! No package list was given!")
+
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        result=api_models.CountDepResponse(
+            depList=await queries.get_num_dependencies(lava_request.packages)
+        ),
+    )
 
 
 @router.get("/count_dependencies")
@@ -103,11 +87,7 @@ async def post_count_vul(
 ) -> api_models.LavaResponse:
     """Check to make sure repo was sent"""
     if not lava_request.repo:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! LavaRequest did not recieve a repo! repo is required.",
-            result=None,
-        )
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
@@ -127,20 +107,16 @@ async def get_count_vul(jobID: str) -> api_models.LavaResponse:
 # package (how many dependencies deep).
 @router.post("/depth")
 async def post_depth(lava_request: api_models.LavaRequest) -> api_models.LavaResponse:
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            result=api_models.DepthResponse(
-                vulDepth=await queries.get_vulnerability_depths(lava_request.packages)
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            result=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! No package list was given!")
+
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        result=api_models.DepthResponse(
+            vulDepth=await queries.get_vulnerability_depths(lava_request.packages)
+        ),
+    )
 
 
 @router.get("/depth")
@@ -154,20 +130,16 @@ async def get_depth(jobID: str) -> api_models.LavaResponse:
 async def post_num_downloads(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            response=api_models.NumDownloadsResponse(
-                downloads=await queries.get_num_downloads(lava_request.packages)
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            response=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! No package list was given!")
+    
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        response=api_models.NumDownloadsResponse(
+            downloads=await queries.get_num_downloads(lava_request.packages)
+        ),
+    )
 
 
 @router.get("/num_downloads")
@@ -181,20 +153,16 @@ async def get_num_downloads(jobID: str) -> api_models.LavaResponse:
 async def post_severities(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            result=api_models.SeveritiesResponse(
-                sevList=await queries.get_pkg_severity(lava_request.packages)
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            result=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! No package list was given!")
+
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        result=api_models.SeveritiesResponse(
+            sevList=await queries.get_pkg_severity(lava_request.packages)
+        ),
+    )
 
 
 @router.get("/severities")
@@ -205,20 +173,16 @@ async def get_severities(jobID: str) -> api_models.LavaResponse:
 # 8.) Types - Returns CSV with CWEs and a count of how many vulnerabilities for each CWE
 @router.post("/types")
 async def post_types(lava_request: api_models.LavaRequest) -> api_models.LavaResponse:
-    if lava_request.packages:
-        return api_models.LavaResponse(
-            status=ResponseEnum.complete,
-            error=None,
-            result=api_models.TypesResponse(
-                cweList=await queries.get_num_types(lava_request.packages)
-            ),
-        )
-    else:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! No package list was given!",
-            result=None,
-        )
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! No package list was given!")
+
+    return api_models.LavaResponse(
+        status=ResponseEnum.complete,
+        error=None,
+        result=api_models.TypesResponse(
+            cweList=await queries.get_num_types(lava_request.packages)
+        ),
+    )
 
 
 @router.get("/types")
@@ -233,11 +197,7 @@ async def post_vulnerable_packages(
 ) -> api_models.LavaResponse:
     """Check to make sure repo was sent"""
     if not lava_request.repo:
-        return api_models.LavaResponse(
-            status=ResponseEnum.failure,
-            error="Error! LavaRequest did not recieve a repo! repo is required.",
-            result=None,
-        )
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
 
     return api_models.LavaResponse(
         status=ResponseEnum.complete,
