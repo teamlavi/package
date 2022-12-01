@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter
 
 from internal import queries
@@ -64,6 +66,9 @@ async def post_count(lava_request: api_models.LavaRequest) -> api_models.LavaRes
 
 @router.get("/count")
 async def get_count(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.CountResponse(count=job_result)
+
     job = get_queue(QueueName.analysis).fetch_job(jobID)
     status = job.get_status()
     if status in ["queued", "started", "deferred", "scheduled"]:
@@ -71,7 +76,7 @@ async def get_count(jobID: str) -> api_models.LavaResponse:
     elif status in ["stopped", "cancelled", "failed"]:
         return api_models.lava_failure(str(job.exc_info))
     elif status == "finished":
-        return api_models.lava_success(api_models.CountResponse(count=job.result))
+        return api_models.lava_success(parse_result(job.result))
     else:
         return api_models.lava_failure(f"Unrecognized job status: {status}")
 
