@@ -19,7 +19,7 @@ func getRemote(cmd *cobra.Command) string {
 	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
 		return remote
 	}
-	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and end with a slash", remote))
+	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 }
 
 func getCds(cmd *cobra.Command, gen generator.RepositoryTreeGenerator) models.CDS {
