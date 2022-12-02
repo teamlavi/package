@@ -214,3 +214,23 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
         return api_models.VulPackagesResponse(vulList=job_result)
 
     return _handle_get_job(jobID, parse_result)
+
+#10.) 
+@router.post("/vulnerability_paths")
+def post_vulnerability_paths(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    if not lava_request.repo:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
+    if not lava_request.packages:
+        return api_model.lava_failure("Error! No package list was given!")
+
+    return _handle_enqueue(queries.get_vulnerability_paths, lava_request.packages)
+
+@router.get("/vulnerability_paths")
+def get_vulnerability_paths(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.vulPathResponse(vulPath=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+    

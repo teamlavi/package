@@ -236,3 +236,47 @@ async def get_affected_packages_cve(
                 if pkg in vuln_pkgs[cve_id]:
                     cve_effect[cve_id] = cve_effect.setdefault(pkg, 0) + 1
     return cve_effect
+
+
+#10
+async def get_vulnerability_paths(
+    pkgs: list[str] 
+) -> dict[str, dict[str, list[list[str]]]] :
+    vuln_paths: dict[str, dict[str, list[list[str]]]] = {}
+
+    #helper function to process one package at a time
+    async def package_paths(pkg : str) -> None:
+        pkg_paths: dict[str, list[list[str]]] = {}
+        pkg_tree : dict[str, list[str]] | None =  await get_dependencies(pkg)
+        #Set to avoid repeat traversals
+        seen_pkgs : set = set()
+        seen_pkgs.add(pkg)
+
+        #traverse the tree recursively to find vulnerable package paths
+        async def tree_traversal(currDep: str, currPath: list[str]) -> None:
+            newPath : list[str] = currPath.copy()
+            newPath.append(currDep)
+        
+            #check if the current dependency has any direct vulnerabilities
+            if await find_full_vulnerabilities_id(currDep):
+                if currDep in pkg_paths:
+                    pkg_paths[currDep].append(newPath)
+                else:
+                    pkg_paths.update({currDep, [newPath]})
+
+            #only traverse child dependencies if this dependency hasn't been seen already, avoid repeat traversals
+            if currDep not in seen_pkgs:
+                seen_pkgs.add(currDep)
+                for subDep in pkg_tree[currDep]:
+                    tree_traversal(subDep, newPath)
+                
+
+        #check to make sure this package has a dependency tree   
+        if pkg_tree:
+            tree_traversal(pkg, [])
+            vuln_paths.update({pkg: pkg_paths})
+
+    for pkg in pkgs:
+        package_paths(pkg)
+
+    return vuln_paths 
