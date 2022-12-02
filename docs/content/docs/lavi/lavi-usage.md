@@ -53,6 +53,7 @@ Available Flags:
 | `--low`       |         Only show low severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --high, --medium] as other filters for vulnerabilities.|
 | `--no-scan`   |         Ignore scanning the tree for vulnerabilities and only create the dependency tree  |
 | `--package string`   |   Run lavi on a single package. If provided along with the version, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
+| `--remote string`   |   Remote api url. Must start with http:// or https://, and must not end with a slash (default "http://vocation.cs.umd.edu/api") |
 | `-s, --show`     |          Show a UI representation of the vulnerabilities that have been found. Using this UI the user will be able to experiment with different combinations of package versions to try and eliminate the vulnerabilities that were found in the packages they are currently using. These changes to package versions can also be deployed immediately locally by running update packages.  |
 | `--version string`   |  Run lavi on a single package. If provided along with the package, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
 | `-w, --write`        |       Write tree to a file that will be available for the user to use. |
