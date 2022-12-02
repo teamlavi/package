@@ -28,10 +28,10 @@ func New() *Client {
 
 func (c *Client) setRemote(cmd *cobra.Command) {
 	remote, _ := cmd.Flags().GetString("remote")
-	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && strings.HasSuffix(remote, "/") {
+	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
 		c.remote = remote
 	}
-	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and end with a slash", remote))
+	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 }
 
 /*
