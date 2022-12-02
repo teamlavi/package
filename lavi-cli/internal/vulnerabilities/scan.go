@@ -22,7 +22,7 @@ func SwitchFailure(logOnFailure bool, message string) {
 	}
 }
 
-func ScanSet(ids []string, logOnFailure bool) BatchVulnerabilityResponse {
+func ScanSet(ids []string, logOnFailure bool, remote string) BatchVulnerabilityResponse {
 	values := map[string][]string{"ids": ids}
 	json_data, err := json.Marshal(values)
 
@@ -30,7 +30,7 @@ func ScanSet(ids []string, logOnFailure bool) BatchVulnerabilityResponse {
 		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
 	}
 
-	resp, err := http.Post("https://lavi-lava.com/lavi/find_vulnerabilities_id_list", "application/json",
+	resp, err := http.Post(fmt.Sprintf("%s/find_vulnerabilities_id_list", remote), "application/json",
 		bytes.NewBuffer(json_data))
 
 	if err != nil {
@@ -70,7 +70,7 @@ func GrabSlice(start, end int, arr []string) ([]string, int) {
 	return arr[start:end], len(arr[start:end])
 }
 
-func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
+func Scan(cds models.CDS, remote string) map[string][]VulnerabilityResponseData {
 	pkgIds := []string{}
 	for id, _ := range cds.Nodes {
 		pkgIds = append(pkgIds, id)
@@ -83,7 +83,7 @@ func Scan(cds models.CDS) map[string][]VulnerabilityResponseData {
 	// batch by groups of 100
 	for i := 0; i < len(pkgIds); i += 100 {
 		slice, count := GrabSlice(i, i+100, pkgIds)
-		all = append(all, ScanSet(slice, true))
+		all = append(all, ScanSet(slice, true, remote))
 		bar.Add(count)
 	}
 	bar.Set(len(pkgIds))

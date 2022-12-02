@@ -36,4 +36,6 @@ func init() {
 	rootCmd.PersistentFlags().Bool("high", false, "Only show high severity vulnerabilities. Can be used alongside [--critical, --medium, --low]")
 	rootCmd.PersistentFlags().Bool("medium", false, "Only show medium severity vulnerabilities. Can be used alongside [--critical, --high, --low]")
 	rootCmd.PersistentFlags().Bool("low", false, "Only show low severity vulnerabilities. Can be used alongside [--critical, --high, --medium]")
+
+	rootCmd.PersistentFlags().String("remote", "http://vocation.cs.umd.edu/api", "Remote api url. Must start with http:// or https://, and must not end with a slash")
 }
