@@ -34,7 +34,7 @@ func ScanSet(ids []string, logOnFailure bool, remote string) BatchVulnerabilityR
 		bytes.NewBuffer(json_data))
 
 	if err != nil {
-		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
+		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities, maybe the remote url is incorrect?")
 	}
 	defer resp.Body.Close()
 
@@ -42,7 +42,7 @@ func ScanSet(ids []string, logOnFailure bool, remote string) BatchVulnerabilityR
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
-		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities")
+		SwitchFailure(logOnFailure, "failed to scan for vulnerabilities, error found in decoding api response")
 	}
 	return res
 }
