@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -21,15 +22,16 @@ type Client struct {
 	remote string
 }
 
-// Variadic, but only the first value provided will be used
-// Made it variadic so it can work with nothing provided
-func New(remote ...string) *Client {
-	useRemote := "https://lavi-lava.com/lavi"
-	if len(remote) > 0 {
-		useRemote = remote[0]
-	}
-	return &Client{
-		remote: useRemote,
+func New() *Client {
+	return &Client{}
+}
+
+func (c *Client) setRemote(cmd *cobra.Command) {
+	remote, _ := cmd.Flags().GetString("remote")
+	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
+		c.remote = remote
+	} else {
+		panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 	}
 }
 
@@ -50,6 +52,8 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 			os.Exit(1)
 		}
 	}()
+	c.setRemote(cmd)
+
 	request := models.BuildLavaRequest(cmd)
 	resp, err := c.sendPost(request, endpoint)
 	if err != nil {
@@ -81,7 +85,6 @@ func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Resp
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
-
 	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
 		bytes.NewBuffer(json_data))
 

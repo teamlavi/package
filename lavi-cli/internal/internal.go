@@ -75,7 +75,7 @@ func WatchId(id string) {
 	}
 }
 
-func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator, vulnData map[string][]vulnerabilities.Vulnerability) {
+func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGenerator, vulnData map[string][]vulnerabilities.Vulnerability, remote string) {
 	port := 8080
 
 	for {
@@ -111,6 +111,7 @@ func Serve(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTreeGener
 		Generator:                  gen,
 		CDSVulnerabilities:         vulnData,
 		OriginalCDSVulnerabilities: vulnData,
+		Remote:                     remote,
 	})
 
 	server.RegisterRoutes(api)

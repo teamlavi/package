@@ -147,7 +147,7 @@ func DispatchInstall(cfg config.ConfigInterface, packages map[string]string, han
 		c := 0
 		for i := 0; i < len(pkgIds); i += 100 {
 			slice, count := vulnerabilities.GrabSlice(i, i+100, pkgIds)
-			all = append(all, vulnerabilities.ScanSet(slice, false))
+			all = append(all, vulnerabilities.ScanSet(slice, false, cfg.GetRemote()))
 			c += count
 			if c > len(pkgIds) {
 				c = len(pkgIds)

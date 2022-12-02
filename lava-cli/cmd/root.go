@@ -43,4 +43,5 @@ func init() {
 	rootCmd.PersistentFlags().String("level", "", "Vulnerability depth levels to look at (direct, indirect, or all)")
 	rootCmd.PersistentFlags().StringSlice("packages", []string{}, "Packages to look at")
 	rootCmd.PersistentFlags().String("csv", "", "Save to csv file")
+	rootCmd.PersistentFlags().String("remote", "http://vocation.cs.umd.edu/api", "Remote api url. Must start with http:// or https://, and not end with a slash")
 }
