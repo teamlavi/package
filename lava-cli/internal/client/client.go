@@ -30,8 +30,9 @@ func (c *Client) setRemote(cmd *cobra.Command) {
 	remote, _ := cmd.Flags().GetString("remote")
 	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
 		c.remote = remote
+	} else {
+		panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 	}
-	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 }
 
 /*
@@ -84,7 +85,6 @@ func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Resp
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
-
 	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
 		bytes.NewBuffer(json_data))
 
