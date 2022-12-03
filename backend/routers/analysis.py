@@ -245,7 +245,7 @@ def post_tree_depth(
     return _handle_enqueue(queries.get_tree_depth)
 
 
-@router.get("/all_packages")
+@router.get("/tree_depth")
 def get_tree_depth(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.TreeDepthsResponse(depths=job_result)
