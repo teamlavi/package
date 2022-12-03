@@ -214,3 +214,13 @@ class TypesResponse(BaseModel):
 class VulPackagesResponse(BaseModel):
     # List of all the package ids that are vulnerable in our database
     vulList: list[str]
+
+
+class AllPackagesResponse():
+    # List of all pkgs with ids, versions, repos, and hashes
+    pkgs: list[tuple]
+
+
+class TreeDepthsResponse():
+    # Depth of each dependency tree in the input packages
+    depths: list[int]
