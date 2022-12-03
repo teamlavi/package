@@ -216,11 +216,11 @@ class VulPackagesResponse(BaseModel):
     vulList: list[str]
 
 
-class AllPackagesResponse():
+class AllPackagesResponse:
     # List of all pkgs with ids, versions, repos, and hashes
     pkgs: list[tuple]
 
 
-class TreeDepthsResponse():
+class TreeDepthsResponse:
     # Depth of each dependency tree in the input packages
     depths: list[int]
