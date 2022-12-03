@@ -250,7 +250,6 @@ async def get_vulnerability_paths(
         pkg_tree : dict[str, list[str]] | None =  await get_dependencies(pkg)
         #Set to avoid repeat traversals
         seen_pkgs : set = set()
-        seen_pkgs.add(pkg)
 
         #traverse the tree recursively to find vulnerable package paths
         async def tree_traversal(currDep: str, currPath: list[str]) -> None:
