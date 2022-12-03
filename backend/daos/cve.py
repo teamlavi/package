@@ -179,3 +179,10 @@ async def get_table_storage_size(tx: Transaction) -> str:
         await cur.execute("SELECT pg_size_pretty(pg_total_relation_size('cves'))")
         row = await cur.fetchone()
         return row[0]  # type: ignore
+
+
+async def get_cve_pkgs(tx: Transaction, cve_id: str) -> list[str]:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT univ_hash FROM cves WHERE cve_id = %s", (cve_id,))
+        pkgs = await cur.fetchall()
+        return [pkg[0] for pkg in pkgs] if pkgs else []
