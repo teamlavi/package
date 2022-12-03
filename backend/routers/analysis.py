@@ -226,7 +226,7 @@ def post_all_packages(
 
 
 @router.get("/all_packages")
-def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
+def get_all_packages(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.AllPackagesResponse(pkgs=job_result)
 
@@ -235,7 +235,7 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
 
 # 12.) treeDepth - Return the depth of the dependency tree.
 @router.post("/tree_depth")
-def post_all_packages(
+def post_tree_depth(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
     """Check to make sure hash was sent"""
@@ -246,7 +246,7 @@ def post_all_packages(
 
 
 @router.get("/all_packages")
-def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
+def get_tree_depth(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.TreeDepthsResponse(depths=job_result)
 
