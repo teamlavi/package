@@ -8,8 +8,15 @@ type VulPackagesResponse struct {
 
 func (a VulPackagesResponse) Display() {
 	fmt.Printf("Vulnerable Packages Found: %v\n", a.VulList)
+	fmt.Printf("Count: %d\n", len(a.VulList))
 }
 
 func (a VulPackagesResponse) ToCSV() [][]string {
-	return [][]string{}
+	out := [][]string{
+		{"packages"},
+	}
+	for _, v := range a.VulList {
+		out = append(out, []string{v})
+	}
+	return out
 }

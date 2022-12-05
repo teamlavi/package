@@ -1,6 +1,9 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type TypesResponse struct {
 	CweList map[string]int `json:"cweList"` // CWE id -> how many Vulnerabilities for this CWE
@@ -13,5 +16,11 @@ func (a TypesResponse) Display() {
 }
 
 func (a TypesResponse) ToCSV() [][]string {
-	return [][]string{}
+	out := [][]string{
+		{"cwe", "count"},
+	}
+	for k, v := range a.CweList {
+		out = append(out, []string{k, strconv.Itoa(v)})
+	}
+	return out
 }
