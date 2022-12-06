@@ -20,10 +20,19 @@ import (
 // going to be responsible for sending requests
 type Client struct {
 	remote string
+	apiKey string
 }
 
 func New() *Client {
 	return &Client{}
+}
+
+func (c *Client) setApiKey(cmd *cobra.Command) {
+	apiKey, _ := cmd.Flags().GetString("api-key")
+	if apiKey == "" {
+		panic("api key must be provided")
+	}
+	c.apiKey = apiKey
 }
 
 func (c *Client) setRemote(cmd *cobra.Command) {
@@ -53,6 +62,7 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 			os.Exit(1)
 		}
 	}()
+	c.setApiKey(cmd)
 	c.setRemote(cmd)
 
 	request := models.BuildLavaRequest(cmd)
@@ -73,6 +83,7 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 	id := res["result"].(string)
 
 	csvName, _ := cmd.Flags().GetString("csv")
+	// eventually need to include the auth code
 	poller := poll.New(id, fmt.Sprintf("%s/%s", c.remote, endpoint), dataType, csvName)
 	poller.PollBlocking()
 }
@@ -89,6 +100,7 @@ func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Resp
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
+	// eventually need to include the auth code
 	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
 		bytes.NewBuffer(json_data))
 
