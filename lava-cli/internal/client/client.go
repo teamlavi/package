@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"lava/internal/files"
 	"lava/internal/models"
 	"lava/internal/models/commands"
+	"lava/internal/poll"
 	"log"
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -21,15 +22,16 @@ type Client struct {
 	remote string
 }
 
-// Variadic, but only the first value provided will be used
-// Made it variadic so it can work with nothing provided
-func New(remote ...string) *Client {
-	useRemote := "https://lavi-lava.com/lavi"
-	if len(remote) > 0 {
-		useRemote = remote[0]
-	}
-	return &Client{
-		remote: useRemote,
+func New() *Client {
+	return &Client{}
+}
+
+func (c *Client) setRemote(cmd *cobra.Command) {
+	remote, _ := cmd.Flags().GetString("remote")
+	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
+		c.remote = remote
+	} else {
+		panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
 	}
 }
 
@@ -42,14 +44,17 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 	var body []byte
 	defer func() {
 		if err := recover(); err != nil {
+			fname := fmt.Sprintf("lava-response-%s.txt", randSeq(10))
 			fmt.Printf("LAVA failed. Error: %s\n", err)
-			fmt.Println("Attempting to write api response body to a file for inspection and future use")
-			if err := os.WriteFile(fmt.Sprintf("lava-response-%s.txt", randSeq(10)), body, 0644); err != nil {
+			fmt.Println("Attempting to write api response body to a file for inspection and future use. ", fname)
+			if err := os.WriteFile((fname), body, 0644); err != nil {
 				log.Fatal("Failed to write to file", err)
 			}
 			os.Exit(1)
 		}
 	}()
+	c.setRemote(cmd)
+
 	request := models.BuildLavaRequest(cmd)
 	resp, err := c.sendPost(request, endpoint)
 	if err != nil {
@@ -58,15 +63,18 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 
 	body = c.extractBytes(resp)
 
-	lavaResp := c.unmarshalBytes(body, dataType)
-	hasDisplayed := lavaResp.Display()
-	if hasDisplayed {
-		if cmd.Flags().Changed("csv") {
-			csvName, _ := cmd.Flags().GetString("csv")
-			csvData := lavaResp.ToCSV()
-			files.SaveCSV(csvName, csvData)
-		}
+	var res map[string]interface{}
+
+	err = json.Unmarshal(body, &res)
+	if err != nil {
+		panic("Could not decode api response body")
 	}
+
+	id := res["result"].(string)
+
+	csvName, _ := cmd.Flags().GetString("csv")
+	poller := poll.New(id, fmt.Sprintf("%s/%s", c.remote, endpoint), dataType, csvName)
+	poller.PollBlocking()
 }
 
 /*
@@ -81,7 +89,6 @@ func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Resp
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
-
 	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
 		bytes.NewBuffer(json_data))
 

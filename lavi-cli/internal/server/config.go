@@ -15,6 +15,7 @@ type ServerConfig struct {
 	OriginalCDSVulnerabilities map[string][]vulnerabilities.Vulnerability
 	Cmd                        *cobra.Command
 	Generator                  generator.RepositoryTreeGenerator
+	Remote                     string
 }
 
 func (s *ServerConfig) SetCDS(cds models.CDS) {
@@ -55,6 +56,10 @@ func (s *ServerConfig) GetOriginalVulns() map[string][]vulnerabilities.Vulnerabi
 
 func (s *ServerConfig) SetVulns(d map[string][]vulnerabilities.Vulnerability) {
 	s.CDSVulnerabilities = d
+}
+
+func (s *ServerConfig) GetRemote() string {
+	return s.Remote
 }
 
 // too lazy to add more error codes

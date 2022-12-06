@@ -1,6 +1,9 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type CountVulResponse struct {
 	VulCount int `json:"vulCount"` // Total number of Vulns found in the packages in our database
@@ -11,5 +14,8 @@ func (a CountVulResponse) Display() {
 }
 
 func (a CountVulResponse) ToCSV() [][]string {
-	return [][]string{}
+	return [][]string{
+		[]string{"count"},
+		[]string{strconv.Itoa(a.VulCount)},
+	}
 }

@@ -215,6 +215,73 @@ async def get_all_vulnerable_packages(repo: RepoEnum) -> list[str]:
     return pkgs
 
 
+async def get_affected_packages_cve(
+    repo: RepoEnum, cve_ids: list[str]
+) -> dict[str, int]:
+    """Get number of affected packages from CVE."""
+    # get all pkgs and their cves
+    vuln_pkgs: dict[str, list[str]] = {}
+    for cve_id in cve_ids:
+        vuln_pkgs[cve_id, await cve.get_cve_pkgs(cve_id)]
+    # get number of packages that depend on the list of vulnerable packages
+    cve_effect: dict[str, int] = {}
+    async with await get_db_tx() as tx:
+        dep_table: list[dependencies.Dependency] = await dependencies.get_repo_table(
+            tx, repo.value
+        )
+    for dep_entry in dep_table:
+        dep_tree: dict[str, list[str]] = decompress_tree(dep_entry.pkg_dependencies)
+        for pkg in dep_tree.keys():
+            for cve_id in vuln_pkgs.keys():
+                if pkg in vuln_pkgs[cve_id]:
+                    cve_effect[cve_id] = cve_effect.setdefault(pkg, 0) + 1
+    return cve_effect
+
+
+#10
+async def get_vulnerability_paths(
+    pkgs: list[str] 
+) -> dict[str, dict[str, list[list[str]]]] :
+    vuln_paths: dict[str, dict[str, list[list[str]]]] = {}
+
+    #helper function to process one package at a time
+    async def package_paths(pkg : str) -> None:
+        pkg_paths: dict[str, list[list[str]]] = {}
+        pkg_tree : dict[str, list[str]] | None =  await get_dependencies(pkg)
+        #Set to avoid repeat traversals
+        seen_pkgs : set[str] = set()
+
+        #traverse the tree recursively to find vulnerable package paths
+        async def tree_traversal(currDep: str, currPath: list[str]) -> None:
+            newPath : list[str] = currPath.copy()
+            newPath.append(currDep)
+        
+            #check if the current dependency has any direct vulnerabilities
+            if await find_full_vulnerabilities_id(currDep):
+                if currDep in pkg_paths:
+                    pkg_paths[currDep].append(newPath)
+                else:
+                    pkg_paths.update({currDep: [newPath]})
+
+            #only traverse child dependencies if this dependency hasn't been seen already, avoid repeat traversals
+            if currDep not in seen_pkgs:
+                seen_pkgs.add(currDep)
+                if pkg_tree[currDep]:
+                    for subDep in pkg_tree[currDep]:
+                        tree_traversal(subDep, newPath)
+                
+
+        #check to make sure this package has a dependency tree   
+        if pkg_tree:
+            tree_traversal(pkg, [])
+            vuln_paths.update({pkg: pkg_paths})
+
+    for pkg in pkgs:
+        package_paths(pkg)
+
+    return vuln_paths 
+
+
 # 11
 async def get_all_pkgs() -> list[tuple]:
     """Get all packages from dependencies table"""
@@ -249,3 +316,4 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
         result.append(get_depth(dep_tree, list(dep_tree.keys())[0]))
 
     return result
+

@@ -39,6 +39,7 @@ Available Commands:
 | `-h, --help` |               help for lava.     |
 | `--level string`     |    Vulnerability depth levels to look at (direct, indirect, or all). |
 | `--packages strings`   |  A list of packages that will be queried with specified command. |
+| `--remote string`   |   Remote api url. Must start with http:// or https://, and must not end with a slash (default "http://vocation.cs.umd.edu/api") |
 | `-r, --repo string`       |   Repository to run the analysis on (Options: pip, npm or go)|
 | `--status string`   |     Vulnerability status that will be filtered upon. (Options: active, patched, or all). Active vulnerabilities are vulnerabilities that have not been patched and still exist. Patched vulnerabilities are vulnerabilities that have been patched and are no longer active.  |
 

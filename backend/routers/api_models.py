@@ -144,6 +144,10 @@ class LavaRequest(BaseModel):
     # include active, patched or all vulnerabilities.
     # Includes only ACTIVE vulnerabilities by default if None
     status: StatusEnum | None
+    # Query with cves in list
+    cves: list[str] | None
+    # Only consider dependencies up to this depth
+    depthLimit: int | None
 
 
 # LAVA Responses
@@ -172,7 +176,7 @@ def lava_pending(job_id: str) -> LavaResponse:
 
 # job finished successfully Responses
 class AffectedCountResponse(BaseModel):
-    # CVE id -> Number of packages affected
+    # Package id -> Number of packages affected
     pkgsAffected: dict[str, int]
 
 
@@ -224,3 +228,41 @@ class AllPackagesResponse:
 class TreeDepthsResponse:
     # Depth of each dependency tree in the input packages
     depths: list[int]
+
+class VulPathResponse(BaseModel):
+    # Package id -> Vulnerable Package id -> List of path lists
+    vulPath: dict[str, dict[str, list[list[str]]]]
+
+
+class AffectedByCVECountResponse(BaseModel):
+    # CVE id -> List of affected packages
+    pkgsAffected: dict[str, int]
+
+
+class PackageVulnsResponse(BaseModel):
+    # Package id -> List of CVE ids
+    cveList: dict[str, list[str]]
+
+
+class AllPackagesResponse(BaseModel):
+    # Repo -> List of packages
+    allPkgs: dict[str, list[str]]
+
+
+class DependencyStats(BaseModel):
+    # Dependency count statistics
+    mean: int
+    stdDev: int
+    median: int
+    mode: int
+
+
+class DependencyStatsResponse(BaseModel):
+    # Repo -> Dependency count statistics
+    depStats: dict[str, DependencyStats]
+
+
+class allPackageDependenciesResponse(BaseModel):
+    # Repo -> package id -> number of dependencies
+    depCount: dict[str, dict[str, int]]
+
