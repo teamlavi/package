@@ -1,12 +1,13 @@
 from typing import Any, Callable
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from internal import queries
 from internal.queues import QueueName, get_queue
 from routers import api_models
+from routers.dependencies import verify_code
 
-router = APIRouter(tags=["analysis"])
+router = APIRouter(dependencies=[Depends(verify_code)], tags=["analysis"])
 
 
 def _handle_enqueue(func: Callable[..., Any], *args: Any) -> api_models.LavaResponse:
@@ -215,7 +216,8 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
 
     return _handle_get_job(jobID, parse_result)
 
-#10.) 
+
+# 10.)
 @router.post("/vulnerability_paths")
 def post_vulnerability_paths(
     lava_request: api_models.LavaRequest,
@@ -227,10 +229,10 @@ def post_vulnerability_paths(
 
     return _handle_enqueue(queries.get_vulnerability_paths, lava_request.packages)
 
+
 @router.get("/vulnerability_paths")
 def get_vulnerability_paths(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.vulPathResponse(vulPath=job_result)
 
     return _handle_get_job(jobID, parse_result)
-    
