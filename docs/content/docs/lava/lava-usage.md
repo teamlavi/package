@@ -11,7 +11,7 @@ Each command may have different options. Be sure to use "lava [command] --help t
 
 NOTE: the --repo flag is REQUIRED for every LAVA command
 
-Usage:
+## Usage
 
     lava [command] --Flags
 
@@ -30,8 +30,7 @@ Available Commands:
 | types | Returns CWEs and a count of how many vulnerabilities are linked with each CWE. This command requires the user to pass in a list of packages using the --packages flag documented in the Flags table below.|
 | vulnerablePackages | Returns a list of vulnerable packages inside the chosen repository. Ex: lava vulnerablePackages --repo "pip" returns a list of all the vulnerable packages in the pip repository.|
 
-<br><br><br><br>
-
+## Flags
 
 | Flags: | Description: |
 | -    |    - |

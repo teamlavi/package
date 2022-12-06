@@ -65,7 +65,7 @@ const DocsPage = () => {
 						Find vulnerable packages in your project
 					</Typography>
 					<Typography>
-						LAVI helps you find vulnerable packages you project relies on.
+					By scanning through the dependencies and libraries used in the project, LAVI is able to identify any known vulnerabilities and alert the user. This allows users to proactively address any potential security risks, ensuring the safety and security of their project. 
 					</Typography>
 				</Grid>
 				<Grid item xs={4}>
@@ -73,7 +73,7 @@ const DocsPage = () => {
 						Look for non-vulnerable packages to replaced
 					</Typography>
 					<Typography>
-						LAVI helps find alternate package versions that aren't vulnerable for you to use in your project.
+					LAVI's remediation feature is a valuable tool for addressing vulnerabilities in your project. By providing accurate replacement versions for vulnerable packages, LAVI ensures that your project is always using secure, up-to-date code. This helps to improve the performance and reliability of your project, as well as reduce the likelihood of encountering any vulnerabilities.
 					</Typography>
 				</Grid>
 				<Grid item xs={4}>
@@ -81,11 +81,11 @@ const DocsPage = () => {
 						Learn about vulnerability rates in repositories
 					</Typography>
 					<Typography>
-						LAVI's subproduct LAVA, helps perform research on package repositories to learn about vulnerability rates
+						LAVI's subproduct LAVA, helps perform research on package repositories to learn about vulnerability rates. LAVA provides a number of useful queries to generate insights into a specific language's vulnerability statistics.
 					</Typography>
 				</Grid>
 			</Grid>
-			<hr style={{margin: 0, backgroundColor: "gray"}} />
+			{/* <hr style={{margin: 0, backgroundColor: "gray"}} />
 			<div style={{padding: "4em 4em"}}>
 				<Typography 
 					variant="h1" 
@@ -101,7 +101,7 @@ const DocsPage = () => {
 				<Typography style={{paddingTop: "2em"}}>
 					LAVI searches through packages included in your project to determine if any known vulnerabilities are included in a package. If it finds vulnerabilities it explains what they are, where to find more information about the vulnerability and optionally will help you find alternate package versions that aren't vulnerable.
 				</Typography>
-			</div>
+			</div> */}
 	</Layout>
 }
 
