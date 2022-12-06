@@ -1,11 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import PlainTextResponse
 
 from internal import scraping
 from internal.queues import QueueName, get_queue
+from routers.dependencies import verify_code
 
 
-router = APIRouter(tags=["scrapers"])
+router = APIRouter(dependencies=[Depends(verify_code)], tags=["scrapers"])
 
 
 @router.post("/trigger/get_cves", response_class=PlainTextResponse)
