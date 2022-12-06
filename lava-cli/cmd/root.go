@@ -38,6 +38,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().String("api-key", "", "Lava backend api key")
 	rootCmd.PersistentFlags().StringP("repo", "r", "", "Repo to run analysis on (pip, npm, or go)")
 	rootCmd.PersistentFlags().String("status", "", "Vulnerability status to look at (active, patched, or all)")
 	rootCmd.PersistentFlags().String("level", "", "Vulnerability depth levels to look at (direct, indirect, or all)")
