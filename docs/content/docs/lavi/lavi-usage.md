@@ -29,7 +29,6 @@ LAVI is a tool built to help uncover hidden vulnerabilities that can be nested d
     # write command, lavi will also include vulnerabilities in the written tree file
     
     lavi pip --critical --high --medium -show -write -write-with-vulns
-<br><br>
 
 Available Commands:
  | Commands: | Description: |
@@ -40,8 +39,7 @@ Available Commands:
 | pip  |       Run LAVI against a python project (using pip) by running the command when in the project directory|
 | poetry   |   Run LAVI against a python project (using poetry) to build the package-lock.json if your project doesn't have one by running the command when in the project directory |
 
-
-<br><br>
+## Flags 
 
 Available Flags:
 | Flags: | Description: |
