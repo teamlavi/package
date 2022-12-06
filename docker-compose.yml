@@ -17,6 +17,7 @@ services:
       REDIS_HOST: backend-redis
       REDIS_PORT: 6379
       EXPECTED_PREFIX: /api
+      AUTH_CODE: 3GhbNlYM994kdxJt
 
   backend-db:
     environment:
