@@ -9,6 +9,7 @@ DB_NAME = os.getenv("DB_NAME")
 GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = int(os.getenv("REDIS_PORT") or "6379")
+AUTH_CODE = os.getenv("AUTH_CODE") or "password"
 
 
 # Env vars required for a full deployment, checked in app_startup

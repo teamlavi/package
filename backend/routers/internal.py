@@ -1,15 +1,16 @@
 from base64 import b64decode
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import PlainTextResponse
 import orjson
 
 from internal import updates
 from routers import api_models
+from routers.dependencies import verify_code
 from utils.utils import compress_tree, decompress_tree
 
 
-router = APIRouter(tags=["internal"])
+router = APIRouter(dependencies=[Depends(verify_code)], tags=["internal"])
 
 
 @router.post("/insert_vuln")
