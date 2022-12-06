@@ -220,6 +220,15 @@ class VulPackagesResponse(BaseModel):
     vulList: list[str]
 
 
+class AllPackagesResponse:
+    # List of all pkgs with ids, versions, repos, and hashes
+    pkgs: list[tuple]
+
+
+class TreeDepthsResponse:
+    # Depth of each dependency tree in the input packages
+    depths: list[int]
+
 class VulPathResponse(BaseModel):
     # Package id -> Vulnerable Package id -> List of path lists
     vulPath: dict[str, dict[str, list[list[str]]]]
@@ -256,3 +265,4 @@ class DependencyStatsResponse(BaseModel):
 class allPackageDependenciesResponse(BaseModel):
     # Repo -> package id -> number of dependencies
     depCount: dict[str, dict[str, int]]
+

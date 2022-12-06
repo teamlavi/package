@@ -249,7 +249,7 @@ async def get_vulnerability_paths(
         pkg_paths: dict[str, list[list[str]]] = {}
         pkg_tree : dict[str, list[str]] | None =  await get_dependencies(pkg)
         #Set to avoid repeat traversals
-        seen_pkgs : set = set()
+        seen_pkgs : set[str] = set()
 
         #traverse the tree recursively to find vulnerable package paths
         async def tree_traversal(currDep: str, currPath: list[str]) -> None:
@@ -261,13 +261,14 @@ async def get_vulnerability_paths(
                 if currDep in pkg_paths:
                     pkg_paths[currDep].append(newPath)
                 else:
-                    pkg_paths.update({currDep, [newPath]})
+                    pkg_paths.update({currDep: [newPath]})
 
             #only traverse child dependencies if this dependency hasn't been seen already, avoid repeat traversals
             if currDep not in seen_pkgs:
                 seen_pkgs.add(currDep)
-                for subDep in pkg_tree[currDep]:
-                    tree_traversal(subDep, newPath)
+                if pkg_tree[currDep]:
+                    for subDep in pkg_tree[currDep]:
+                        tree_traversal(subDep, newPath)
                 
 
         #check to make sure this package has a dependency tree   
@@ -279,3 +280,40 @@ async def get_vulnerability_paths(
         package_paths(pkg)
 
     return vuln_paths 
+
+
+# 11
+async def get_all_pkgs() -> list[tuple]:
+    """Get all packages from dependencies table"""
+    pkgs: list[tuple] = []
+    async with await get_db_tx() as tx:
+        deps: list[dependencies.Dependency] | None = await dependencies.get_table(tx)
+    for dep in deps:
+        pkgs.append((dep.repo_name, dep.pkg_name, dep.pkg_vers, dep.univ_hash))
+    return pkgs
+
+
+# 12
+async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
+    """Get the max depth of the dependency tree"""
+    result = []
+
+    async def get_depth(tree: dict, key: str) -> int:
+        if tree.get(key) is None:
+            return 1
+        result = 0
+        for pkg in tree.get(key):
+            curr = get_depth(tree, pkg)
+            if curr > result:
+                result = curr
+        return 1 + result
+
+    for univ_hash in univ_hash_list:
+        depth = 0
+        dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
+        if dep_tree is None:
+            result.append(depth)
+        result.append(get_depth(dep_tree, list(dep_tree.keys())[0]))
+
+    return result
+

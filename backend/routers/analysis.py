@@ -215,6 +215,7 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
 
     return _handle_get_job(jobID, parse_result)
 
+
 #10.) 
 @router.post("/vulnerability_paths")
 def post_vulnerability_paths(
@@ -223,14 +224,52 @@ def post_vulnerability_paths(
     if not lava_request.repo:
         return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
     if not lava_request.packages:
-        return api_model.lava_failure("Error! No package list was given!")
+        return api_models.lava_failure("Error! No package list was given!")
 
     return _handle_enqueue(queries.get_vulnerability_paths, lava_request.packages)
+
 
 @router.get("/vulnerability_paths")
 def get_vulnerability_paths(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
-        return api_models.vulPathResponse(vulPath=job_result)
+        return api_models.VulPathResponse(vulPath=job_result)
 
     return _handle_get_job(jobID, parse_result)
-    
+
+
+# 11.) allPackages - Return list of all packages.
+@router.post("/all_packages")
+def post_all_packages(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+
+    return _handle_enqueue(queries.get_all_packages)
+
+
+@router.get("/all_packages")
+def get_all_packages(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.AllPackagesResponse(pkgs=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+# 12.) treeDepth - Return the depth of the dependency tree.
+@router.post("/tree_depth")
+def post_tree_depth(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_tree_depth)
+
+
+@router.get("/tree_depth")
+def get_tree_depth(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.TreeDepthsResponse(depths=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
