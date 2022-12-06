@@ -24,15 +24,11 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     image: docker.io/postgres:15.0
-    ports:
-      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   backend-redis:
     image: docker.io/redis:7.0.5
-    ports:
-      - 6379:6379
 
   worker-get-cves:
     build: ./backend
