@@ -266,3 +266,8 @@ class DependencyStatsResponse(BaseModel):
 class allPackageDependenciesResponse(BaseModel):
     # repo -> package id -> number of dependencies
     depCount: dict[str, dict[str, int]]
+
+
+class DependencyTreeResponse(BaseModel):
+    # package id -> dependency tree
+    depTrees: dict[str, dict[str, list[str]]]

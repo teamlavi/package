@@ -346,7 +346,7 @@ async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
             for item in fatSet:
                 newSet = newSet.union(set(tree.get(item)))
             fatSet = newSet
-        return fatness   
+        return fatness
 
     for univ_hash in univ_hash_list:
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
@@ -357,4 +357,15 @@ async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
 
     return result
 
-    
+
+async def get_pkg_dependencies(
+    univ_hashes: list[str],
+) -> dict[str, dict[str, list[str]]]:
+    """Get the dependencies for each package."""
+    return {
+        univ_hashii: dep_tree
+        for univ_hashii, dep_tree in {
+            univ_hashi: await get_dependencies(univ_hashi) for univ_hashi in univ_hashes
+        }.items()
+        if dep_tree is not None
+    }
