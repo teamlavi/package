@@ -252,11 +252,10 @@ class PackageVulnsResponse(BaseModel):
 
 class DependencyStats(BaseModel):
     # Dependency count statistics
-    # mean: int
-    # stdDev: int
-    # median: int
-    # mode: int
-    stats: list[int]
+    mean: float
+    stdDev: float
+    median: float
+    mode: float
 
 
 class DependencyStatsResponse(BaseModel):
