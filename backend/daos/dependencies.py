@@ -157,8 +157,8 @@ async def get_table_storage_size(tx: Transaction) -> str:
         return row[0]  # type: ignore
 
 
-async def get_all_packages(tx: Transaction) -> list[Package]:
+async def get_all_packages(tx: Transaction) -> list[Dependency]:
     async with tx.cursor() as cur:
         await cur.execute("SELECT repo_name, pkg_name, pkg_vers FROM dependencies")
         rows = await cur.fetchall()
-        return [Package(*row) for row in rows]
+        return [Dependency(*row) for row in rows]
