@@ -333,11 +333,11 @@ async def get_all_package_dependency_num() -> dict[str, dict[str, int]]:
 
 
 # 13
-async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
-    """Get the max breast of the dependency tree"""
-    result = []
+async def get_tree_breadth(univ_hash_list: list[str]) -> dict[str, int]:
+    """Get the max breadth of the dependency tree"""
+    result: dict[str, int] = {}
 
-    async def get_breadth(tree: dict, root: str) -> int:
+    async def get_breadth(tree: dict[str, list[str]], root: str) -> int:
         fatness = 1
         fatSet = set(tree.get(root))
         while len(fatSet) > 0:
@@ -351,9 +351,9 @@ async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
     for univ_hash in univ_hash_list:
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
         if dep_tree is None:
-            result.append(0)
+            result[univ_hash] = 0
         else:
-            result.append(await get_breadth(dep_tree, list(dep_tree.keys())[0]))
+            result[univ_hash] = await get_breadth(dep_tree, list(dep_tree.keys())[0])
 
     return result
 

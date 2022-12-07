@@ -231,8 +231,8 @@ class TreeDepthsResponse(BaseModel):
 
 
 class TreeBreadthsResponse(BaseModel):
-    # Breadth of each dependency tree in the input packages
-    breadths: list[int]
+    # package id -> Dependency tree breadth
+    breadths: dict[str, int]
 
 
 class VulPathResponse(BaseModel):
