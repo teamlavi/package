@@ -12,6 +12,7 @@ class Dependency:
     pkg_vers: str
     pkg_dependencies: str
 
+
 async def create(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
 ) -> None:

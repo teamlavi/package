@@ -261,4 +261,3 @@ class DependencyStatsResponse(BaseModel):
 class allPackageDependenciesResponse(BaseModel):
     # Repo -> package id -> number of dependencies
     depCount: dict[str, dict[str, int]]
-

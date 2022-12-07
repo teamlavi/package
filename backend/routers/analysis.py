@@ -216,7 +216,7 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
     return _handle_get_job(jobID, parse_result)
 
 
-#10.) 
+# 10.)
 @router.post("/vulnerability_paths")
 def post_vulnerability_paths(
     lava_request: api_models.LavaRequest,
@@ -270,4 +270,3 @@ def get_tree_depth(jobID: str) -> api_models.LavaResponse:
         return api_models.TreeDepthsResponse(depths=job_result)
 
     return _handle_get_job(jobID, parse_result)
-
