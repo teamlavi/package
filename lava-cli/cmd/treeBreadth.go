@@ -24,31 +24,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// affectedCountCmd represents the affectedCount command
-var affectedCountCmd = &cobra.Command{
-	Use:   "affectedCount",
-	Short: "For vulnerabilities found in queried packages return a list with the number of of packages affected by each vulnerability",
+// treeBreadthCmd represents the treeBreadth command
+var treeBreadthCmd = &cobra.Command{
+	Use:   "treeBreadth",
+	Short: "Return the breadth of the dependency tree.",
 	Run: func(cmd *cobra.Command, args []string) {
 		client.
 			New().
 			Cmd(cmd).
-			Api("analysis/affected_count").
-			ResponseType(reflect.TypeOf(commands.AffectedCountResponse{})).
+			Api("analysis/tree_breadth").
+			ResponseType(reflect.TypeOf(commands.TreeBreadthsResponse{})).
 			Requires(models.REQUIRES_PKG_LIST).
 			Run()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(affectedCountCmd)
+	rootCmd.AddCommand(treeBreadthCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// affectedCountCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// treeBreadthCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// affectedCountCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// treeBreadthCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

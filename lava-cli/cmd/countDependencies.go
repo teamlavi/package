@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"lava/internal/client"
+	"lava/internal/models"
 	"lava/internal/models/commands"
 	"reflect"
 
@@ -28,7 +29,13 @@ var countDependenciesCmd = &cobra.Command{
 	Use:   "countDependencies",
 	Short: "Returns list of how many other packages each package relies on",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/count_dependencies", reflect.TypeOf(commands.CountDepResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/count_dependencies").
+			ResponseType(reflect.TypeOf(commands.CountDepResponse{})).
+			Requires(models.REQUIRES_PKG_LIST).
+			Run()
 	},
 }
 

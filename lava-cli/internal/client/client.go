@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"lava/internal/models"
-	"lava/internal/models/commands"
 	"lava/internal/poll"
 	"log"
 	"net/http"
@@ -19,24 +18,52 @@ import (
 
 // going to be responsible for sending requests
 type Client struct {
-	remote string
-	apiKey string
+	remote       string
+	api          string
+	apiKey       string
+	cmd          *cobra.Command
+	responseType reflect.Type
+	requires     []models.Requires
 }
 
 func New() *Client {
 	return &Client{}
 }
 
-func (c *Client) setApiKey(cmd *cobra.Command) {
-	apiKey, _ := cmd.Flags().GetString("api-key")
+func (c *Client) Cmd(cmd *cobra.Command) *Client {
+	c.cmd = cmd
+	return c
+}
+
+func (c *Client) Api(api string) *Client {
+	c.api = api
+	return c
+}
+
+func (c *Client) ResponseType(dataType reflect.Type) *Client {
+	c.responseType = dataType
+	return c
+}
+
+func (c *Client) Requires(requires ...models.Requires) *Client {
+	c.requires = requires
+	return c
+}
+
+func (c *Client) remoteUrl() string {
+	return fmt.Sprintf("%s/%s", c.remote, c.api)
+}
+
+func (c *Client) setApiKey() {
+	apiKey, _ := c.cmd.Flags().GetString("api-key")
 	if apiKey == "" {
 		panic("api key must be provided")
 	}
 	c.apiKey = apiKey
 }
 
-func (c *Client) setRemote(cmd *cobra.Command) {
-	remote, _ := cmd.Flags().GetString("remote")
+func (c *Client) setRemote() {
+	remote, _ := c.cmd.Flags().GetString("remote")
 	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
 		c.remote = remote
 	} else {
@@ -49,7 +76,16 @@ func (c *Client) setRemote(cmd *cobra.Command) {
 
 	DO NOT USE LOG.FATAL
 */
-func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type) {
+func (c *Client) Run() {
+
+	if c.cmd == nil {
+		panic("error: need to provide cmd to the client")
+	}
+
+	if c.responseType == nil {
+		panic("error: need to provide response type to the client")
+	}
+
 	var body []byte
 	defer func() {
 		if err := recover(); err != nil {
@@ -62,11 +98,14 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 			os.Exit(1)
 		}
 	}()
-	c.setApiKey(cmd)
-	c.setRemote(cmd)
+	c.setApiKey()
+	c.setRemote()
 
-	request := models.BuildLavaRequest(cmd)
-	resp, err := c.sendPost(request, endpoint)
+	request, err := models.BuildLavaRequest(c.cmd, c.requires...)
+	if err != nil {
+		panic(err)
+	}
+	resp, err := c.sendPost(request)
 	if err != nil {
 		panic("Request to lava api failed")
 	}
@@ -82,9 +121,9 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 
 	id := res["result"].(string)
 
-	csvName, _ := cmd.Flags().GetString("csv")
+	csvName, _ := c.cmd.Flags().GetString("csv")
 	// eventually need to include the auth code
-	poller := poll.New(id, fmt.Sprintf("%s/%s", c.remote, endpoint), dataType, csvName)
+	poller := poll.New(id, c.remoteUrl(), c.responseType, csvName)
 	poller.PollBlocking()
 }
 
@@ -94,14 +133,14 @@ func (c *Client) Run(cmd *cobra.Command, endpoint string, dataType reflect.Type)
 	In the future, this will return a job id that will be picked up by another function
 	to poll the get endpoint.
 */
-func (c *Client) sendPost(body *models.LavaRequest, endpoint string) (*http.Response, error) {
+func (c *Client) sendPost(body *models.LavaRequest) (*http.Response, error) {
 	json_data, err := json.Marshal(body)
 
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
 	// eventually need to include the auth code
-	resp, err := http.Post(fmt.Sprintf("%s/%s", c.remote, endpoint), "application/json",
+	resp, err := http.Post(c.remoteUrl(), "application/json",
 		bytes.NewBuffer(json_data))
 
 	return resp, err
@@ -114,35 +153,4 @@ func (c *Client) extractBytes(resp *http.Response) []byte {
 		panic("failed to read api response")
 	}
 	return b
-}
-
-// Convert bytes to models.LavaResponse
-func (c *Client) unmarshalBytes(body []byte, dataType reflect.Type) models.LavaResponse {
-
-	var res map[string]interface{}
-
-	err := json.Unmarshal(body, &res)
-	if err != nil {
-		panic("Could not decode api response body")
-	}
-
-	value := reflect.New(dataType).Interface().(commands.CommandResponseModel)
-
-	valueBytes, err := json.Marshal(res["result"])
-	if err != nil {
-		panic("Could not decode api response body")
-
-	}
-
-	if err = json.Unmarshal(valueBytes, &value); err != nil {
-		panic("Could not decode api response body")
-	}
-
-	out := models.LavaResponse{
-		Status: res["status"].(string),
-		Error:  res["error"],
-		Result: value,
-	}
-
-	return out
 }

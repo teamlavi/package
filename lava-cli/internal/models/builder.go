@@ -55,11 +55,21 @@ func getPackages(cmd *cobra.Command) []string {
 	return out
 }
 
-func BuildLavaRequest(cmd *cobra.Command) *LavaRequest {
-	return &LavaRequest{
+func BuildLavaRequest(cmd *cobra.Command, requires ...Requires) (*LavaRequest, error) {
+	lr := &LavaRequest{
 		Repo:     getRepo(cmd),
 		Status:   getStatus(cmd),
 		Level:    getLevel(cmd),
 		Packages: getPackages(cmd),
 	}
+
+	for _, r := range requires {
+		ok, err := r(lr)
+		if !ok {
+			return nil, err
+		}
+	}
+
+	return lr, nil
+
 }

@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"lava/internal/client"
+	"lava/internal/models"
 	"lava/internal/models/commands"
 	"reflect"
 
@@ -28,7 +29,13 @@ var vulnerablePackagesCmd = &cobra.Command{
 	Use:   "vulnerablePackages",
 	Short: "Return list of vulnerable packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/vulnerable_packages", reflect.TypeOf(commands.VulPackagesResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/vulnerable_packages").
+			ResponseType(reflect.TypeOf(commands.VulPackagesResponse{})).
+			Requires(models.REQUIRES_PKG_LIST).
+			Run()
 	},
 }
 

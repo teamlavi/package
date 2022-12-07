@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"lava/internal/client"
+	"lava/internal/models"
 	"lava/internal/models/commands"
 	"reflect"
 
@@ -28,7 +29,13 @@ var depthCmd = &cobra.Command{
 	Use:   "depth",
 	Short: "Returns list of how deep each vulnerability was from the top level package (how many dependencies deep)",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/depth", reflect.TypeOf(commands.DepthResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/depth").
+			ResponseType(reflect.TypeOf(commands.DepthResponse{})).
+			Requires(models.REQUIRES_PKG_LIST).
+			Run()
 	},
 }
 

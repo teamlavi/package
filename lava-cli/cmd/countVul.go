@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"lava/internal/client"
+	"lava/internal/models"
 	"lava/internal/models/commands"
 	"reflect"
 
@@ -28,7 +29,13 @@ var countVulCmd = &cobra.Command{
 	Use:   "countVul",
 	Short: "Number of vulnerable packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/count_vul", reflect.TypeOf(commands.CountVulResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/count_vul").
+			ResponseType(reflect.TypeOf(commands.CountVulResponse{})).
+			Requires(models.REQUIRES_PKG_LIST).
+			Run()
 	},
 }
 

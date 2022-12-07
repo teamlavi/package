@@ -28,7 +28,12 @@ var typesCmd = &cobra.Command{
 	Use:   "types",
 	Short: "Returns CWEs and a count of how many vulnerabilities for each CWE",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/types", reflect.TypeOf(commands.TypesResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/types").
+			ResponseType(reflect.TypeOf(commands.TypesResponse{})).
+			Run()
 	},
 }
 

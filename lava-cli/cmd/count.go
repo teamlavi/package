@@ -28,7 +28,12 @@ var countCmd = &cobra.Command{
 	Use:   "count",
 	Short: "Number of packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		client.New().Run(cmd, "analysis/count", reflect.TypeOf(commands.CountResponse{}))
+		client.
+			New().
+			Cmd(cmd).
+			Api("analysis/count").
+			ResponseType(reflect.TypeOf(commands.CountResponse{})).
+			Run()
 	},
 }
 
