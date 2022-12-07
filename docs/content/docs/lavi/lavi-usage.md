@@ -16,7 +16,7 @@ LAVI is a tool built to help uncover hidden vulnerabilities that can be nested d
     # In this example the npm command tells lavi you are working in npm
     # The flag -s tells lavi to open up the UI element after running lavi
     
-    lavi npm -show
+    lavi npm --show
 
     # This is an example with multiple flags lavi will only flag severities that it gets from the cve database
     # that are filtered under critical or high danger
@@ -29,6 +29,7 @@ LAVI is a tool built to help uncover hidden vulnerabilities that can be nested d
     # write command, lavi will also include vulnerabilities in the written tree file
     
     lavi pip --critical --high --medium -show -write -write-with-vulns
+<br><br>
 
 Available Commands:
  | Commands: | Description: |
@@ -39,7 +40,8 @@ Available Commands:
 | pip  |       Run LAVI against a python project (using pip) by running the command when in the project directory|
 | poetry   |   Run LAVI against a python project (using poetry) to build the package-lock.json if your project doesn't have one by running the command when in the project directory |
 
-## Flags 
+
+<br><br>
 
 Available Flags:
 | Flags: | Description: |
@@ -51,7 +53,6 @@ Available Flags:
 | `--low`       |         Only show low severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --high, --medium] as other filters for vulnerabilities.|
 | `--no-scan`   |         Ignore scanning the tree for vulnerabilities and only create the dependency tree  |
 | `--package string`   |   Run lavi on a single package. If provided along with the version, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
-| `--remote string`   |   Remote api url. Must start with http:// or https://, and must not end with a slash (default "http://vocation.cs.umd.edu/api") |
 | `-s, --show`     |          Show a UI representation of the vulnerabilities that have been found. Using this UI the user will be able to experiment with different combinations of package versions to try and eliminate the vulnerabilities that were found in the packages they are currently using. These changes to package versions can also be deployed immediately locally by running update packages.  |
 | `--version string`   |  Run lavi on a single package. If provided along with the package, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
 | `-w, --write`        |       Write tree to a file that will be available for the user to use. |
