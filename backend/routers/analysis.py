@@ -239,13 +239,13 @@ def get_vulnerability_paths(jobID: str) -> api_models.LavaResponse:
 
 # 11.) allPackages - Return list of all packages.
 @router.post("/all_packages")
-def post_all_packages() -> api_models.LavaResponse:
+def post_all_pkgs() -> api_models.LavaResponse:
 
-    return _handle_enqueue(queries.get_all_packages)
+    return _handle_enqueue(queries.get_all_pkgs)
 
 
 @router.get("/all_packages")
-def get_all_packages(jobID: str) -> api_models.LavaResponse:
+def get_all_pkgs(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.AllPackagesResponse(pkgs=job_result)
 
