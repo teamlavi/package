@@ -272,9 +272,8 @@ async def get_vulnerability_paths(
                 
 
         #check to make sure this package has a dependency tree   
-        if pkg_tree:
-            tree_traversal(pkg, [])
-            vuln_paths.update({pkg: pkg_paths})
+        tree_traversal(pkg, [])
+        vuln_paths.update({pkg: pkg_paths})
 
     for pkg in pkgs:
         package_paths(pkg)
