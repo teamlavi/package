@@ -6,7 +6,22 @@ permalink: docs/lavi/install.html
 
 LAVI install
 
-## Mac
+## Mac or Linux
+
+### Installation Prerequisites
+
+#### The directory `/usr/local/bin` must exist
+This can be checked by trying to cd into it.
+Run `cd /usr/local/bin`.
+If the directory is changed successfully then the folder exists. 
+If the output is `cd: /usr/local/bin: No such file or directory` then run `sudo mkdir -p -m 775 /usr/local/bin` to create the directory.
+
+#### `usr/local/bin` must be referenced in $PATH
+This can be checked manually with `echo $PATH`, `:/usr/local/bin` should appear somewhere in the output.
+
+If it is not run `export PATH=$PATH:/usr/local/bin` to add `/usr/local/bin` to `$PATH`
+
+### Installation
 1. Download LAVI from http://vocation.cs.umd.edu/downloads/ and unzip the folder
 2. Open terminal and `cd` into the downloaded folder
 3. From the folder run the following command (enter your password if prompted):
