@@ -40,3 +40,6 @@
     - id: adding-language
       title: Adding a Language
       path: /docs/extension/language.html
+    - id: future-work
+      title: Future Work
+      path: /docs/extension/future.html
