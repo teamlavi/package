@@ -13,6 +13,13 @@ class Dependency:
     pkg_dependencies: str
 
 
+@define(frozen=True)
+class Package:
+    repo_name: str
+    pkg_name: str
+    pkg_vers: str
+
+
 async def create(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
 ) -> None:

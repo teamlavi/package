@@ -283,10 +283,9 @@ async def get_all_pkgs() -> list[tuple]:
     """Get all packages from dependencies table"""
     allpkgs = []
     async with await get_db_tx() as tx:
-        pkgs: list[dependencies.Dependency] = await dependencies.get_table(tx)
-    for pkg in pkgs:
-        allpkgs.append((pkg.repo_name, pkg.pkg_name, pkg.pkg_vers))
-    return allpkgs
+        pkgs: list[dependencies.Package] = await dependencies.get_all_packages(tx)
+    print[pkgs]
+    return pkgs
 
 
 # 12
@@ -311,3 +310,21 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
         else:
             result.append(await get_depth(dep_tree, list(dep_tree.keys())[0]))
     return result
+
+
+async def get_all_package_dependency_num_repo(repo: RepoEnum) -> dict[str, int]:
+    """Get the number of dependencies for every package in the database for a repository."""
+    async with await get_db_tx() as tx:
+        deps: list[dependencies.Dependency] = await dependencies.get_repo_table(
+            tx, repo.value
+        )
+    return {
+        dep.univ_hash: len(decompress_tree(dep.pkg_dependencies).keys()) for dep in deps
+    }
+
+
+async def get_all_package_dependency_num() -> dict[str, dict[str, int]]:
+    """Get the number of dependencies for every package in every repository."""
+    return {
+        repo.value: await get_all_package_dependency_num_repo(repo) for repo in RepoEnum
+    }
