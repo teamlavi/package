@@ -264,7 +264,7 @@ async def get_vulnerability_paths(
             #only traverse child dependencies if this dependency hasn't been seen already, avoid repeat traversal
             if pkg_tree[currDep]:
                 for subDep in pkg_tree[currDep]:
-                    tree_traversal(subDep, newPath)
+                    await tree_traversal(subDep, newPath)
                 
 
         #check to make sure this package has a dependency tree   
