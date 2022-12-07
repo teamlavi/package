@@ -74,6 +74,7 @@ async def get_dependencies(univ_hash: str) -> dict[str, list[str]] | None:
     async with await get_db_tx() as tx:
         dep_string: str | None = await dependencies.find_tree_id(tx, univ_hash)
     if dep_string:
+        print("fuck yessss!!!s")
         dep_tree: dict[str, list[str]] = decompress_tree(dep_string)
         return dep_tree
     else:
@@ -279,14 +280,16 @@ async def get_vulnerability_paths(
 
 
 # 11
-async def get_all_pkgs() -> list[dependencies.Package]:
+async def get_all_pkgs() -> list[tuple]:
     """Get all packages from dependencies table"""
+    allpkgs = []
     async with await get_db_tx() as tx:
-        pkgs: list[dependencies.Package] = await dependencies.get_all_packages(
+        pkgs: list[dependencies.Dependency] = await dependencies.get_table(
             tx
         )
-    print[pkgs]
-    return pkgs
+    for pkg in pkgs:
+        allpkgs.append((pkg.repo_name, pkg.pkg_name, pkg.pkg_vers))
+    return allpkgs
 
 
 # 12
