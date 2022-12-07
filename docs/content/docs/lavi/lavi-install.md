@@ -6,7 +6,7 @@ permalink: docs/lavi/install.html
 
 LAVI install
 
-## Mac
+## Mac or Linux
 
 ### Installation Prerequisites
 
