@@ -4,7 +4,7 @@ title: Install the backend
 permalink: docs/backend/install.html
 ---
 
-# Installation
+Installing the backend currently only works on Linux based machines
 
 ```bash
 sudo apt-get update -y
@@ -21,6 +21,8 @@ Before running the setup script, you have to get a Github Access token, [generat
 NOTE: The token will be stored in plaintext in the root user's crontab file.
 
 TODO: any specific scopes necessary on the gh tok?
+
+This script will install all dependencies (golang, npm, docker, etc) and setup the cronjob for updating based on changes to main.
 
 ```bash
 cd package

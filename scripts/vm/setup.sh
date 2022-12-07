@@ -30,6 +30,15 @@ else
   echo "Go is already installed. Skipping installation."
 fi
 
+# install npm
+if ! [ -x "$(command -v npm)" ]; then
+  curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+  sudo bash /tmp/nodesource_setup.sh
+  sudo apt install nodejs
+else
+  echo "npm is already installed. Skipping installation."
+fi
+
 # Enable docker to start at boot
 sudo systemctl enable docker
 sudo systemctl start docker
