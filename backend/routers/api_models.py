@@ -220,14 +220,15 @@ class VulPackagesResponse(BaseModel):
     vulList: list[str]
 
 
-class AllPackagesResponse:
+class AllPackagesResponse(BaseModel):
     # List of all pkgs with ids, versions, repos, and hashes
     pkgs: list[tuple]
 
 
-class TreeDepthsResponse:
+class TreeDepthsResponse(BaseModel):
     # Depth of each dependency tree in the input packages
     depths: list[int]
+
 
 class VulPathResponse(BaseModel):
     # Package id -> Vulnerable Package id -> List of path lists
@@ -242,11 +243,6 @@ class AffectedByCVECountResponse(BaseModel):
 class PackageVulnsResponse(BaseModel):
     # Package id -> List of CVE ids
     cveList: dict[str, list[str]]
-
-
-class AllPackagesResponse(BaseModel):
-    # Repo -> List of packages
-    allPkgs: dict[str, list[str]]
 
 
 class DependencyStats(BaseModel):

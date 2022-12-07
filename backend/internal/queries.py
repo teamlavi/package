@@ -282,9 +282,9 @@ async def get_vulnerability_paths(
 
 
 # 11
-async def get_all_pkgs() -> list[tuple]:
+async def get_all_packages() -> list[tuple]:
     """Get all packages from dependencies table"""
-    pkgs: list[tuple] = []
+    pkgs = []
     async with await get_db_tx() as tx:
         deps: list[dependencies.Dependency] | None = await dependencies.get_table(tx)
     for dep in deps:
@@ -308,11 +308,12 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
         return 1 + result
 
     for univ_hash in univ_hash_list:
-        depth = 0
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
+        print(dep_tree)
         if dep_tree is None:
-            result.append(depth)
-        result.append(get_depth(dep_tree, list(dep_tree.keys())[0]))
-
+            result.append(0)
+        else:
+            result.append(get_depth(dep_tree, list(dep_tree.keys())[0]))
+    print("result" + result)
     return result
 
