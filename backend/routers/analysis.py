@@ -286,3 +286,23 @@ def get_tree_depth(jobID: str) -> api_models.LavaResponse:
         return api_models.allPackageDependenciesResponse(depCount=job_result)
 
     return _handle_get_job(jobID, parse_result)
+
+
+# 13.) treeBreadth - Return the breadth of the dependency tree.
+@router.post("/tree_breadth")
+def post_tree_breadth(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_tree_breadth, lava_request.packages)
+
+
+@router.get("/tree_breadth")
+def get_tree_breadth(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.TreeBreadthsResponse(breadths=job_result)
+
+    return _handle_get_job(jobID, parse_result)

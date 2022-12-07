@@ -230,6 +230,11 @@ class TreeDepthsResponse(BaseModel):
     depths: list[int]
 
 
+class TreeBreadthsResponse(BaseModel):
+    # Breadth of each dependency tree in the input packages
+    breadths: list[int]
+
+
 class VulPathResponse(BaseModel):
     # Package id -> Vulnerable Package id -> List of path lists
     vulPath: dict[str, dict[str, list[list[str]]]]
