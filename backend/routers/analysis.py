@@ -306,3 +306,43 @@ def get_tree_breadth(jobID: str) -> api_models.LavaResponse:
         return api_models.TreeBreadthsResponse(breadths=job_result)
 
     return _handle_get_job(jobID, parse_result)
+
+
+@router.post("/dependency_stats")
+def post_dependency_stats(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        #return _handle_enqueue(queries.get_dependency_stats_all)
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
+
+    return _handle_enqueue(queries.get_dependency_stats, lava_request.repo)
+
+
+@router.get("/dependency_stats")
+def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.DependencyStats(stats=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+
+@router.post("/num_downloads")
+def post_num_downloads(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
+
+
+@router.get("/num_downloads")
+def get_num_downloads(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.NumDownloadsResponse(downloads=job_result)
+
+    return _handle_get_job(jobID, parse_result)
