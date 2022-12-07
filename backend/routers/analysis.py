@@ -216,7 +216,7 @@ def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
     return _handle_get_job(jobID, parse_result)
 
 
-#10.) 
+# 10.)
 @router.post("/vulnerability_paths")
 def post_vulnerability_paths(
     lava_request: api_models.LavaRequest,
@@ -271,3 +271,18 @@ def get_tree_depth(jobID: str) -> api_models.LavaResponse:
 
     return _handle_get_job(jobID, parse_result)
 
+
+@router.post("/all_package_dependency_count")
+def post_all_package_dependency_count(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+
+    return _handle_enqueue(queries.get_all_package_dependency_num)
+
+
+@router.get("/all_package_dependency_count")
+def get_tree_depth(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.allPackageDependenciesResponse(depCount=job_result)
+
+    return _handle_get_job(jobID, parse_result)
