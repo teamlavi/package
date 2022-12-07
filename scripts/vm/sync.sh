@@ -36,7 +36,6 @@ build () {
 
     sudo mkdir $FILE
     sudo mv $PREFIX "$FILE/"
-    sudo cp INSTALL.txt "$FILE/"
 
     if [[ $GOOS = "windows" ]]
     then
