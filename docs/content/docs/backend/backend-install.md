@@ -6,6 +6,8 @@ permalink: docs/backend/install.html
 
 Installing the backend currently only works on Linux based machines
 
+## Install 
+
 ```bash
 sudo apt-get update -y
 sudo apt-get install -y git
@@ -33,3 +35,19 @@ bash scripts/vm/setup.sh
 When prompted with the `postfix` post-install configuration, just set it to local-only mail. This allows us to see logs from the cron job if it should fail.
 
 The setup script will then install dependencies, then update your cron as necessary to keep this VM live with prod every minute or so.
+
+
+## Troubleshooting
+
+Sometimes, you may run into some undefined issues. In order to get more information, there are a couple of steps you can try
+
+* Manually trigger sync script
+```bash
+sudo crontab -l
+```
+Copy the command shown there (except the stars) and run it using sudo to manually trigger the sync script, which can reveal some errors
+
+* See cronjob output
+```bash
+sudo tail /var/mail/root
+```
