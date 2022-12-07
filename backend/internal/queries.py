@@ -257,11 +257,10 @@ async def get_vulnerability_paths(
             newPath.append(currDep)
         
             #check if the current dependency has any direct vulnerabilities
-            if await find_full_vulnerabilities_id(currDep):
-                if currDep in pkg_paths:
-                    pkg_paths[currDep].append(newPath)
-                else:
-                    pkg_paths.update({currDep: [newPath]})
+            if currDep in pkg_paths:
+                pkg_paths[currDep].append(newPath)
+            else:
+                pkg_paths.update({currDep: [newPath]})
 
             #only traverse child dependencies if this dependency hasn't been seen already, avoid repeat traversals
             if currDep not in seen_pkgs:
@@ -278,7 +277,7 @@ async def get_vulnerability_paths(
     for pkg in pkgs:
         package_paths(pkg)
 
-    return {"package": {"vuln": [["list"]]}}
+    return vuln_paths
 
 
 # 11
