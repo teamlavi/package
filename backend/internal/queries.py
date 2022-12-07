@@ -215,6 +215,7 @@ async def get_all_vulnerable_packages(repo: RepoEnum) -> list[str]:
     return pkgs
 
 
+# 16
 async def get_affected_packages_cve(
     repo: RepoEnum, cve_ids: list[str]
 ) -> dict[str, int]:
@@ -222,7 +223,8 @@ async def get_affected_packages_cve(
     # get all pkgs and their cves
     vuln_pkgs: dict[str, list[str]] = {}
     for cve_id in cve_ids:
-        vuln_pkgs[cve_id, await cve.get_cve_pkgs(cve_id)]
+        async with await get_db_tx() as tx:
+            vuln_pkgs[cve_id] = await cve.get_cve_pkgs(tx, cve_id)
     # get number of packages that depend on the list of vulnerable packages
     cve_effect: dict[str, int] = {}
     async with await get_db_tx() as tx:
@@ -234,7 +236,7 @@ async def get_affected_packages_cve(
         for pkg in dep_tree.keys():
             for cve_id in vuln_pkgs.keys():
                 if pkg in vuln_pkgs[cve_id]:
-                    cve_effect[cve_id] = cve_effect.setdefault(pkg, 0) + 1
+                    cve_effect[cve_id] = cve_effect.setdefault(cve_id, 0) + 1
     return cve_effect
 
 

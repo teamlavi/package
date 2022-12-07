@@ -345,3 +345,25 @@ def get_get_all_vulnerabilities(jobID: str) -> api_models.LavaResponse:
         )
 
     return _handle_get_job(jobID, parse_result)
+
+
+# 16.) Get Affected by CVE
+@router.post("/affected_by_cve")
+def post_affected_by_cve(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Note the packages list should contain cve ids."""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(
+        queries.get_affected_packages_cve, lava_request.repo, lava_request.packages
+    )
+
+
+@router.get("/affected_by_cve")
+def get_affected_by_cve(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.AffectedByCVECountResponse(pkgsAffected=job_result)
+
+    return _handle_get_job(jobID, parse_result)
