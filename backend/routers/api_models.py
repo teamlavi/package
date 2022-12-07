@@ -226,8 +226,8 @@ class AllPackagesResponse(BaseModel):
 
 
 class TreeDepthsResponse(BaseModel):
-    # Depth of each dependency tree in the input packages
-    depths: list[int]
+    # package id -> Dependency tree depth
+    depths: dict[str, int]
 
 
 class TreeBreadthsResponse(BaseModel):

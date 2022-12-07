@@ -290,14 +290,14 @@ async def get_all_pkgs() -> list[tuple]:
 
 
 # 12
-async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
+async def get_tree_depth(univ_hash_list: list[str]) -> dict[str, int]:
     """Get the max depth of the dependency tree"""
-    result = []
+    result: dict[str, int] = {}
 
-    async def get_depth(tree: dict, key: str) -> int:
+    async def get_depth(tree: dict[str, list[str]], key: str) -> int:
         if tree.get(key) is None:
             return 1
-        result = 0
+        result: int = 0
         for pkg in tree.get(key):
             curr = await get_depth(tree, pkg)
             if curr > result:
@@ -307,9 +307,9 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
     for univ_hash in univ_hash_list:
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
         if dep_tree is None:
-            result.append(0)
+            result[univ_hash] = 0
         else:
-            result.append(await get_depth(dep_tree, list(dep_tree.keys())[0]))
+            result[univ_hash] = await get_depth(dep_tree, list(dep_tree.keys())[0])
 
     return result
 
