@@ -39,7 +39,7 @@ If it is not run `export PATH=$PATH:/usr/local/bin` to add `/usr/local/bin` to `
 If you are still unable to run LAVI try the following:
 - macOS < 13.0
   - Open `System Preferences`
-  - Go to `Security & Privacy`. 
+  - Go to `Security & Privacy`
   - Select `Open Anyway` next to `"LAVI" was blocked from use because it is not from an identified developer.`
 
 - macOS >= 13.0
