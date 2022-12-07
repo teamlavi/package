@@ -202,7 +202,7 @@ class DepthResponse(BaseModel):
 
 class NumDownloadsResponse(BaseModel):
     # Package id -> Number of package downloads
-    downloads: dict[str, int]
+    downloads: dict[str, str]
 
 
 class SeveritiesResponse(BaseModel):
@@ -252,10 +252,11 @@ class PackageVulnsResponse(BaseModel):
 
 class DependencyStats(BaseModel):
     # Dependency count statistics
-    mean: int
-    stdDev: int
-    median: int
-    mode: int
+    # mean: int
+    # stdDev: int
+    # median: int
+    # mode: int
+    stats: list[int]
 
 
 class DependencyStatsResponse(BaseModel):
