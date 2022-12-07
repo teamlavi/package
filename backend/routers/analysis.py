@@ -139,26 +139,6 @@ def get_depth(jobID: str) -> api_models.LavaResponse:
     return _handle_get_job(jobID, parse_result)
 
 
-# 6.) numDownloads - Returns a list with the number of downloads for each
-# package included.
-@router.post("/num_downloads")
-def post_num_downloads(
-    lava_request: api_models.LavaRequest,
-) -> api_models.LavaResponse:
-    if not lava_request.packages:
-        return api_models.lava_failure("Error! No package list was given!")
-
-    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
-
-
-@router.get("/num_downloads")
-def get_num_downloads(jobID: str) -> api_models.LavaResponse:
-    def parse_result(job_result: Any) -> Any:
-        return api_models.NumDownloadsResponse(downloads=job_result)
-
-    return _handle_get_job(jobID, parse_result)
-
-
 # 7.) Severities - Return list of vulnerable packages and severity for each
 # vulnerability.
 @router.post("/severities")
@@ -365,5 +345,43 @@ def post_affected_by_cve(
 def get_affected_by_cve(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
         return api_models.AffectedByCVECountResponse(pkgsAffected=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+@router.post("/num_downloads")
+def post_num_downloads(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
+
+
+@router.get("/num_downloads")
+def get_num_downloads(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.NumDownloadsResponse(downloads=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+@router.post("/dependency_stats")
+def post_dependency_stats(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        #return _handle_enqueue(queries.get_dependency_stats_all)
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
+
+    return _handle_enqueue(queries.get_dependency_stats, lava_request.repo)
+
+
+@router.get("/dependency_stats")
+def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.DependencyStats(stats=job_result)
 
     return _handle_get_job(jobID, parse_result)

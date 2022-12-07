@@ -382,3 +382,52 @@ async def get_repo_vulnerabilities(repo: RepoEnum) -> list[cve.Cve]:
 async def get_all_vulnerabilities() -> dict[str, list[cve.Cve]]:
     """Get all vulnerabilities."""
     return {repo.value: await get_repo_vulnerabilities(repo) for repo in RepoEnum}
+
+async def get_dependency_stats(repo: RepoEnum) -> list[int]:
+    result = []
+    async with await get_db_tx() as tx:
+        deps: list[dependencies.Dependency] = await dependencies.get_repo_table(
+            tx, repo.value
+        )
+    
+    for dep in deps:
+        result.append(len(decompress_tree(dep.pkg_dependencies).keys()))
+    result.sort()
+    
+    mean = sum(result) / len(result)
+    variance = sum([((x - mean) ** 2) for x in result]) / len(result)
+    std_dev = variance ** 0.5
+    median = result[len(result)//2]
+    
+    #mode calculation
+    counter = 0
+    maxCount = 0
+    helper = result[0]
+    mode = -1
+
+    for x in result:
+        if x == helper:
+            counter += 1
+        else:
+            if counter > maxCount:
+                maxCount = counter
+                mode = helper
+            
+            helper = x
+            counter = 1
+
+
+    return [mean, std_dev, median, mode]
+
+async def get_num_downloads(pkgs: list[str]) -> dict[str, str]:
+    download_results = {}
+    for pkg in pkgs:
+        downloads = ""
+        jsonDownloads = pypistats.overall(pkg, format="json")
+        helper = jsonDownloads.split(']')[0]
+        downloads = helper[helper.rfind('downloads'):-1]
+        downloads = downloads[12:]
+
+        download_results[pkg] = downloads
+    
+    return download_results
