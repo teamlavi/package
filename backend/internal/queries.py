@@ -74,7 +74,6 @@ async def get_dependencies(univ_hash: str) -> dict[str, list[str]] | None:
     async with await get_db_tx() as tx:
         dep_string: str | None = await dependencies.find_tree_id(tx, univ_hash)
     if dep_string:
-        print("fuck yessss!!!s")
         dep_tree: dict[str, list[str]] = decompress_tree(dep_string)
         return dep_tree
     else:
@@ -283,9 +282,11 @@ async def get_all_pkgs() -> list[tuple]:
     """Get all packages from dependencies table"""
     allpkgs = []
     async with await get_db_tx() as tx:
-        pkgs: list[dependencies.Package] = await dependencies.get_all_packages(tx)
-    print[pkgs]
-    return pkgs
+        pkgs: list[dependencies.Package] = await dependencies.get_table(tx)
+    for pkg in pkgs:
+        allpkgs.append((pkg.repo_name, pkg.pkg_name, pkg.pkg_vers))
+
+    return allpkgs
 
 
 # 12
@@ -309,6 +310,7 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
             result.append(0)
         else:
             result.append(await get_depth(dep_tree, list(dep_tree.keys())[0]))
+
     return result
 
 
@@ -328,3 +330,31 @@ async def get_all_package_dependency_num() -> dict[str, dict[str, int]]:
     return {
         repo.value: await get_all_package_dependency_num_repo(repo) for repo in RepoEnum
     }
+
+
+# 13
+async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
+    """Get the max breast of the dependency tree"""
+    result = []
+
+    async def get_breadth(tree: dict, root: str) -> int:
+        fatness = 1
+        fatSet = set(tree.get(root))
+        while len(fatSet) > 0:
+            fatness = max(fatness, len(fatSet))
+            newSet = set()
+            for item in fatSet:
+                newSet = newSet.union(set(tree.get(item)))
+            fatSet = newSet
+        return fatness   
+
+    for univ_hash in univ_hash_list:
+        dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
+        if dep_tree is None:
+            result.append(0)
+        else:
+            result.append(await get_breadth(dep_tree, list(dep_tree.keys())[0]))
+
+    return result
+
+    
