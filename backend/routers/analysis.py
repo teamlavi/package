@@ -309,3 +309,39 @@ def get_package_dependencies(jobID: str) -> api_models.LavaResponse:
         return api_models.DependencyTreeResponse(depTrees=job_result)
 
     return _handle_get_job(jobID, parse_result)
+
+
+# 15.) Vulnerabilities - return all vulnerabilities
+@router.post("/get_all_vulnerabilities")
+def post_get_all_vulnerabilities(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+
+    return _handle_enqueue(queries.get_all_vulnerabilities)
+
+
+@router.get("/get_all_vulnerabilities")
+def get_get_all_vulnerabilities(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.AllVulnerabilitiesResponse(
+            allVulns={
+                repo: [
+                    api_models.CveData(
+                        cve_id=rcve.cve_id,
+                        severity=rcve.severity,
+                        description=rcve.description,
+                        cwe=rcve.cwe,
+                        url=rcve.url,
+                        repo_name=rcve.repo_name,
+                        pkg_name=rcve.pkg_name,
+                        pkg_vers=rcve.pkg_vers,
+                        univ_hash=rcve.univ_hash,
+                        first_patched_vers=rcve.first_patched_vers,
+                    )
+                    for rcve in rcves
+                ]
+                for repo, rcves in job_result.items()
+            }
+        )
+
+    return _handle_get_job(jobID, parse_result)

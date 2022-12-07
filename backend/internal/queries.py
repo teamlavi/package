@@ -369,3 +369,14 @@ async def get_pkg_dependencies(
         }.items()
         if dep_tree is not None
     }
+
+
+async def get_repo_vulnerabilities(repo: RepoEnum) -> list[cve.Cve]:
+    """Get all vulnerabilities in a repository."""
+    async with await get_db_tx() as tx:
+        return await cve.find_cves_from_repo(tx, repo.value)
+
+
+async def get_all_vulnerabilities() -> dict[str, list[cve.Cve]]:
+    """Get all vulnerabilities."""
+    return {repo.value: await get_repo_vulnerabilities(repo) for repo in RepoEnum}
