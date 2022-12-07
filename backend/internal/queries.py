@@ -215,6 +215,7 @@ async def get_all_vulnerable_packages(repo: RepoEnum) -> list[str]:
     return pkgs
 
 
+# 16
 async def get_affected_packages_cve(
     repo: RepoEnum, cve_ids: list[str]
 ) -> dict[str, int]:
@@ -222,7 +223,8 @@ async def get_affected_packages_cve(
     # get all pkgs and their cves
     vuln_pkgs: dict[str, list[str]] = {}
     for cve_id in cve_ids:
-        vuln_pkgs[cve_id, await cve.get_cve_pkgs(cve_id)]
+        async with await get_db_tx() as tx:
+            vuln_pkgs[cve_id] = await cve.get_cve_pkgs(tx, cve_id)
     # get number of packages that depend on the list of vulnerable packages
     cve_effect: dict[str, int] = {}
     async with await get_db_tx() as tx:
@@ -234,7 +236,7 @@ async def get_affected_packages_cve(
         for pkg in dep_tree.keys():
             for cve_id in vuln_pkgs.keys():
                 if pkg in vuln_pkgs[cve_id]:
-                    cve_effect[cve_id] = cve_effect.setdefault(pkg, 0) + 1
+                    cve_effect[cve_id] = cve_effect.setdefault(cve_id, 0) + 1
     return cve_effect
 
 
@@ -290,14 +292,14 @@ async def get_all_pkgs() -> list[tuple]:
 
 
 # 12
-async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
+async def get_tree_depth(univ_hash_list: list[str]) -> dict[str, int]:
     """Get the max depth of the dependency tree"""
-    result = []
+    result: dict[str, int] = {}
 
-    async def get_depth(tree: dict, key: str) -> int:
+    async def get_depth(tree: dict[str, list[str]], key: str) -> int:
         if tree.get(key) is None:
             return 1
-        result = 0
+        result: int = 0
         for pkg in tree.get(key):
             curr = await get_depth(tree, pkg)
             if curr > result:
@@ -307,9 +309,9 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
     for univ_hash in univ_hash_list:
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
         if dep_tree is None:
-            result.append(0)
+            result[univ_hash] = 0
         else:
-            result.append(await get_depth(dep_tree, list(dep_tree.keys())[0]))
+            result[univ_hash] = await get_depth(dep_tree, list(dep_tree.keys())[0])
 
     return result
 
@@ -333,11 +335,11 @@ async def get_all_package_dependency_num() -> dict[str, dict[str, int]]:
 
 
 # 13
-async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
-    """Get the max breast of the dependency tree"""
-    result = []
+async def get_tree_breadth(univ_hash_list: list[str]) -> dict[str, int]:
+    """Get the max breadth of the dependency tree"""
+    result: dict[str, int] = {}
 
-    async def get_breadth(tree: dict, root: str) -> int:
+    async def get_breadth(tree: dict[str, list[str]], root: str) -> int:
         fatness = 1
         fatSet = set(tree.get(root))
         while len(fatSet) > 0:
@@ -346,15 +348,37 @@ async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
             for item in fatSet:
                 newSet = newSet.union(set(tree.get(item)))
             fatSet = newSet
-        return fatness   
+        return fatness
 
     for univ_hash in univ_hash_list:
         dep_tree: dict[str, list[str]] | None = await get_dependencies(univ_hash)
         if dep_tree is None:
-            result.append(0)
+            result[univ_hash] = 0
         else:
-            result.append(await get_breadth(dep_tree, list(dep_tree.keys())[0]))
+            result[univ_hash] = await get_breadth(dep_tree, list(dep_tree.keys())[0])
 
     return result
 
-    
+
+async def get_pkg_dependencies(
+    univ_hashes: list[str],
+) -> dict[str, dict[str, list[str]]]:
+    """Get the dependencies for each package."""
+    return {
+        univ_hashii: dep_tree
+        for univ_hashii, dep_tree in {
+            univ_hashi: await get_dependencies(univ_hashi) for univ_hashi in univ_hashes
+        }.items()
+        if dep_tree is not None
+    }
+
+
+async def get_repo_vulnerabilities(repo: RepoEnum) -> list[cve.Cve]:
+    """Get all vulnerabilities in a repository."""
+    async with await get_db_tx() as tx:
+        return await cve.find_cves_from_repo(tx, repo.value)
+
+
+async def get_all_vulnerabilities() -> dict[str, list[cve.Cve]]:
+    """Get all vulnerabilities."""
+    return {repo.value: await get_repo_vulnerabilities(repo) for repo in RepoEnum}

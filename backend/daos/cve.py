@@ -185,4 +185,11 @@ async def get_cve_pkgs(tx: Transaction, cve_id: str) -> list[str]:
     async with tx.cursor() as cur:
         await cur.execute("SELECT univ_hash FROM cves WHERE cve_id = %s", (cve_id,))
         pkgs = await cur.fetchall()
-        return [pkg[0] for pkg in pkgs] if pkgs else []
+    return [pkg[0] for pkg in pkgs] if pkgs else []
+
+
+async def find_cves_from_repo(tx: Transaction, repo: str) -> list[Cve]:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT * FROM cves WHERE repo_name = %s", (repo,))
+        raw_cves = await cur.fetchall()
+    return [Cve(*raw_cve) for raw_cve in raw_cves]

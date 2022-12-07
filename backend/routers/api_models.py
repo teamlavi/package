@@ -1,7 +1,7 @@
 from typing import Any
 
 from pydantic import BaseModel
-from daos import dependencies
+from daos.cve import Cve
 from utils.utils import LevelEnum, RepoEnum, ResponseEnum, StatusEnum
 
 
@@ -226,13 +226,13 @@ class AllPackagesResponse(BaseModel):
 
 
 class TreeDepthsResponse(BaseModel):
-    # Depth of each dependency tree in the input packages
-    depths: list[int]
+    # package id -> Dependency tree depth
+    depths: dict[str, int]
 
 
 class TreeBreadthsResponse(BaseModel):
-    # Breadth of each dependency tree in the input packages
-    breadths: list[int]
+    # package id -> Dependency tree breadth
+    breadths: dict[str, int]
 
 
 class VulPathResponse(BaseModel):
@@ -266,3 +266,26 @@ class DependencyStatsResponse(BaseModel):
 class allPackageDependenciesResponse(BaseModel):
     # repo -> package id -> number of dependencies
     depCount: dict[str, dict[str, int]]
+
+
+class DependencyTreeResponse(BaseModel):
+    # package id -> dependency tree
+    depTrees: dict[str, dict[str, list[str]]]
+
+
+class CveData(BaseModel):
+    cve_id: str
+    severity: str | None
+    description: str | None
+    cwe: str | None
+    url: str
+    repo_name: str
+    pkg_name: str
+    pkg_vers: str
+    univ_hash: str
+    first_patched_vers: str | None
+
+
+class AllVulnerabilitiesResponse(BaseModel):
+    # repo -> list of all vulnerabilities
+    allVulns: dict[str, list[CveData]]
