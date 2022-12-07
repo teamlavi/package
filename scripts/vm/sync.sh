@@ -28,10 +28,6 @@ build () {
 
     FILE="$PREFIX-cli-$GOOS-$GOARCH"
 
-    if [[ $PREFIX = "lavi" ]]
-    then
-        sudo mkdir -p "$PACKAGE_DIR/lavi-cli/ui/build" 
-    fi
     GOOS=$GOOS GOARCH=$GOARCH /usr/local/go/bin/go build -o $PREFIX
     if [[ $GOOS = "darwin" || $GOOS = "linux" ]]
     then
@@ -40,14 +36,13 @@ build () {
 
     sudo mkdir $FILE
     sudo mv $PREFIX "$FILE/"
-    sudo cp INSTALL.txt "$FILE/"
 
     if [[ $GOOS = "windows" ]]
     then
         sudo mv "$FILE/$PREFIX" "$FILE/$PREFIX.exe"
     fi
     
-    sudo zip -r -j "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip" "$FILE/"
+    sudo zip -r -j - "$FILE/" > "$PACKAGE_DIR/downloads/$PREFIX/$FILE.zip"
     sudo rm -rf "$FILE"
 }
 
@@ -57,12 +52,20 @@ sudo git pull
 
 echo "building lavi archives"
 
-rm -rf "$PACKAGE_DIR/downloads" || :
-
-mkdir "$PACKAGE_DIR/downloads/lavi" -p
-mkdir "$PACKAGE_DIR/downloads/lava" -p
+mkdir "$PACKAGE_DIR/downloads/lavi" -p || :
+mkdir "$PACKAGE_DIR/downloads/lava" -p || :
 
 cd "$PACKAGE_DIR/lavi-cli" || exit 1
+
+echo "building lavi ui"
+
+cd "$PACKAGE_DIR/lavi-cli/ui" || exit 1
+
+npm install
+npm run build
+
+cd "$PACKAGE_DIR/lavi-cli" || exit 1
+
 
 build lavi darwin amd64
 build lavi darwin arm64

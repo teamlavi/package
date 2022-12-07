@@ -9,9 +9,18 @@ import (
 	"lavi/internal"
 	internalModels "lavi/internal/models"
 	"lavi/internal/vulnerabilities"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
+
+func getRemote(cmd *cobra.Command) string {
+	remote, _ := cmd.Flags().GetString("remote")
+	if (strings.HasPrefix(remote, "http://") || strings.HasPrefix(remote, "https://")) && !strings.HasSuffix(remote, "/") {
+		return remote
+	}
+	panic(fmt.Sprintf("remote url %s is invalid. Must start with http:// or https://, and not end with a slash", remote))
+}
 
 func getCds(cmd *cobra.Command, gen generator.RepositoryTreeGenerator) models.CDS {
 	var cds models.CDS
@@ -38,8 +47,10 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 	clean := map[string][]vulnerabilities.Vulnerability{}
 	results := map[string][]vulnerabilities.VulnerabilityResponseData{}
 
+	remote := getRemote(cmd)
+
 	if !noScan {
-		results = vulnerabilities.Scan(cds)
+		results = vulnerabilities.Scan(cds, remote)
 		clean = vulnerabilities.ConvertToCleanResponse(results)
 
 		display(cmd, cds, results)
@@ -57,7 +68,7 @@ func postCommand(cmd *cobra.Command, cds models.CDS, gen generator.RepositoryTre
 	}
 
 	if show && !singlePkg {
-		internal.Serve(cmd, cds, gen, clean)
+		internal.Serve(cmd, cds, gen, clean, remote)
 	} else if show && singlePkg {
 		fmt.Println("WARNING: Running lavi in single package mode will disable the ui")
 	}

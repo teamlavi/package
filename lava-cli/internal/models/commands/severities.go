@@ -17,5 +17,12 @@ func (a SeveritiesResponse) Display() {
 }
 
 func (a SeveritiesResponse) ToCSV() [][]string {
-	return [][]string{}
+	out := [][]string{
+		{"name", "version", "severities"},
+	}
+	for k, v := range a.SevList {
+		name, version, _ := utils.DecodeID(k)
+		out = append(out, []string{name, version, fmt.Sprintf("%v", v)})
+	}
+	return out
 }

@@ -13,6 +13,13 @@ class Dependency:
     pkg_dependencies: str
 
 
+@define(frozen=True)
+class Package:
+    repo_name: str
+    pkg_name: str
+    pkg_vers: str
+
+
 async def create(
     tx: Transaction, repo_name: str, pkg_name: str, pkg_vers: str, pkg_dependencies: str
 ) -> None:
@@ -148,3 +155,10 @@ async def get_table_storage_size(tx: Transaction) -> str:
         )
         row = await cur.fetchone()
         return row[0]  # type: ignore
+
+
+async def get_all_packages(tx: Transaction) -> list[Dependency]:
+    async with tx.cursor() as cur:
+        await cur.execute("SELECT repo_name, pkg_name, pkg_vers FROM dependencies")
+        rows = await cur.fetchall()
+        return [Dependency(*row) for row in rows]

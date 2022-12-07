@@ -1,6 +1,9 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type CountResponse struct {
 	Count int `json:"count"` // Total number of packages in LAVI database
@@ -11,5 +14,8 @@ func (a CountResponse) Display() {
 }
 
 func (a CountResponse) ToCSV() [][]string {
-	return [][]string{}
+	return [][]string{
+		[]string{"count"},
+		[]string{strconv.Itoa(a.Count)},
+	}
 }

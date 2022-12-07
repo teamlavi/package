@@ -7,6 +7,8 @@ from utils import config
 
 
 class QueueName(str, Enum):
+    analysis = "analysis"
+    to_get_cves = "to_get_cves"
     to_list_packages = "to_list_packages"
     to_list_versions = "to_list_versions"
     to_generate_tree = "to_generate_tree"

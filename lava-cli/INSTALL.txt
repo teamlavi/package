@@ -1,1 +1,0 @@
-To install, just add the binary to a location that is in your PATH environment variable, and then call lava in the command line.

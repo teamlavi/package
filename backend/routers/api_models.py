@@ -1,13 +1,8 @@
-from typing import List, Dict
-
-from pydantic import BaseModel
-
 from typing import Any
 
-from utils.utils import RepoEnum
-from utils.utils import LevelEnum
-from utils.utils import StatusEnum
-from utils.utils import ResponseEnum
+from pydantic import BaseModel
+from daos import dependencies
+from utils.utils import LevelEnum, RepoEnum, ResponseEnum, StatusEnum
 
 
 class InsertTreeData(BaseModel):
@@ -52,11 +47,11 @@ class FindVulnVersRequest(BaseModel):
 
 
 class FindVulnResponse(BaseModel):
-    vulns: List[str]  # List of CVE id strings
+    vulns: list[str]  # List of CVE id strings
 
 
 class FindVulnVersResponse(BaseModel):
-    vers: List[str]  # List of vulnerable versions
+    vers: list[str]  # List of vulnerable versions
 
 
 class PackageVers(BaseModel):
@@ -83,7 +78,7 @@ class PackageVers(BaseModel):
 
 
 class FindVulnsIdListRequest(BaseModel):
-    ids: List[str]
+    ids: list[str]
 
 
 class CveResponse(BaseModel):
@@ -95,7 +90,7 @@ class CveResponse(BaseModel):
 
 
 class FindVulnsIdListResponse(BaseModel):
-    vulns: Dict[str, List[CveResponse]]
+    vulns: dict[str, list[CveResponse]]
 
 
 class InsertVulnRequest(BaseModel):
@@ -133,7 +128,7 @@ class LavaRequest(BaseModel):
     # Query with only a packages in list.
     # Can optionally include a version number.
     # If no version number is included, the most recent release will be used.
-    packages: List[str] | None
+    packages: list[str] | None
     # offset on how many results the user wants to
     # skip(ex: offset=2 would skip the first 2 results)
     offset: int | None
@@ -149,6 +144,10 @@ class LavaRequest(BaseModel):
     # include active, patched or all vulnerabilities.
     # Includes only ACTIVE vulnerabilities by default if None
     status: StatusEnum | None
+    # Query with cves in list
+    cves: list[str] | None
+    # Only consider dependencies up to this depth
+    depthLimit: int | None
 
 
 # LAVA Responses
@@ -163,10 +162,22 @@ class LavaResponse(BaseModel):
     result: Any
 
 
+def lava_success(result: Any) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.complete, error=None, result=result)
+
+
+def lava_failure(error_text: str) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.failure, error=error_text, result=None)
+
+
+def lava_pending(job_id: str) -> LavaResponse:
+    return LavaResponse(status=ResponseEnum.pending, error=None, result=job_id)
+
+
 # job finished successfully Responses
 class AffectedCountResponse(BaseModel):
-    # CVE id -> Number of packages affected
-    pkgsAffected: Dict[str, int]
+    # Package id -> Number of packages affected
+    pkgsAffected: dict[str, int]
 
 
 class CountResponse(BaseModel):
@@ -176,7 +187,7 @@ class CountResponse(BaseModel):
 
 class CountDepResponse(BaseModel):
     # package id -> Number of dependencies for this package
-    depList: Dict[str, int]
+    depList: dict[str, int]
 
 
 class CountVulResponse(BaseModel):
@@ -186,24 +197,67 @@ class CountVulResponse(BaseModel):
 
 class DepthResponse(BaseModel):
     # CVE id -> Vulnerability depth from root package
-    vulDepth: Dict[str, dict[str, list[int]]]
+    vulDepth: dict[str, dict[str, list[int]]]
 
 
 class NumDownloadsResponse(BaseModel):
     # Package id -> Number of package downloads
-    downloads: Dict[str, int]
+    downloads: dict[str, int]
 
 
 class SeveritiesResponse(BaseModel):
     # Vulnerable package id -> CVE Serverity type
-    sevList: Dict[str, list[str]]
+    sevList: dict[str, list[str]]
 
 
 class TypesResponse(BaseModel):
     # CWE id -> how many Vulnerabilities for this CWE
-    cweList: Dict[str, int]
+    cweList: dict[str, int]
 
 
 class VulPackagesResponse(BaseModel):
     # List of all the package ids that are vulnerable in our database
-    vulList: List[str]
+    vulList: list[str]
+
+
+class AllPackagesResponse(BaseModel):
+    # List of all pkgs with ids, versions, repos, and hashes
+    pkgs: list[tuple]
+
+
+class TreeDepthsResponse(BaseModel):
+    # Depth of each dependency tree in the input packages
+    depths: list[int]
+
+
+class VulPathResponse(BaseModel):
+    # Package id -> Vulnerable Package id -> List of path lists
+    vulPath: dict[str, dict[str, list[list[str]]]]
+
+
+class AffectedByCVECountResponse(BaseModel):
+    # CVE id -> List of affected packages
+    pkgsAffected: dict[str, int]
+
+
+class PackageVulnsResponse(BaseModel):
+    # Package id -> List of CVE ids
+    cveList: dict[str, list[str]]
+
+
+class DependencyStats(BaseModel):
+    # Dependency count statistics
+    mean: int
+    stdDev: int
+    median: int
+    mode: int
+
+
+class DependencyStatsResponse(BaseModel):
+    # Repo -> Dependency count statistics
+    depStats: dict[str, DependencyStats]
+
+
+class allPackageDependenciesResponse(BaseModel):
+    # repo -> package id -> number of dependencies
+    depCount: dict[str, dict[str, int]]

@@ -20,4 +20,6 @@ type ConfigInterface interface {
 	SetVulns(d map[string][]vulnerabilities.Vulnerability)
 	GetVulns() map[string][]vulnerabilities.Vulnerability
 	GetOriginalVulns() map[string][]vulnerabilities.Vulnerability
+
+	GetRemote() string
 }

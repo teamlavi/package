@@ -1,11 +1,8 @@
-lava -r npm count 
-lava -r pip count 
+lava countDependencies -r npm --packages="nedb==1.8.0" --api-key=3GhbNlYM994kdxJt
+lava countDependencies -r pip --packages="pytorch-lightning==1.8.3" --api-key=3GhbNlYM994kdxJt
 
-lava countDependencies -r npm --packages="nedb==1.8.0"
-lava countDependencies -r pip --packages="azure-cli==2.9.1"
+lava depth -r npm --packages="nedb==1.8.0" --api-key=3GhbNlYM994kdxJt
+lava depth -r pip --packages="pytorch-lightning==1.8.3" --api-key=3GhbNlYM994kdxJt
 
-lava depth -r npm --packages="nedb==1.8.0"
+lava affectedCount -r pip --packages="requests==2.9.2,pycrypto==2.6.1,uvicorn==0.9.1,pip==9.0.3" --api-key=3GhbNlYM994kdxJt
 
-lava affectedCount -r pip --packages="mysql-connector-python==8.0.6"
-
-lava types -r npm --packages="nedb==1.8.0"
