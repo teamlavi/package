@@ -383,7 +383,7 @@ async def get_all_vulnerabilities() -> dict[str, list[cve.Cve]]:
     """Get all vulnerabilities."""
     return {repo.value: await get_repo_vulnerabilities(repo) for repo in RepoEnum}
 
-async def get_dependency_stats(repo: RepoEnum) -> list[int]:
+async def get_dependency_stats(repo: RepoEnum) -> tuple[float, float, float, float]:
     result = []
     async with await get_db_tx() as tx:
         deps: list[dependencies.Dependency] = await dependencies.get_repo_table(
@@ -417,7 +417,7 @@ async def get_dependency_stats(repo: RepoEnum) -> list[int]:
             counter = 1
 
 
-    return [mean, std_dev, median, mode]
+    return (mean, std_dev, median, mode)
 
 async def get_num_downloads(pkgs: list[str]) -> dict[str, str]:
     download_results = {}
