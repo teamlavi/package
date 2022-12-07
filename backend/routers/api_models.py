@@ -227,12 +227,12 @@ class AllPackagesResponse(BaseModel):
 
 class TreeDepthsResponse(BaseModel):
     # Depth of each dependency tree in the input packages
-    depths: list[int]
+    depths: dict[str, int]
 
 
 class TreeBreadthsResponse(BaseModel):
     # Breadth of each dependency tree in the input packages
-    breadths: list[int]
+    breadths: dict[str, int]
 
 
 class VulPathResponse(BaseModel):

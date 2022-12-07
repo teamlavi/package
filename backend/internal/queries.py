@@ -290,9 +290,9 @@ async def get_all_pkgs() -> list[tuple]:
 
 
 # 12
-async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
+async def get_tree_depth(univ_hash_list: list[str]) -> dict[str, int]:
     """Get the max depth of the dependency tree"""
-    result = []
+    result = {}
 
     async def get_depth(tree: dict, key: str) -> int:
         if tree.get(key) is None:
@@ -309,7 +309,8 @@ async def get_tree_depth(univ_hash_list: list[str]) -> list[int]:
         if dep_tree is None:
             result.append(0)
         else:
-            result.append(await get_depth(dep_tree, list(dep_tree.keys())[0]))
+            root = list(dep_tree.keys())[0]
+            result.update({root : await get_depth(dep_tree, root)})
 
     return result
 
@@ -333,9 +334,9 @@ async def get_all_package_dependency_num() -> dict[str, dict[str, int]]:
 
 
 # 13
-async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
+async def get_tree_breadth(univ_hash_list: list[str]) -> dict[str, int]:
     """Get the max breast of the dependency tree"""
-    result = []
+    result = {}
 
     async def get_breadth(tree: dict, root: str) -> int:
         fatness = 1
@@ -353,7 +354,8 @@ async def get_tree_breadth(univ_hash_list: list[str]) -> list[int]:
         if dep_tree is None:
             result.append(0)
         else:
-            result.append(await get_breadth(dep_tree, list(dep_tree.keys())[0]))
+            root = list(dep_tree.keys())[0]
+            result.update({root : await get_breadth(dep_tree, root)})
 
     return result
 
