@@ -20,6 +20,25 @@ echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docke
 sudo apt-get update -y
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
+# Install golang
+if ! [ -x "$(command -v go)" ]; then
+  # Install go
+  wget https://go.dev/dl/go1.19.4.linux-amd64.tar.gz
+  tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz
+  export PATH=$PATH:/usr/local/go/bin
+else
+  echo "Go is already installed. Skipping installation."
+fi
+
+# install npm
+if ! [ -x "$(command -v npm)" ]; then
+  curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+  sudo bash /tmp/nodesource_setup.sh
+  sudo apt install nodejs
+else
+  echo "npm is already installed. Skipping installation."
+fi
+
 # Enable docker to start at boot
 sudo systemctl enable docker
 sudo systemctl start docker

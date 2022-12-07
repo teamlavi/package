@@ -4,7 +4,9 @@ title: Install the backend
 permalink: docs/backend/install.html
 ---
 
-# Installation
+Installing the backend currently only works on Linux based machines
+
+## Install 
 
 ```bash
 sudo apt-get update -y
@@ -22,6 +24,8 @@ NOTE: The token will be stored in plaintext in the root user's crontab file.
 
 TODO: any specific scopes necessary on the gh tok?
 
+This script will install all dependencies (golang, npm, docker, etc) and setup the cronjob for updating based on changes to main.
+
 ```bash
 cd package
 sudo git pull
@@ -31,3 +35,19 @@ bash scripts/vm/setup.sh
 When prompted with the `postfix` post-install configuration, just set it to local-only mail. This allows us to see logs from the cron job if it should fail.
 
 The setup script will then install dependencies, then update your cron as necessary to keep this VM live with prod every minute or so.
+
+
+## Troubleshooting
+
+Sometimes, you may run into some undefined issues. In order to get more information, there are a couple of steps you can try
+
+* Manually trigger sync script
+```bash
+sudo crontab -l
+```
+Copy the command shown there (except the stars) and run it using sudo to manually trigger the sync script, which can reveal some errors
+
+* See cronjob output
+```bash
+sudo tail /var/mail/root
+```

@@ -4,6 +4,9 @@
     - id: getting-started
       title: Getting Started
       path: /docs/getting-started/getting-started.html
+    - id: data
+      title: Data
+      path: /docs/getting-started/data.html
 - title: LAVI
   isOrdered: false
   items:
@@ -28,3 +31,15 @@
     - id: backend-install
       title: Install
       path: /docs/backend/install.html
+    - id: backend-architecture
+      title: Architecture
+      path: /docs/backend/architecture.html
+- title: Extension
+  isOrdered: false
+  items:
+    - id: adding-language
+      title: Adding a Language
+      path: /docs/extension/language.html
+    - id: future-work
+      title: Future Work
+      path: /docs/extension/future.html
