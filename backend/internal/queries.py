@@ -278,7 +278,7 @@ async def get_vulnerability_paths(
     for pkg in pkgs:
         package_paths(pkg)
 
-    return {"package": {"vuln": ["list"]}}
+    return {"package": {"vuln": [["list"]]}}
 
 
 # 11
