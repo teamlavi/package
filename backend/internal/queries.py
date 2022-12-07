@@ -1,7 +1,7 @@
 from daos import cve, dependencies
 from daos.database import get_db_tx
 from utils.utils import RepoEnum, decompress_tree
-
+import pypistats
 
 async def find_vulnerabilities_simple(
     repo: RepoEnum, package: str, version: str
@@ -423,10 +423,13 @@ async def get_num_downloads(pkgs: list[str]) -> dict[str, str]:
     download_results = {}
     for pkg in pkgs:
         downloads = ""
-        jsonDownloads = pypistats.overall(pkg, format="json")
-        helper = jsonDownloads.split(']')[0]
-        downloads = helper[helper.rfind('downloads'):-1]
-        downloads = downloads[12:]
+        try:
+            jsonDownloads = pypistats.overall(pkg, format="json")
+            helper = jsonDownloads.split(']')[0]
+            downloads = helper[helper.rfind('downloads'):-1]
+            downloads = downloads[12:]
+        except:
+            downloads = "Couldn't recognize the given package name and/or package version"
 
         download_results[pkg] = downloads
     
