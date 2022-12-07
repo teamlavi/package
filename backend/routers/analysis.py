@@ -243,7 +243,7 @@ def post_all_packages(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
 
-    return _handle_enqueue(queries.get_all_packages)
+    return _handle_enqueue(queries.get_all_packages, lava_request.packages)
 
 
 @router.get("/all_packages")
@@ -263,7 +263,7 @@ def post_tree_depth(
     if not lava_request.packages:
         return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
 
-    return _handle_enqueue(queries.get_tree_depth)
+    return _handle_enqueue(queries.get_tree_depth, lava_request.packages)
 
 
 @router.get("/tree_depth")
