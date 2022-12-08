@@ -382,6 +382,7 @@ def post_dependency_stats(
 @router.get("/dependency_stats")
 def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
-        return api_models.DependencyStats(stats=job_result)
+        mean1, stdev1, median1, mode1 = job_result
+        return api_models.DependencyStats(mean=mean1, stdDev=stdev1,  median=median1, mode=mode1)
 
     return _handle_get_job(jobID, parse_result)
