@@ -10,12 +10,7 @@ type VulPackagesResponse struct {
 }
 
 func (a VulPackagesResponse) Display() {
-	// fmt.Printf("Vulnerable Packages Found: %v\n", a.VulList)
 	fmt.Printf("Total Vulnerable Package Count: %d\n", len(a.VulList))
-	for _, pkg := range a.VulList {
-		name, version, _ := utils.DecodeID(pkg)
-		fmt.Printf("%s==%s\n", name, version)
-	}
 }
 
 func (a VulPackagesResponse) ToCSV() [][]string {
