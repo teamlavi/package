@@ -23,7 +23,7 @@ If it is not run `export PATH=$PATH:/usr/local/bin` to add `/usr/local/bin` to `
 
 ### Installation
 1. Download LAVI from http://vocation.cs.umd.edu/downloads/ and unzip the folder
-2. Open terminal and `cd` into the folder that was unzipped
+2. Open terminal and `cd` into the where lavi was unzipped
 3. Run the following command (enter your password if prompted):
    `sudo mv lavi /usr/local/bin/lavi`
 4. Run `lavi` The result will be one of the following cases:
