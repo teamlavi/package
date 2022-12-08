@@ -20,6 +20,7 @@ type Poller struct {
 	api      string
 	dataType reflect.Type
 	csvName  string
+	apiKey   string
 }
 
 var letters = []rune("1234567890")
@@ -33,12 +34,13 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func New(id string, api string, dataType reflect.Type, csvName string) *Poller {
+func New(id string, api string, apiKey string, dataType reflect.Type, csvName string) *Poller {
 	return &Poller{
 		id:       id,
 		api:      api,
 		dataType: dataType,
 		csvName:  csvName,
+		apiKey:   apiKey,
 	}
 }
 
@@ -109,7 +111,22 @@ func (p *Poller) poll() models.LavaResponse {
 }
 
 func (p *Poller) sendGet() (*http.Response, error) {
-	resp, err := http.Get(fmt.Sprintf("%s?jobID=%s", p.api, p.id))
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s?jobID=%s", p.api, p.id), nil)
+	if err != nil {
+		panic("unknown error occured while sending get request")
+	}
+
+	client := &http.Client{}
+
+	req.Header = http.Header{
+		"Content-Type":  {"application/json"},
+		"Authorization": {fmt.Sprintf("Bearer %s", p.apiKey)},
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		panic("unknown error occured while sending get request")
+	}
 
 	return resp, err
 }
