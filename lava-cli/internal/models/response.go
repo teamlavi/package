@@ -35,10 +35,15 @@ func (l LavaResponse) DisplayStatus() {
 	fmt.Printf("Status: %s\n", statusToColor(l.Status))
 }
 
+func (l LavaResponse) GetStatusColor() string {
+	return statusToColor(l.Status)
+}
+
 func (l LavaResponse) Display() bool {
 	l.DisplayStatus()
 	if l.Result != nil {
 		l.Result.Display()
+		fmt.Println("see generated output file for more information")
 		return true
 	}
 	return false

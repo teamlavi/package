@@ -22,8 +22,12 @@ func getStringFlagValue(name string, cmd *cobra.Command, allowBlank bool) string
 }
 
 // checks for flag, and checks against repo whitelist
-func getRepo(cmd *cobra.Command) Repo {
-	v := getStringFlagValue("repo", cmd, false)
+func getRepo(cmd *cobra.Command, allowNoRepo bool) Repo {
+	v := getStringFlagValue("repo", cmd, allowNoRepo)
+	if v == "" {
+		// these functions dont rely on repos, just gonna return pip
+		return REPO_PIP
+	}
 	return new(Repo).GetForValue(v)
 }
 
@@ -49,15 +53,15 @@ func getPackages(cmd *cobra.Command) []string {
 			panic(fmt.Sprintf("Package %s is invalid. Format must be PACKAGE_NAME==PACKAGE_VERSION", pkg))
 		}
 		nameVers := strings.Split(pkg, "==")
-		out = append(out, utils.GenerateID(nameVers[0], nameVers[1], string(getRepo(cmd))))
+		out = append(out, utils.GenerateID(nameVers[0], nameVers[1], string(getRepo(cmd, false))))
 	}
 
 	return out
 }
 
-func BuildLavaRequest(cmd *cobra.Command, requires ...Requires) (*LavaRequest, error) {
+func BuildLavaRequest(cmd *cobra.Command, allowNoRepo bool, requires ...Requires) (*LavaRequest, error) {
 	lr := &LavaRequest{
-		Repo:     getRepo(cmd),
+		Repo:     getRepo(cmd, allowNoRepo),
 		Status:   getStatus(cmd),
 		Level:    getLevel(cmd),
 		Packages: getPackages(cmd),

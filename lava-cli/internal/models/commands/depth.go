@@ -26,7 +26,7 @@ func (a DepthResponse) ToCSV() [][]string {
 	for k, v := range a.VulDepth {
 		name, version, _ := utils.DecodeID(k)
 		for cveId, arr := range v {
-			out = append(out, []string{name, version, cveId, fmt.Sprintf("%v", arr)})
+			out = append(out, []string{name, version, cveId, AnyArrayToString(arr)})
 		}
 	}
 

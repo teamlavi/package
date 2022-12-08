@@ -12,7 +12,7 @@ type SeveritiesResponse struct {
 func (a SeveritiesResponse) Display() {
 	for k, v := range a.SevList {
 		name, version, _ := utils.DecodeID(k)
-		fmt.Printf("CVE Severities found in %s==%s: %v\n", name, version, v)
+		fmt.Printf("CVE Severities found in %s==%s: %d\n", name, version, len(v))
 	}
 }
 
@@ -22,7 +22,7 @@ func (a SeveritiesResponse) ToCSV() [][]string {
 	}
 	for k, v := range a.SevList {
 		name, version, _ := utils.DecodeID(k)
-		out = append(out, []string{name, version, fmt.Sprintf("%v", v)})
+		out = append(out, []string{name, version, AnyArrayToString(v)})
 	}
 	return out
 }

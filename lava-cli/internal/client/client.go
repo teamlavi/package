@@ -18,6 +18,7 @@ import (
 
 // going to be responsible for sending requests
 type Client struct {
+	allowNoRepo  bool
 	remote       string
 	api          string
 	apiKey       string
@@ -32,6 +33,11 @@ func New() *Client {
 
 func (c *Client) Cmd(cmd *cobra.Command) *Client {
 	c.cmd = cmd
+	return c
+}
+
+func (c *Client) AllowNoRepo() *Client {
+	c.allowNoRepo = true
 	return c
 }
 
@@ -101,7 +107,7 @@ func (c *Client) Run() {
 	c.setApiKey()
 	c.setRemote()
 
-	request, err := models.BuildLavaRequest(c.cmd, c.requires...)
+	request, err := models.BuildLavaRequest(c.cmd, c.allowNoRepo, c.requires...)
 	if err != nil {
 		panic(err)
 	}
