@@ -1,12 +1,13 @@
 from typing import Any, Callable
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from internal import queries
 from internal.queues import QueueName, get_queue
 from routers import api_models
+from routers.dependencies import verify_code
 
-router = APIRouter(tags=["analysis"])
+router = APIRouter(dependencies=[Depends(verify_code)], tags=["analysis"])
 
 
 def _handle_enqueue(func: Callable[..., Any], *args: Any) -> api_models.LavaResponse:
