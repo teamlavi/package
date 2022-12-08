@@ -62,8 +62,8 @@ func getPackages(cmd *cobra.Command) []string {
 func BuildLavaRequest(cmd *cobra.Command, allowNoRepo bool, requires ...Requires) (*LavaRequest, error) {
 	lr := &LavaRequest{
 		Repo:     getRepo(cmd, allowNoRepo),
-		Status:   getStatus(cmd),
-		Level:    getLevel(cmd),
+		Status:   STATUS_ACTIVE,
+		Level:    LEVEL_BOTH,
 		Packages: getPackages(cmd),
 	}
 
