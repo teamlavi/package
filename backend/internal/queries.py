@@ -422,17 +422,13 @@ async def get_dependency_stats(repo: RepoEnum) -> tuple[float, float, float, flo
 async def get_num_downloads(pkgs: list[str]) -> dict[str, str]:
     download_results = {}
     for pkg in pkgs:
+        pkg = pkg[pkg.index(":")+1:pkg.rindex(":")]
+        pkg = b64decode(pkg).decode()
         downloads = ""
-        try:
-            pkg = pkg[pkg.index(":")+1:pkg.rindex(":")]
-            pkg = b64decode(pkg).decode()
-            jsonDownloads = pypistats.overall(pkg, format="json")
-            helper = jsonDownloads.split(']')[0]
-            downloads = helper[helper.rfind('downloads'):-1]
-            downloads = downloads[12:]
-        except:
-            downloads = "Couldn't recognize the given package name and/or package version"
-
+        jsonDownloads = pypistats.overall(pkg, format="json")
+        helper = jsonDownloads.split(']')[0]
+        downloads = helper[helper.rfind('downloads'):-1]
+        downloads = downloads[12:]
         download_results[pkg] = downloads
-    
+
     return download_results
