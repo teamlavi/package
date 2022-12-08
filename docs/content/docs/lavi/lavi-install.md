@@ -23,8 +23,8 @@ If it is not run `export PATH=$PATH:/usr/local/bin` to add `/usr/local/bin` to `
 
 ### Installation
 1. Download LAVI from http://vocation.cs.umd.edu/downloads/ and unzip the folder
-2. Open terminal and `cd` into the downloaded folder
-3. From the folder run the following command (enter your password if prompted):
+2. Open terminal and `cd` into the where lavi was unzipped
+3. Run the following command (enter your password if prompted):
    `sudo mv lavi /usr/local/bin/lavi`
 4. Run `lavi` The result will be one of the following cases:
    - If the result is LAVI usage information then LAVI is successfully installed
@@ -35,8 +35,21 @@ If it is not run `export PATH=$PATH:/usr/local/bin` to add `/usr/local/bin` to `
      4. When the popup window appears asking if you're sure you want to open it select `Open`
      5. Close the opened window
 
+#### Troubleshooting
+If you are still unable to run LAVI try the following:
+- macOS < 13.0
+  - Open `System Preferences`
+  - Go to `Security & Privacy`
+  - Select `Open Anyway` next to `"LAVI" was blocked from use because it is not from an identified developer.`
+
+- macOS >= 13.0
+  - Open `System Settings`
+  - Go to `Privacy & Security` 
+  - Select `Open Anyway` next to `"LAVI" was blocked from use because it is not from an identified developer.`
+
+
 ## Windows
-1. Download LAVI binaries from http://vocation.cs.umd.edu/downloads/
+1. Download LAVI from http://vocation.cs.umd.edu/downloads/
 2. Create a `lavi` folder in your `C:\` directory
 3. Extract the `lavi.exe` file from the zip to the `C:\lavi` folder
 4. Add `C:\lavi` to your environment variables
