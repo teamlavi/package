@@ -13,7 +13,7 @@ The LAVI backend runs in Docker Compose, which allows the system to be brought t
 ### lavi-worker
 
 LAVI worker is the centerpiece to the backend. The worker is built to handle all requests into the backend from the CLIs, and execute different business logic based on the query. It interfaces with the databases to find the right data, and returns it back to the user.
-It also interfaces with the Redis queues to start analysis jobs for LAVA
+It also interfaces with the Redis queues to start analysis jobs for LAVA. Please note that in the `docker-compose.yml` file is where you specify the api key for LAVA queries.
 
 ### Redis and Redis queues
 

@@ -24,6 +24,7 @@ var goCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(goCmd)
-	goCmd.Flags().String("path", ".", "Path to project")
+	// disabling go
+	// rootCmd.AddCommand(goCmd)
+	// goCmd.Flags().String("path", ".", "Path to project")
 }
