@@ -13,7 +13,7 @@ type CountDepResponse struct {
 func (a CountDepResponse) Display() {
 	for k, v := range a.DepList {
 		name, version, _ := utils.DecodeID(k)
-		fmt.Printf("%s==%s: %d\n", name, version, v)
+		fmt.Printf("%s==%s: %d dependencies\n", name, version, v)
 	}
 }
 

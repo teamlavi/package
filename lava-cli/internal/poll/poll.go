@@ -43,11 +43,29 @@ func New(id string, api string, dataType reflect.Type, csvName string) *Poller {
 }
 
 func (p *Poller) PollBlocking() {
+	fmt.Printf("Polling job %s\n", p.id)
+	chars := []string{"|", "/", "-", "\\"}
+
+	rotateInterval := 250
+	pollInterval := 5000
+
+	lastPoll := time.Now()
+
+	i := 0
+	timeToNextPoll := 0
+
+	lr := p.poll()
+	status := lr.GetStatusColor()
+
 	for {
-		lr := p.poll()
-		if lr.Status == "pending" {
-			lr.DisplayStatus()
-		} else {
+		if timeToNextPoll <= 0 {
+			lastPoll = time.Now()
+			timeToNextPoll = pollInterval
+			lr = p.poll()
+		}
+		fmt.Printf("\r%s status: %s as of %s", chars[i], status, lastPoll.Format(time.RFC1123))
+		if lr.Status != "pending" {
+			fmt.Println()
 			ok := lr.Display()
 			if ok {
 				csvData := lr.ToCSV()
@@ -55,7 +73,12 @@ func (p *Poller) PollBlocking() {
 			}
 			break
 		}
-		time.Sleep(1 * time.Second)
+		i += 1
+		if i >= len(chars) {
+			i = 0
+		}
+		time.Sleep(200 * time.Millisecond)
+		timeToNextPoll -= rotateInterval
 	}
 }
 

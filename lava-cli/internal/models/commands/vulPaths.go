@@ -17,20 +17,25 @@ func (a VulPathResponse) Display() {
 			vulName, vulVersion, _ := utils.DecodeID(vulPackageId)
 			fmt.Printf("\tVulnerable Package: %s==%s\n", vulName, vulVersion)
 			for _, path := range pathList {
-				fmt.Printf("\t\t%v", path)
+				fmt.Printf("\t\tPath Length: %d\n", len(path))
 			}
 		}
-
 	}
 }
 
 func (a VulPathResponse) ToCSV() [][]string {
-	// out := [][]string{
-	// 	{"packages"},
-	// }
-	// for _, v := range a.VulList {
-	// 	out = append(out, []string{v})
-	// }
-	// return out
-	return [][]string{}
+	out := [][]string{
+		{"name", "version", "vulnerable_dep_name", "vulnerable_dep_version", "path"},
+	}
+	for packageId, vulPackageData := range a.VulPath {
+		name, version, _ := utils.DecodeID(packageId)
+		for vulPackageId, pathList := range vulPackageData {
+			vulName, vulVersion, _ := utils.DecodeID(vulPackageId)
+			for _, path := range pathList {
+				newPath := IdArrayToStringArray(path)
+				out = append(out, []string{name, version, vulName, vulVersion, AnyArrayToString(newPath)})
+			}
+		}
+	}
+	return out
 }

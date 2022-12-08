@@ -13,31 +13,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// severitiesCmd represents the severities command
-var severitiesCmd = &cobra.Command{
-	Use:   "severities",
-	Short: "Return list of vulnerable packages and severity for each vulnerability",
+// packageDependenciesCmd represents the packageDependencies command
+var packageDependenciesCmd = &cobra.Command{
+	Use:   "packageDependencies",
+	Short: "Returns the dependency tree for specified packages",
 	Run: func(cmd *cobra.Command, args []string) {
 		client.
 			New().
 			Cmd(cmd).
-			Api("analysis/severities").
-			ResponseType(reflect.TypeOf(commands.SeveritiesResponse{})).
+			Api("analysis/package_dependencies").
+			ResponseType(reflect.TypeOf(commands.DependencyTreeResponse{})).
 			Requires(models.REQUIRES_PKG_LIST).
 			Run()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(severitiesCmd)
+	rootCmd.AddCommand(packageDependenciesCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// severitiesCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// packageDependenciesCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// severitiesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// packageDependenciesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

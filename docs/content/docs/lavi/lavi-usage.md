@@ -6,54 +6,110 @@ permalink: docs/lavi/usage.html
 
 LAVI is a tool built to help uncover hidden vulnerabilities that can be nested deeply inside a project's dependency tree.
 
-## General Usage:
 
-    lavi [command] --Flags
+Each command may have different options. Be sure to use `lavi [command] --help` to see what options are available before running.
 
-## Example commands:
-    
-    # Simple command to run Lavi on an node project. Make sure in the directory with the package-lock.json file
-    # In this example the npm command tells lavi you are working in npm
-    # The flag -s tells lavi to open up the UI element after running lavi
-    
-    lavi npm --show
+## Usage Notes
 
-    # This is an example with multiple flags lavi will only flag severities that it gets from the cve database
-    # that are filtered under critical or high danger
-    
-    lavi npm --critical --high
+In order to LAVI to work for a provided command, that package repository toolkit **must** be installed on the system. For example, in order to scan npm projects, npm must be installed. For pip, python must be installed. For poetry, poetry must be installed.
 
-    # This example is using the pip command if you would like to run lavi on a python project
-    # The severity tags work as usual so only low severity  vulnerabilities ignored and show pops the UI 
-    # write will write a tree to a file that will be available for the user to use and since write-with-vulns is used with 
-    # write command, lavi will also include vulnerabilities in the written tree file
-    
-    lavi pip --critical --high --medium -show -write -write-with-vulns
-<br><br>
+### UI
 
-Available Commands:
- | Commands: | Description: |
- | ----------- | - | 
- | completion | Generate the autocompletion script for the specified shell | 
-| help |       Help about any command and get description of what each command does|
-| npm  |       Run LAVI against an npm project by running the command when in the project directory|
-| pip  |       Run LAVI against a python project (using pip) by running the command when in the project directory|
-| poetry   |   Run LAVI against a python project (using poetry) to build the package-lock.json if your project doesn't have one by running the command when in the project directory |
+To learn more about how to use the UI and aided remediation, see the [UI Documentation](/docs/lavi/ui.html)
+
+## Persistent Flags
+
+These flags can be applied across all commands
+```bash
+      --critical           Only show critical severity vulnerabilities. Can be used alongside other severity filters
+  -h, --help               help for lavi
+      --high               Only show high severity vulnerabilities. Can be used alongside other severity filters
+      --low                Only show low severity vulnerabilities. Can be used alongside other severity filters
+      --medium             Only show medium severity vulnerabilities. Can be used alongside other severity filters
+      --no-scan            Ignore scanning the tree for vulnerabilities and only create the dependency tree
+      --package string     Run lavi on a single package. If provided along with version, will default to running in single package mode. This will also disable the ui if flag is provided
+      --remote string      Remote api url. Must start with http:// or https://, and must not end with a slash (default "http://vocation.cs.umd.edu/api")
+  -s, --show               Show ui
+      --version string     Run lavi on a single package. If provided along with package, will default to running in single package mode. This will also disable the ui if flag is provided
+  -w, --write              Write tree to a file      --write-with-vulns   When used with write, will include vulnerabilities in written tree
+```
+
+## Commands
+
+Quicklinks
+* [npm](#npm)
+* [pip](#pip)
+* [poetry](#poetry)
+* [Single Package Mode](#single-package-mode)
+
+### npm
+
+`npm` is used to run LAVI against an npm project. This requires npm being installed and accessible via running `npm` in a terminal, as well as a `package.json` in the project. If a `package-lock.json` file doesnt exist, it will be generated during the vulnerability scanning process.
+```bash
+lavi npm [flags]
+```
+
+#### npm specific flags
+```bash
+      --path string   Path to project folder (default ".")
+```
+
+#### Usage
+
+```bash
+lavi npm --critical # only show critical vulnerabilities found
+lavi npm --show # show ui
+lavi npm --path=/some/other/path --show # run lavi and show the ui for a project at /some/other/path
+```
+
+### pip
+
+`pip` is used to run LAVI against a python project. This requires python being installed. This also requires a `requirements.txt` file that enumerates the dependencies of the project.
+```bash
+lavi pip [flags]
+```
+
+#### pip specific flags
+```bash
+      --path string     Path to requirements.txt (default "requirements.txt")
+  -p, --python string   Path or alias to call python from (default "python")
+```
+
+The `--python` flag is provided since some python installations may force the user to call python via `python3` and the user hasn't aliased it. This is because LAVI uses `python -m pip` instead of directly calling `pip` to support multi-environment installations of python.
+
+#### Usage
+
+```bash
+lavi pip --medium --low # only show medium and low severity vulnerabilities found
+lavi pip --show # show ui
+lavi pip --path=my-reqs.txt --python="python3" --show # run lavi and show the ui for a project with requirements in a my-reqs.txt file and python being called from python3
+```
+
+### poetry
+
+`poetry` is used to run LAVI against a poetry project. This requires poetry being installed. This also requires a `pyproject.toml` that is generated by poetry. If a `poetry.lock` file doesnt exist, it will be generated during the vulnerability scanning process.
+```bash
+lavi poetry [flags]
+```
 
 
-<br><br>
+#### poetry specific flags
+```bash
+      --path string   Path to project folder (default ".")
+```
 
-Available Flags:
-| Flags: | Description: |
-| ---------------------------    |----------------------------------------------------------- |
-| `--critical`  |  Only show critical severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--high, --medium, --low] to also show vulnerabilities based on severity. |
-| `-h, --help` |               If you need help with LAVI documentation, run the command to view all possible Flags.     |
-| `--high`     |          Only show high-severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --medium, --low] as other filters for vulnerabilities.|
-| `--medium `   |         Only show medium severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --high, --low] as other filters for vulnerabilities.|
-| `--low`       |         Only show low severity vulnerabilities that have been found using GitHub Advisories. Can be used alongside [--critical, --high, --medium] as other filters for vulnerabilities.|
-| `--no-scan`   |         Ignore scanning the tree for vulnerabilities and only create the dependency tree  |
-| `--package string`   |   Run lavi on a single package. If provided along with the version, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
-| `-s, --show`     |          Show a UI representation of the vulnerabilities that have been found. Using this UI the user will be able to experiment with different combinations of package versions to try and eliminate the vulnerabilities that were found in the packages they are currently using. These changes to package versions can also be deployed immediately locally by running update packages.  |
-| `--version string`   |  Run lavi on a single package. If provided along with the package, will default to running in a single package mode. This will also disable the UI if the flag is provided. |
-| `-w, --write`        |       Write tree to a file that will be available for the user to use. |
-| `--write-with-vulns`  |  When used with write, will also include vulnerabilities in the written tree file that will be available for the user.|
+#### Usage
+
+```bash
+lavi poetry --high --low # only show high and low severity vulnerabilities found
+lavi poetry --show # show ui
+lavi poetry --path=/some/other/path --show # run lavi and show the ui for a project at /some/other/path
+```
+
+### Single Package Mode
+
+To allow experimentation with single packages, the LAVI cli supports running LAVI against a single package. For `poetry` and `npm`, all you have to do is
+```bash
+lavi [poetry|npm] --package="MY_PACKAGE" --version="MY_VERSION"
+```
+For `pip`, you can do the same thing but you may have to provide the `--python` flag detailed in the [pip documentation](#pip-specific-flags)

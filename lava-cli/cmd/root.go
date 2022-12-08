@@ -1,17 +1,6 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Copyright © 2022 LAVI Product Owners (James Purtilo and Guido Ambasz)
+and the LAVI Development Team (Levi Lutz, Preetham Rudraraju, Paul Kolbeck, Tucker Siegel, John Perret, Quan Yuan, and Edson Cortes Rivera)
 */
 package cmd
 
@@ -39,9 +28,9 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().String("api-key", "", "Lava backend api key")
-	rootCmd.PersistentFlags().StringP("repo", "r", "", "Repo to run analysis on (pip, npm, or go)")
-	rootCmd.PersistentFlags().String("status", "", "Vulnerability status to look at (active, patched, or all)")
-	rootCmd.PersistentFlags().String("level", "", "Vulnerability depth levels to look at (direct, indirect, or all)")
+	rootCmd.PersistentFlags().StringP("repo", "r", "", "Repo to run analysis on")
+	// rootCmd.PersistentFlags().String("status", "", "Vulnerability status to look at (active, patched, or all)")
+	// rootCmd.PersistentFlags().String("level", "", "Vulnerability depth levels to look at (direct, indirect, or all)")
 	rootCmd.PersistentFlags().StringSlice("packages", []string{}, "Packages to look at")
 	rootCmd.PersistentFlags().String("csv", "lava-response.csv", "Save to csv file")
 	rootCmd.PersistentFlags().String("remote", "http://vocation.cs.umd.edu/api", "Remote api url. Must start with http:// or https://, and not end with a slash")

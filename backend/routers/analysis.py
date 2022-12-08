@@ -139,26 +139,6 @@ def get_depth(jobID: str) -> api_models.LavaResponse:
     return _handle_get_job(jobID, parse_result)
 
 
-# 6.) numDownloads - Returns a list with the number of downloads for each
-# package included.
-@router.post("/num_downloads")
-def post_num_downloads(
-    lava_request: api_models.LavaRequest,
-) -> api_models.LavaResponse:
-    if not lava_request.packages:
-        return api_models.lava_failure("Error! No package list was given!")
-
-    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
-
-
-@router.get("/num_downloads")
-def get_num_downloads(jobID: str) -> api_models.LavaResponse:
-    def parse_result(job_result: Any) -> Any:
-        return api_models.NumDownloadsResponse(downloads=job_result)
-
-    return _handle_get_job(jobID, parse_result)
-
-
 # 7.) Severities - Return list of vulnerable packages and severity for each
 # vulnerability.
 @router.post("/severities")
@@ -272,17 +252,137 @@ def get_tree_depth(jobID: str) -> api_models.LavaResponse:
     return _handle_get_job(jobID, parse_result)
 
 
-@router.post("/all_package_dependency_count")
-def post_all_package_dependency_count(
+# 13.) treeBreadth - Return the breadth of the dependency tree.
+@router.post("/tree_breadth")
+def post_tree_breadth(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_tree_breadth, lava_request.packages)
+
+
+@router.get("/tree_breadth")
+def get_tree_breadth(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.TreeBreadthsResponse(breadths=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+# 14.) Package dependencies - return the dependency tree of packages
+@router.post("/package_dependencies")
+def post_package_dependencies(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_pkg_dependencies, lava_request.packages)
+
+
+@router.get("/package_dependencies")
+def get_package_dependencies(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.DependencyTreeResponse(depTrees=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+# 15.) Vulnerabilities - return all vulnerabilities
+@router.post("/get_all_vulnerabilities")
+def post_get_all_vulnerabilities(
     lava_request: api_models.LavaRequest,
 ) -> api_models.LavaResponse:
 
-    return _handle_enqueue(queries.get_all_package_dependency_num)
+    return _handle_enqueue(queries.get_all_vulnerabilities)
 
 
-@router.get("/all_package_dependency_count")
-def get_tree_depth(jobID: str) -> api_models.LavaResponse:
+@router.get("/get_all_vulnerabilities")
+def get_get_all_vulnerabilities(jobID: str) -> api_models.LavaResponse:
     def parse_result(job_result: Any) -> Any:
-        return api_models.allPackageDependenciesResponse(depCount=job_result)
+        return api_models.AllVulnerabilitiesResponse(
+            allVulns={
+                repo: [
+                    api_models.CveData(
+                        cve_id=rcve.cve_id,
+                        severity=rcve.severity,
+                        description=rcve.description,
+                        cwe=rcve.cwe,
+                        url=rcve.url,
+                        repo_name=rcve.repo_name,
+                        pkg_name=rcve.pkg_name,
+                        pkg_vers=rcve.pkg_vers,
+                        univ_hash=rcve.univ_hash,
+                        first_patched_vers=rcve.first_patched_vers,
+                    )
+                    for rcve in rcves
+                ]
+                for repo, rcves in job_result.items()
+            }
+        )
+
+    return _handle_get_job(jobID, parse_result)
+
+
+# 16.) Get Affected by CVE
+@router.post("/affected_by_cve")
+def post_affected_by_cve(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Note the packages list should contain cve ids."""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(
+        queries.get_affected_packages_cve, lava_request.repo, lava_request.packages
+    )
+
+
+@router.get("/affected_by_cve")
+def get_affected_by_cve(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.AffectedByCVECountResponse(pkgsAffected=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+
+@router.post("/num_downloads")
+def post_num_downloads(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure hash was sent"""
+    if not lava_request.packages:
+        return api_models.lava_failure("Error! LavaRequest did not recieve a package!")
+
+    return _handle_enqueue(queries.get_num_downloads, lava_request.packages)
+
+
+@router.get("/num_downloads")
+def get_num_downloads(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        return api_models.NumDownloadsResponse(downloads=job_result)
+
+    return _handle_get_job(jobID, parse_result)
+
+@router.post("/dependency_stats")
+def post_dependency_stats(
+    lava_request: api_models.LavaRequest,
+) -> api_models.LavaResponse:
+    """Check to make sure repo was sent"""
+    if not lava_request.repo:
+        #return _handle_enqueue(queries.get_dependency_stats_all)
+        return api_models.lava_failure("Error! LavaRequest did not recieve a repo!")
+
+    return _handle_enqueue(queries.get_dependency_stats, lava_request.repo)
+
+
+@router.get("/dependency_stats")
+def get_vulnerable_packages(jobID: str) -> api_models.LavaResponse:
+    def parse_result(job_result: Any) -> Any:
+        mean1, stdev1, median1, mode1 = job_result
+        return api_models.DependencyStats(mean=mean1, stdDev=stdev1,  median=median1, mode=mode1)
 
     return _handle_get_job(jobID, parse_result)
