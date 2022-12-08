@@ -18,13 +18,14 @@ import (
 
 // going to be responsible for sending requests
 type Client struct {
-	allowNoRepo  bool
-	remote       string
-	api          string
-	apiKey       string
-	cmd          *cobra.Command
-	responseType reflect.Type
-	requires     []models.Requires
+	allowNoRepo     bool
+	remote          string
+	api             string
+	apiKey          string
+	cmd             *cobra.Command
+	responseType    reflect.Type
+	requires        []models.Requires
+	fillPkgsFromCve bool
 }
 
 func New() *Client {
@@ -33,6 +34,11 @@ func New() *Client {
 
 func (c *Client) Cmd(cmd *cobra.Command) *Client {
 	c.cmd = cmd
+	return c
+}
+
+func (c *Client) FillPkgsFromCve() *Client {
+	c.fillPkgsFromCve = true
 	return c
 }
 
@@ -107,7 +113,8 @@ func (c *Client) Run() {
 	c.setApiKey()
 	c.setRemote()
 
-	request, err := models.BuildLavaRequest(c.cmd, c.allowNoRepo, c.requires...)
+	request, err := models.BuildLavaRequest(c.cmd, c.allowNoRepo, c.fillPkgsFromCve, c.requires...)
+	fmt.Println(request)
 	if err != nil {
 		panic(err)
 	}
@@ -129,7 +136,7 @@ func (c *Client) Run() {
 
 	csvName, _ := c.cmd.Flags().GetString("csv")
 	// eventually need to include the auth code
-	poller := poll.New(id, c.remoteUrl(), c.responseType, csvName)
+	poller := poll.New(id, c.remoteUrl(), c.apiKey, c.responseType, csvName)
 	poller.PollBlocking()
 }
 
@@ -145,9 +152,23 @@ func (c *Client) sendPost(body *models.LavaRequest) (*http.Response, error) {
 	if err != nil {
 		panic("unknown error occured while sending post request")
 	}
-	// eventually need to include the auth code
-	resp, err := http.Post(c.remoteUrl(), "application/json",
-		bytes.NewBuffer(json_data))
+
+	req, err := http.NewRequest("POST", c.remoteUrl(), bytes.NewBuffer(json_data))
+	if err != nil {
+		panic("unknown error occured while sending post request")
+	}
+
+	client := &http.Client{}
+
+	req.Header = http.Header{
+		"Content-Type":  {"application/json"},
+		"Authorization": {fmt.Sprintf("Bearer %s", c.apiKey)},
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		panic("unknown error occured while sending post request")
+	}
 
 	return resp, err
 }

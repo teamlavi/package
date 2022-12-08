@@ -59,12 +59,27 @@ func getPackages(cmd *cobra.Command) []string {
 	return out
 }
 
-func BuildLavaRequest(cmd *cobra.Command, allowNoRepo bool, requires ...Requires) (*LavaRequest, error) {
+func fillPackagesFromCves(cmd *cobra.Command) []string {
+	v, err := cmd.Flags().GetStringSlice("cves")
+	if err != nil {
+		log.Fatal("failed to read cves flag")
+	}
+
+	return v
+}
+
+func BuildLavaRequest(cmd *cobra.Command, allowNoRepo bool, fillPackagesFromCvesBool bool, requires ...Requires) (*LavaRequest, error) {
+	var pkgs []string
+	if fillPackagesFromCvesBool {
+		pkgs = fillPackagesFromCves(cmd)
+	} else {
+		pkgs = getPackages(cmd)
+	}
 	lr := &LavaRequest{
 		Repo:     getRepo(cmd, allowNoRepo),
 		Status:   STATUS_ACTIVE,
 		Level:    LEVEL_BOTH,
-		Packages: getPackages(cmd),
+		Packages: pkgs,
 	}
 
 	for _, r := range requires {

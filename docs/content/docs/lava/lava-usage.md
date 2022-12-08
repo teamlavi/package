@@ -60,6 +60,7 @@ The flags `--repo` and `--api-key` are used in every command. **To get an api ke
 Each command has a specific way of showing results. They will also all write to a csv file, specifically the one provided by the `--csv` flag. Should that flag not be provided, the CLI will write to `lavi-response-####.csv`, where #### is a random 4 digit number. This helps prevent overwriting results.
 
 Quicklinks
+* [affectedByCve](#affectedbycve)
 * [affectedCount](#affectedcount)
 * [allPackages](#allpackages)
 * [count](#count)
@@ -75,6 +76,13 @@ Quicklinks
 * [types](#types)
 * [vulnerabilityPaths](#vulnerabilitypaths)
 * [vulnerablePackages](#vulnerablepackages)
+
+### affectedByCve
+
+`affectedByCve` returns the number of packages affected by vulnerabilities provided by the `--cves` flag.
+```bash
+lava -r [REPO] affectedByCve --cves="CVEID1,CVEID2,..."
+```
 
 ### affectedCount
 
