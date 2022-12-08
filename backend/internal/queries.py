@@ -1,6 +1,8 @@
 from daos import cve, dependencies
 from daos.database import get_db_tx
 from utils.utils import RepoEnum, decompress_tree
+from base64 import b64decode
+
 import pypistats
 
 async def find_vulnerabilities_simple(
