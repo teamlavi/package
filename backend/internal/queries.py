@@ -424,6 +424,8 @@ async def get_num_downloads(pkgs: list[str]) -> dict[str, str]:
     for pkg in pkgs:
         downloads = ""
         try:
+            pkg = pkg[pkg.index(":")+1:pkg.rindex(":")]
+            pkg = b64decode(pkg).decode()
             jsonDownloads = pypistats.overall(pkg, format="json")
             helper = jsonDownloads.split(']')[0]
             downloads = helper[helper.rfind('downloads'):-1]
