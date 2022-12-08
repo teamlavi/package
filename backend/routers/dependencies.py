@@ -1,9 +1,16 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from utils.config import AUTH_CODE
 
 
-def verify_code(auth_code: str) -> None:
+security = HTTPBearer()
+
+
+def verify_code(credentials: HTTPAuthorizationCredentials = Security(security)) -> None:
     """Verify that the given code is valid."""
-    if auth_code != AUTH_CODE:
+    print(credentials.scheme, credentials.credentials)
+    if credentials.scheme != "Bearer":
+        raise HTTPException(status_code=401, detail="Use Bearer auth")
+    if credentials.credentials != AUTH_CODE:
         raise HTTPException(status_code=401, detail="Invalid auth code")
