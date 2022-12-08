@@ -39,6 +39,10 @@ sudo crontab -e
 ```
 And then comenting out the line for the `sync.sh` script
 
+## Configuration
+
+One important configuration parameter is the api-key parameter. In the `package/docker-compose.yml` file, under `services.backend`, you can set `AUTH_CODE` to be whatever value you want it to be. This token is what is given as the `--api-key` parameter in the [LAVA CLI](/docs/lava/usage.html)
+
 
 ## Troubleshooting
 
