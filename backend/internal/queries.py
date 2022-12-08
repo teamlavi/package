@@ -139,13 +139,6 @@ async def get_vulnerability_depths(
         all_vuln_depths[univ_hash] = vulns
     return all_vuln_depths
 
-
-# 6
-async def get_num_downloads(univ_hashes: list[str]) -> dict[str, int]:
-    """Get the number of downloads for a package."""
-    return {univ_hash: 0 for univ_hash in univ_hashes}
-
-
 # 7
 async def get_pkg_severity(pkgs: list[str]) -> dict[str, list[str]]:
     """Get the severities of the package vulnerabilities."""
