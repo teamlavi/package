@@ -64,6 +64,34 @@ const Downloads = () => {
                     Windows AMD64: <a href="/downloads/lavi/lavi-cli-windows-amd64.zip">Download</a>
 				</Typography>
 			</div>
+            <div style={{padding: "0 4em"}}>
+				<Typography 
+					variant="h1" 
+					component="h1" 
+					sx={{
+						fontSize: '45px',
+						lineHeight: 'normal',
+						letterSpacing: '2px',
+						fontWeight: 600,
+					}}>
+						LAVA Downloads
+				</Typography>
+				<Typography style={{paddingTop: "2em"}}>
+                    MacOS (M series CPU): <a href="/downloads/lava/lava-cli-darwin-arm64.zip">Download</a>
+				</Typography>
+				<Typography style={{paddingTop: "2em"}}>
+                    MacOS (Intel CPU): <a href="/downloads/lava/lava-cli-darwin-amd64.zip">Download</a>
+				</Typography>
+				<Typography style={{paddingTop: "2em"}}>
+                    Linux AMD64: <a href="/downloads/lava/lava-cli-linux-amd64.zip">Download</a>
+				</Typography>
+				<Typography style={{paddingTop: "2em"}}>
+                    Linux ARM64: <a href="/downloads/lava/lava-cli-linux-arm64.zip">Download</a>
+				</Typography>
+				<Typography style={{paddingTop: "2em"}}>
+                    Windows AMD64: <a href="/downloads/lava/lava-cli-windows-amd64.zip">Download</a>
+				</Typography>
+			</div>
 	</Layout>
 }
 
