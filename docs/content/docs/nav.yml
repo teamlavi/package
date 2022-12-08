@@ -16,6 +16,9 @@
     - id: lavi-usage
       title: LAVI Usage
       path: /docs/lavi/usage.html
+    - id: lavi-ui
+      title: LAVI UI
+      path: /docs/lavi/ui.html
 - title: LAVA
   isOrdered: false
   items:

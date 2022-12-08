@@ -13,6 +13,10 @@ Each command may have different options. Be sure to use `lavi [command] --help` 
 
 In order to LAVI to work for a provided command, that package repository toolkit **must** be installed on the system. For example, in order to scan npm projects, npm must be installed. For pip, python must be installed. For poetry, poetry must be installed.
 
+### UI
+
+To learn more about how to use the UI and aided remediation, see the [UI Documentation](/docs/lavi/ui.html)
+
 ## Persistent Flags
 
 These flags can be applied across all commands
